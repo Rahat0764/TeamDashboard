@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
   try {
     switch (action) {
       case 'update_app_settings':
-        await sb.from('app_settings').update(payload).eq('id', 1).throwOnError();
+        await sb.from('app_settings').upsert({ id: 1, ...payload }).throwOnError();
         return res.status(200).json({ ok: true });
       case 'create_team':
         const { data: tData } = await sb.from('teams').insert([payload]).select().throwOnError();
@@ -33,10 +33,10 @@ module.exports = async (req, res) => {
         await sb.from('match_results').upsert([payload], { onConflict: 'match_id,team_id' }).throwOnError();
         return res.status(200).json({ ok: true });
       case 'update_point_settings':
-        await sb.from('point_settings').update(payload).eq('id', 1).throwOnError();
+        await sb.from('point_settings').upsert({ id: 1, ...payload }).throwOnError();
         return res.status(200).json({ ok: true });
       case 'update_bkash_numbers':
-        await sb.from('bkash_numbers').update({ numbers: payload.numbers }).eq('id', 1).throwOnError();
+        await sb.from('bkash_numbers').upsert({ id: 1, numbers: payload.numbers }).throwOnError();
         return res.status(200).json({ ok: true });
       case 'approve_payment':
         await sb.from('payments').update({ status: 'approved' }).eq('id', payload.id).throwOnError();
