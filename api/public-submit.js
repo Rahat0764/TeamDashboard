@@ -2,6 +2,9 @@ const { getAdminClient, sendTelegram, refId } = require('../lib/server');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  
+  if (JSON.stringify(req.body).length > 50000) return res.status(400).json({error: 'Payload too large'});
+
   const sb = getAdminClient();
   const { action, payload } = req.body || {};
 
