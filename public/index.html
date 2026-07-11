@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en" class="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>QE Scrim | Team Management</title>
+<title>QE Scrim | Dashboard</title>
 <meta name="theme-color" content="#0a0a0f">
+<script>
+  if (localStorage.getItem('qe_theme') === 'light') document.documentElement.classList.remove('dark');
+  else document.documentElement.classList.add('dark');
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,79 +16,97 @@
 <link rel="icon" href="/assets/logo-transparent.png">
 <script>
 tailwind.config = {
+  darkMode: 'class',
   theme: { extend: {
-    fontFamily: { display: ['"Rajdhani"','sans-serif'], body: ['"Hind Siliguri"','"Inter"','sans-serif'] },
+    fontFamily: { display: ['"Rajdhani"','sans-serif'], body: ['"Inter"','"Hind Siliguri"','sans-serif'] },
     colors: { qeBg:'#0a0a0f', qeCard:'#131319', qeBorder:'#232330', qeRed:'#c8203d', qeRedDim:'#7a1428' }
   }}
 }
 </script>
 <style>
   * { -webkit-tap-highlight-color: transparent; }
-  html,body{ background:#0a0a0f; }
-  body { font-family:'Hind Siliguri','Inter',sans-serif; }
-  .disp { font-family:'Rajdhani',sans-serif; letter-spacing:.02em; }
-  .hide-scrollbar::-webkit-scrollbar{ display:none; } .hide-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
-  .cut-card{ clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px); }
-  .cut-card-sm{ clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
-  .glass{ background:rgba(19,19,25,.9); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
-  .mesh-lines{ background-image: repeating-linear-gradient(115deg, rgba(200,32,61,.09) 0 2px, transparent 2px 26px); }
-  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
-  .fade-in{ animation:fadeIn .45s cubic-bezier(.16,1,.3,1) forwards; }
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)} }
-  .scale-in{ animation:scaleIn .25s cubic-bezier(.16,1,.3,1) forwards; }
-  @keyframes scaleIn{ from{opacity:0; transform:scale(.92)} to{opacity:1; transform:scale(1)} }
-  .toast-in{ animation:toastIn .3s ease-out forwards; }
-  @keyframes toastIn{ from{opacity:0; transform:translateX(110%)} to{opacity:1; transform:translateX(0)} }
-  .glow-red{ box-shadow:0 0 0 1px rgba(200,32,61,.35), 0 8px 30px -8px rgba(200,32,61,.5); }
-  ::selection{ background:#c8203d; color:#fff; }
-  .rank-1{ background:linear-gradient(135deg,#7a5c00,#d4af37); }
-  .rank-2{ background:linear-gradient(135deg,#5c5c5c,#c0c0c0); }
-  .rank-3{ background:linear-gradient(135deg,#5c2e0e,#cd7f32); }
+  html,body { background: #f8fafc; transition: background 0.3s ease; }
+  html.dark, html.dark body { background: #0a0a0f; }
+  body { font-family: 'Inter', 'Hind Siliguri', sans-serif; }
+  .disp { font-family: 'Rajdhani', sans-serif; letter-spacing: .02em; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; } 
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .cut-card { clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px); }
+  .cut-card-sm { clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+  
+  .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: #e2e8f0; }
+  .dark .glass { background: rgba(19,19,25,0.9); border-color: #232330; }
+  
+  .mesh-lines { background-image: repeating-linear-gradient(115deg, rgba(200,32,61,.05) 0 2px, transparent 2px 26px); }
+  .dark .mesh-lines { background-image: repeating-linear-gradient(115deg, rgba(200,32,61,.09) 0 2px, transparent 2px 26px); }
+  
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  
+  .fade-in { animation: fadeIn .45s cubic-bezier(.16,1,.3,1) forwards; }
+  @keyframes fadeIn { from {opacity: 0; transform: translateY(14px)} to {opacity: 1; transform: translateY(0)} }
+  
+  .scale-in { animation: scaleIn .25s cubic-bezier(.16,1,.3,1) forwards; }
+  @keyframes scaleIn { from {opacity: 0; transform: scale(.92)} to {opacity: 1; transform: scale(1)} }
+  
+  .toast-in { animation: toastIn .3s ease-out forwards; }
+  @keyframes toastIn { from {opacity: 0; transform: translateX(110%)} to {opacity: 1; transform: translateX(0)} }
+  
+  ::selection { background: #c8203d; color: #fff; }
+  .rank-1 { background: linear-gradient(135deg,#7a5c00,#d4af37); color: #fff; }
+  .rank-2 { background: linear-gradient(135deg,#5c5c5c,#c0c0c0); color: #fff; }
+  .rank-3 { background: linear-gradient(135deg,#5c2e0e,#cd7f32); color: #fff; }
 </style>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col overflow-hidden h-screen">
+<body class="text-slate-900 dark:text-slate-100 min-h-screen flex flex-col overflow-hidden h-screen">
 
-<header class="glass z-40 shrink-0 border-b border-qeBorder px-4 py-3 relative mesh-lines">
+<header class="glass z-40 shrink-0 border-b px-4 py-3 relative mesh-lines transition-colors duration-300">
   <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
     <div class="flex items-center gap-3 min-w-0">
       <img src="/assets/logo-transparent.png" class="w-10 h-10 object-contain shrink-0" alt="QE">
       <div class="min-w-0">
-        <h1 class="disp text-xl font-bold text-white leading-none tracking-wide">QE <span class="text-qeRed">SCRIM</span></h1>
-        <p class="text-[10px] text-slate-500 font-semibold tracking-widest uppercase">Team Management</p>
+        <h1 class="disp text-xl font-bold text-slate-900 dark:text-white leading-none tracking-wide transition-colors">QE <span class="text-qeRed">SCRIM</span></h1>
+        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold tracking-widest uppercase transition-colors">Dashboard</p>
       </div>
     </div>
-    <button id="adminBtn" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-lg border border-qeRed/30 active:scale-95 transition-transform shrink-0">
-      <i data-lucide="shield" class="w-4 h-4"></i> <span id="adminBtnText">এডমিন</span>
-    </button>
+    <div class="flex items-center gap-2 shrink-0">
+      <button id="themeToggleBtn" class="flex items-center justify-center w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 active:scale-95 transition-all duration-300">
+        <i data-lucide="sun" class="absolute transition-all duration-500 transform scale-0 rotate-90 dark:scale-100 dark:rotate-0 w-4 h-4"></i>
+        <i data-lucide="moon" class="absolute transition-all duration-500 transform scale-100 rotate-0 dark:scale-0 dark:-rotate-90 w-4 h-4"></i>
+      </button>
+      <button id="adminBtn" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-lg border border-qeRed/30 active:scale-95 transition-transform">
+        <i data-lucide="shield" class="w-4 h-4"></i> <span id="adminBtnText">Admin</span>
+      </button>
+    </div>
   </div>
 </header>
 
-<div class="w-full glass border-b border-qeBorder py-1.5 shrink-0">
-  <p class="text-center text-[11px] text-slate-500">
-    Developed by <a href="https://linkedin.com/in/RahatAhmedX" target="_blank" class="text-qeRed font-semibold hover:underline">Rahat</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/Rahat0764" target="_blank" class="text-slate-400 font-semibold hover:text-white inline-flex items-center gap-1">
-      <i data-lucide="github" class="w-3 h-3"></i> GitHub
+<div class="w-full glass border-b py-2 shrink-0 transition-colors duration-300">
+  <div class="flex items-center justify-center gap-2 text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+    <span>Developed by <a href="https://linkedin.com/in/RahatAhmedX" target="_blank" class="text-qeRed font-semibold hover:underline">Rahat</a></span>
+    <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+    <a href="https://github.com/Rahat0764" target="_blank" class="font-semibold hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      GitHub
     </a>
-  </p>
+  </div>
 </div>
 
 <div id="main-scroll" class="flex-1 overflow-y-auto w-full pb-28 pt-4 px-4 md:px-6 hide-scrollbar">
   <main id="app" class="max-w-6xl mx-auto fade-in"></main>
 </div>
 
-<nav class="glass z-40 fixed bottom-0 left-0 w-full border-t border-qeBorder pb-safe">
+<nav class="glass z-40 fixed bottom-0 left-0 w-full border-t pb-safe transition-colors duration-300">
   <div class="max-w-6xl mx-auto flex justify-around items-center h-16 px-1">
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">ড্যাশবোর্ড</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="teams"><i data-lucide="swords" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">টিম</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="standings"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">স্ট্যান্ডিংস</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="payments"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">পেমেন্ট</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="activity"><i data-lucide="activity" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">লগ</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">Dashboard</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="teams"><i data-lucide="swords" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">Teams</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="standings"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">Standings</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="payments"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">Payments</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="activity"><i data-lucide="activity" class="w-5 h-5"></i><span class="text-[10px] disp font-bold">Logs</span></button>
   </div>
 </nav>
 
-<div id="modalContainer" class="fixed inset-0 bg-black/85 z-50 hidden flex justify-center items-center px-4 backdrop-blur-sm overflow-y-auto py-8"></div>
-<div id="toast-container" class="fixed top-20 right-4 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+<div id="modalContainer" class="fixed inset-0 bg-slate-900/60 dark:bg-black/85 z-50 hidden flex justify-center items-center px-4 backdrop-blur-sm overflow-y-auto py-8 transition-colors"></div>
+<div id="toast-container" class="fixed top-24 right-4 z-[60] flex flex-col gap-2 pointer-events-none"></div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/+esm';
@@ -94,14 +116,14 @@ let activeTab = localStorage.getItem('qe_tab') || 'dashboard';
 let adminToken = localStorage.getItem('qe_admin_token') || null;
 let isAdmin = !!adminToken;
 
-let data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [] };
+let data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [], appSettings: null };
 let selectedMatchId = null;
 
 const showToast = (msg, type='success') => {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
-  const colors = type==='success' ? 'bg-emerald-600' : (type==='error' ? 'bg-qeRed' : 'bg-slate-700');
-  t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-white ${colors} text-sm font-semibold max-w-xs`;
+  const colors = type==='success' ? 'bg-emerald-600' : (type==='error' ? 'bg-qeRed' : 'bg-slate-800');
+  t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-white ${colors} text-sm font-semibold max-w-xs border border-white/10`;
   t.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5 shrink-0"></i><span>${msg}</span>`;
   c.appendChild(t); lucide.createIcons();
   setTimeout(()=>{ t.style.opacity='0'; t.style.transition='.3s'; setTimeout(()=>t.remove(),300); }, 3200);
@@ -110,16 +132,16 @@ const showToast = (msg, type='success') => {
 const copyText = async (text, label) => {
   try {
     await navigator.clipboard.writeText(text);
-    showToast(`${label} কপি হয়েছে!`);
+    showToast(`${label} copied!`);
   } catch(e){
     const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); ta.remove(); showToast(`${label} কপি হয়েছে!`);
+    document.execCommand('copy'); ta.remove(); showToast(`${label} copied!`);
   }
 };
 
 const showModal = (html) => {
   const mc = document.getElementById('modalContainer');
-  mc.innerHTML = `<div class="glass w-full max-w-md rounded-2xl p-6 border border-qeBorder fade-in shadow-2xl relative my-auto max-h-[85vh] overflow-y-auto hide-scrollbar">${html}</div>`;
+  mc.innerHTML = `<div class="bg-white dark:bg-[#131319] w-full max-w-md rounded-2xl p-6 border border-slate-200 dark:border-qeBorder fade-in shadow-2xl relative my-auto max-h-[85vh] overflow-y-auto hide-scrollbar text-slate-900 dark:text-white transition-colors">${html}</div>`;
   mc.classList.remove('hidden');
   lucide.createIcons();
   mc.onclick = (e) => { if(e.target === mc) hideModal(); };
@@ -135,35 +157,37 @@ async function api(action, payload) {
   });
   const json = await res.json();
   if(!res.ok){
-    if(res.status === 401){ doLogout(); showToast('সেশন শেষ, আবার লগইন করুন', 'error'); }
-    throw new Error(json.error || 'এরর হয়েছে');
+    if(res.status === 401){ doLogout(); showToast('Session expired, please login again', 'error'); }
+    throw new Error(json.error || 'Server error occurred');
   }
   return json;
 }
 
 async function loadAll() {
   try {
-    const [t, m, r, s, p, l, n] = await Promise.all([
+    const [t, m, r, s, p, l, n, as] = await Promise.all([
       supabase.from('teams').select('*').order('created_at'),
       supabase.from('matches').select('*').order('match_no'),
       supabase.from('match_results').select('*'),
       supabase.from('point_settings').select('*').eq('id',1).single(),
       supabase.from('payments').select('*').order('created_at', { ascending: false }),
       supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(60),
-      supabase.from('bkash_numbers').select('*').eq('id',1).single()
+      supabase.from('bkash_numbers').select('*').eq('id',1).single(),
+      supabase.from('app_settings').select('*').eq('id',1).single()
     ]);
     data.teams = t.data || []; data.matches = m.data || []; data.results = r.data || [];
     data.settings = s.data || { kill_point_value:1, position_table:{} };
     data.payments = p.data || []; data.logs = l.data || [];
     data.numbers = (n.data && n.data.numbers) || [];
+    data.appSettings = as.data || { title: 'QE SCRIM Dashboard', description: 'Manage teams, standings, and payments all in one place.' };
     if(!selectedMatchId && data.matches.length) selectedMatchId = data.matches[data.matches.length-1].id;
-  } catch(e) { showToast('ডাটা লোড করতে সমস্যা হয়েছে', 'error'); }
+  } catch(e) { showToast('Failed to load data', 'error'); }
 }
 
 function updateNav(){
   document.querySelectorAll('.nav-btn').forEach(b=>{
-    if(b.dataset.tab === activeTab){ b.classList.add('text-qeRed'); b.classList.remove('text-slate-500'); }
-    else { b.classList.remove('text-qeRed'); b.classList.add('text-slate-500'); }
+    if(b.dataset.tab === activeTab){ b.classList.add('text-qeRed'); b.classList.remove('text-slate-500', 'dark:text-slate-500'); }
+    else { b.classList.remove('text-qeRed'); b.classList.add('text-slate-500', 'dark:text-slate-500'); }
   });
 }
 
@@ -177,13 +201,13 @@ function render(){
   lucide.createIcons();
   attachListeners();
   updateNav();
-  document.getElementById('adminBtnText').innerText = isAdmin ? 'লগআউট' : 'এডমিন';
+  document.getElementById('adminBtnText').innerText = isAdmin ? 'Logout' : 'Admin';
 }
 
 function statCard(label, value, icon, grad){
-  return `<div class="cut-card ${grad} p-5 relative overflow-hidden shadow-xl">
+  return `<div class="cut-card ${grad} p-5 relative overflow-hidden shadow-lg border border-white/10">
     <i data-lucide="${icon}" class="absolute -right-3 -bottom-3 w-24 h-24 text-white/10"></i>
-    <span class="text-[10px] font-bold uppercase tracking-widest text-white/70 block mb-1">${label}</span>
+    <span class="text-[10px] font-bold uppercase tracking-widest text-white/80 block mb-1">${label}</span>
     <h3 class="text-3xl font-bold disp text-white relative z-10">${value}</h3>
   </div>`;
 }
@@ -194,28 +218,34 @@ function buildDashboard(){
   const pendingCount = data.payments.filter(p=>p.status==='pending').length;
   const totalMatches = data.matches.length;
 
-  let html = `<div class="mb-6 cut-card mesh-lines bg-gradient-to-br from-qeRedDim via-qeCard to-qeCard border border-qeBorder p-6 relative overflow-hidden">
-    <img src="/assets/logo-transparent.png" class="absolute -right-4 -top-6 w-40 opacity-20">
-    <p class="text-qeRed font-bold text-xs uppercase tracking-widest mb-1">Welcome</p>
-    <h2 class="disp text-3xl font-bold text-white mb-2">QE SCRIM কন্ট্রোল রুম</h2>
-    <p class="text-sm text-slate-400 max-w-md">টিম, স্ট্যান্ডিংস এবং পেমেন্ট — সব একজায়গায় ম্যানেজ করুন। ${isAdmin ? 'আপনি এডমিন মোডে আছেন।' : 'বিস্তারিত দেখতে নিচের ট্যাব থেকে যেকোনো সেকশনে যান।'}</p>
+  let html = `<div class="mb-6 cut-card mesh-lines bg-gradient-to-br from-qeRedDim/10 to-white dark:to-qeCard border border-slate-200 dark:border-qeBorder p-6 relative overflow-hidden shadow-sm transition-colors">
+    <img src="/assets/logo-transparent.png" class="absolute -right-4 -top-6 w-40 opacity-[0.08] dark:opacity-20 pointer-events-none">
+    <div class="flex justify-between items-start relative z-10">
+      <div>
+        <p class="text-qeRed font-bold text-xs uppercase tracking-widest mb-1">Welcome</p>
+        <h2 class="disp text-3xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">${data.appSettings.title}</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 max-w-md transition-colors">${data.appSettings.description}</p>
+        ${isAdmin ? `<p class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1"><i data-lucide="shield-check" class="w-3 h-3"></i> Admin Mode Active</p>` : ''}
+      </div>
+      ${isAdmin ? `<button id="editSettingsBtn" class="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 p-2 rounded-lg active:scale-95"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
+    </div>
   </div>`;
 
   html += `<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-    ${statCard('মোট টিম', totalTeams, 'swords', 'bg-gradient-to-br from-indigo-600 to-indigo-800')}
-    ${statCard('মোট ম্যাচ', totalMatches, 'gamepad-2', 'bg-gradient-to-br from-qeRed to-qeRedDim')}
-    ${statCard('মোট ফান্ড', '৳'+totalFund, 'wallet', 'bg-gradient-to-br from-emerald-600 to-emerald-800')}
-    ${statCard('পেন্ডিং পেমেন্ট', pendingCount, 'clock', 'bg-gradient-to-br from-amber-600 to-amber-800')}
+    ${statCard('Total Teams', totalTeams, 'swords', 'bg-gradient-to-br from-indigo-500 to-indigo-700')}
+    ${statCard('Total Matches', totalMatches, 'gamepad-2', 'bg-gradient-to-br from-qeRed to-qeRedDim')}
+    ${statCard('Total Fund', '৳'+totalFund, 'wallet', 'bg-gradient-to-br from-emerald-500 to-emerald-700')}
+    ${statCard('Pending Pay', pendingCount, 'clock', 'bg-gradient-to-br from-amber-500 to-amber-700')}
   </div>`;
 
-  html += `<div class="cut-card bg-qeCard border border-qeBorder overflow-hidden">
-    <div class="p-4 border-b border-qeBorder flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-qeRed"></i><h3 class="font-bold disp tracking-wide">সাম্প্রতিক অ্যাক্টিভিটি</h3></div>
-    <div class="divide-y divide-qeBorder max-h-80 overflow-y-auto hide-scrollbar">
+  html += `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder overflow-hidden shadow-sm transition-colors">
+    <div class="p-4 border-b border-slate-200 dark:border-qeBorder flex items-center gap-2 transition-colors"><i data-lucide="activity" class="w-4 h-4 text-qeRed"></i><h3 class="font-bold disp tracking-wide">Recent Activity</h3></div>
+    <div class="divide-y divide-slate-100 dark:divide-qeBorder max-h-80 overflow-y-auto hide-scrollbar transition-colors">
       ${data.logs.slice(0,8).map(l=>`
-        <div class="p-4 flex gap-3">
+        <div class="p-4 flex gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
           <div class="w-8 h-8 rounded-lg bg-qeRed/10 text-qeRed flex items-center justify-center shrink-0"><i data-lucide="bell" class="w-4 h-4"></i></div>
-          <div class="min-w-0"><p class="text-sm font-semibold">${l.action}</p><p class="text-xs text-slate-400 mt-0.5">${l.details}</p><p class="text-[10px] text-slate-600 mt-1">${new Date(l.created_at).toLocaleString('bn-BD')}</p></div>
-        </div>`).join('') || '<div class="p-8 text-center text-slate-500 text-sm">কোনো অ্যাক্টিভিটি নেই</div>'}
+          <div class="min-w-0"><p class="text-sm font-semibold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${l.details}</p><p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">${new Date(l.created_at).toLocaleString('en-US')}</p></div>
+        </div>`).join('') || '<div class="p-8 text-center text-slate-500 text-sm">No recent activity</div>'}
     </div>
   </div>`;
   return html;
@@ -223,37 +253,37 @@ function buildDashboard(){
 
 function buildTeams(){
   let html = `<div class="flex justify-between items-center mb-5">
-    <h2 class="disp text-2xl font-bold flex items-center gap-2"><i data-lucide="swords" class="w-6 h-6 text-qeRed"></i> টিম রোস্টার</h2>
-    ${isAdmin ? `<button id="addTeamBtn" class="bg-qeRed text-white px-3 py-2 rounded-lg text-xs font-bold cut-card-sm active:scale-95"><i data-lucide="plus" class="inline w-3 h-3"></i> নতুন টিম</button>` : ''}
+    <h2 class="disp text-2xl font-bold flex items-center gap-2"><i data-lucide="swords" class="w-6 h-6 text-qeRed"></i> Team Roster</h2>
+    ${isAdmin ? `<button id="addTeamBtn" class="bg-qeRed text-white px-3 py-2 rounded-lg text-xs font-bold cut-card-sm active:scale-95 shadow-lg shadow-qeRed/20"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Team</button>` : ''}
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
 
-  if(!data.teams.length) html += `<div class="col-span-full p-10 text-center text-slate-500 cut-card bg-qeCard border border-qeBorder">কোনো টিম যোগ করা হয়নি।</div>`;
+  if(!data.teams.length) html += `<div class="col-span-full p-10 text-center text-slate-500 cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder shadow-sm">No teams added yet.</div>`;
 
   html += data.teams.map(t=>{
     const main = t.main_players || []; const res = t.reserve_players || [];
-    return `<div class="cut-card bg-qeCard border border-qeBorder p-5 relative">
+    return `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder p-5 relative shadow-sm transition-colors">
       ${isAdmin ? `<div class="absolute top-4 right-4 flex gap-2">
-        <button class="edit-team-btn p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-qeRed" data-id="${t.id}"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-        <button class="del-team-btn p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-qeRed" data-id="${t.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        <button class="edit-team-btn p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-qeRed dark:hover:text-qeRed transition-colors" data-id="${t.id}"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+        <button class="del-team-btn p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-qeRed dark:hover:text-qeRed transition-colors" data-id="${t.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
       </div>` : ''}
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-11 h-11 rounded-lg bg-gradient-to-br from-qeRed to-qeRedDim flex items-center justify-center font-bold disp text-lg">${(t.slot_no||'?')}</div>
-        <div><h3 class="font-bold text-lg disp">${t.team_name}</h3><p class="text-[10px] text-slate-500 uppercase tracking-wider">স্লট ${t.slot_no ?? '-'}</p></div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-qeRed to-qeRedDim flex items-center justify-center font-bold disp text-xl text-white shadow-md">${(t.slot_no||'?')}</div>
+        <div><h3 class="font-bold text-xl disp text-slate-900 dark:text-white">${t.team_name}</h3><p class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Slot ${t.slot_no ?? '-'}</p></div>
       </div>
-      <div class="grid grid-cols-2 gap-3 mb-3 text-sm">
+      <div class="grid grid-cols-2 gap-3 mb-4 text-sm bg-slate-50 dark:bg-black/20 p-3 rounded-lg border border-slate-100 dark:border-white/5">
         <div>
-          <p class="text-[10px] font-bold text-emerald-500 uppercase mb-1">মূল ৪ জন</p>
-          ${main.map(p=>`<p class="text-slate-300 text-xs py-0.5">${p||'-'}</p>`).join('') || '<p class="text-slate-600 text-xs">-</p>'}
+          <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-1.5 flex items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i> Main</p>
+          ${main.map(p=>`<p class="text-slate-700 dark:text-slate-300 text-xs py-0.5">${p||'-'}</p>`).join('') || '<p class="text-slate-400 text-xs">-</p>'}
         </div>
         <div>
-          <p class="text-[10px] font-bold text-amber-500 uppercase mb-1">৫ম/রিজার্ভ</p>
-          ${res.map(p=>`<p class="text-slate-300 text-xs py-0.5">${p||'-'}</p>`).join('') || '<p class="text-slate-600 text-xs">-</p>'}
+          <p class="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase mb-1.5 flex items-center gap-1"><i data-lucide="user-plus" class="w-3 h-3"></i> Reserve</p>
+          ${res.map(p=>`<p class="text-slate-700 dark:text-slate-300 text-xs py-0.5">${p||'-'}</p>`).join('') || '<p class="text-slate-400 text-xs">-</p>'}
         </div>
       </div>
-      <div class="pt-3 border-t border-qeBorder flex items-center justify-between">
-        <div class="min-w-0"><p class="text-xs font-bold text-slate-300">${t.manager_name || 'ম্যানেজার নেই'}</p><p class="text-[10px] text-slate-500">IGN: ${t.manager_ign || '-'}</p></div>
-        ${t.manager_contact ? `<button class="copy-btn flex items-center gap-1 text-[11px] bg-slate-800 px-2 py-1.5 rounded-lg text-slate-300" data-copy="${t.manager_contact}" data-label="নাম্বার"><i data-lucide="copy" class="w-3 h-3"></i>${t.manager_contact}</button>` : ''}
+      <div class="pt-3 border-t border-slate-200 dark:border-qeBorder flex items-center justify-between transition-colors">
+        <div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-300">${t.manager_name || 'No Manager'}</p><p class="text-[10px] text-slate-500">IGN: ${t.manager_ign || '-'}</p></div>
+        ${t.manager_contact ? `<button class="copy-btn flex items-center gap-1.5 text-[11px] bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-medium" data-copy="${t.manager_contact}" data-label="Contact"><i data-lucide="copy" class="w-3 h-3"></i>${t.manager_contact}</button>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -262,7 +292,7 @@ function buildTeams(){
 }
 
 function buildStandings(){
-  const matchOptions = data.matches.map(m=>`<option value="${m.id}" ${m.id===selectedMatchId?'selected':''}>${m.match_label || ('ম্যাচ '+m.match_no)}</option>`).join('');
+  const matchOptions = data.matches.map(m=>`<option value="${m.id}" ${m.id===selectedMatchId?'selected':''}>${m.match_label || ('Match '+m.match_no)}</option>`).join('');
 
   const totals = {};
   data.teams.forEach(t=> totals[t.id] = { team:t, pos:0, kill:0, total:0 });
@@ -270,134 +300,141 @@ function buildStandings(){
   const overall = Object.values(totals).sort((a,b)=>b.total-a.total);
 
   let html = `<div class="flex justify-between items-center mb-5 flex-wrap gap-2">
-    <h2 class="disp text-2xl font-bold flex items-center gap-2"><i data-lucide="trophy" class="w-6 h-6 text-qeRed"></i> স্ট্যান্ডিংস</h2>
+    <h2 class="disp text-2xl font-bold flex items-center gap-2"><i data-lucide="trophy" class="w-6 h-6 text-qeRed"></i> Standings</h2>
     ${isAdmin ? `<div class="flex gap-2">
-      <button id="addMatchBtn" class="bg-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold cut-card-sm active:scale-95"><i data-lucide="plus" class="inline w-3 h-3"></i> ম্যাচ যোগ</button>
-      <button id="pointSettingsBtn" class="bg-slate-800 text-slate-200 px-3 py-2 rounded-lg text-xs font-bold cut-card-sm active:scale-95"><i data-lucide="settings" class="inline w-3 h-3"></i> পয়েন্ট সেটিং</button>
+      <button id="addMatchBtn" class="bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-3 py-2 rounded-lg text-xs font-bold cut-card-sm active:scale-95 transition-colors"><i data-lucide="plus" class="inline w-3 h-3"></i> Match</button>
+      <button id="pointSettingsBtn" class="bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-3 py-2 rounded-lg text-xs font-bold cut-card-sm active:scale-95 transition-colors"><i data-lucide="settings" class="inline w-3 h-3"></i> Points</button>
     </div>` : ''}
   </div>`;
 
-  html += `<div class="cut-card bg-qeCard border border-qeBorder mb-6 overflow-hidden">
-    <div class="p-4 border-b border-qeBorder flex justify-between items-center gap-2 flex-wrap">
-      <h3 class="font-bold disp">ওভারঅল টেবিল</h3>
+  html += `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder mb-6 overflow-hidden shadow-sm transition-colors">
+    <div class="p-4 border-b border-slate-200 dark:border-qeBorder flex justify-between items-center gap-2 flex-wrap transition-colors">
+      <h3 class="font-bold disp text-lg">Overall Leaderboard</h3>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm whitespace-nowrap">
-        <thead><tr class="text-slate-500 text-xs border-b border-qeBorder"><th class="p-3">র‍্যাংক</th><th class="p-3">টিম</th><th class="p-3">পজিশন পয়েন্ট</th><th class="p-3">কিল পয়েন্ট</th><th class="p-3">মোট</th></tr></thead>
+        <thead><tr class="text-slate-500 text-xs border-b border-slate-200 dark:border-qeBorder transition-colors bg-slate-50 dark:bg-transparent"><th class="p-3 font-semibold">Rank</th><th class="p-3 font-semibold">Team</th><th class="p-3 font-semibold">Place Pts</th><th class="p-3 font-semibold">Kill Pts</th><th class="p-3 font-semibold">Total</th></tr></thead>
         <tbody>
           ${overall.map((o,idx)=>`
-            <tr class="border-b border-qeBorder/60">
-              <td class="p-3"><span class="w-7 h-7 inline-flex items-center justify-center rounded-lg font-bold disp text-xs ${idx===0?'rank-1':idx===1?'rank-2':idx===2?'rank-3':'bg-slate-800 text-slate-400'}">${idx+1}</span></td>
-              <td class="p-3 font-semibold">${o.team.team_name}</td>
-              <td class="p-3 text-slate-400">${o.pos}</td>
-              <td class="p-3 text-slate-400">${o.kill}</td>
-              <td class="p-3 font-bold text-qeRed">${o.total}</td>
-            </tr>`).join('') || `<tr><td colspan="5" class="p-8 text-center text-slate-500">কোনো টিম নেই</td></tr>`}
+            <tr class="border-b border-slate-100 dark:border-qeBorder/60 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+              <td class="p-3"><span class="w-7 h-7 inline-flex items-center justify-center rounded-lg font-bold disp text-sm ${idx===0?'rank-1 shadow-md':idx===1?'rank-2 shadow-md':idx===2?'rank-3 shadow-md':'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}">${idx+1}</span></td>
+              <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">${o.team.team_name}</td>
+              <td class="p-3 text-slate-600 dark:text-slate-400">${o.pos}</td>
+              <td class="p-3 text-slate-600 dark:text-slate-400">${o.kill}</td>
+              <td class="p-3 font-bold text-qeRed text-base">${o.total}</td>
+            </tr>`).join('') || `<tr><td colspan="5" class="p-8 text-center text-slate-500">No teams available</td></tr>`}
         </tbody>
       </table>
     </div>
   </div>`;
 
   if(data.matches.length){
-    html += `<div class="cut-card bg-qeCard border border-qeBorder overflow-hidden">
-      <div class="p-4 border-b border-qeBorder flex justify-between items-center gap-2 flex-wrap">
-        <h3 class="font-bold disp">ম্যাচ-ভিত্তিক এন্ট্রি</h3>
-        <select id="matchSelect" class="bg-slate-800 border border-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none">${matchOptions}</select>
+    html += `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder overflow-hidden shadow-sm transition-colors">
+      <div class="p-4 border-b border-slate-200 dark:border-qeBorder flex justify-between items-center gap-2 flex-wrap transition-colors bg-slate-50 dark:bg-transparent">
+        <h3 class="font-bold disp text-lg">Match Results</h3>
+        <select id="matchSelect" class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs rounded-lg px-3 py-2 outline-none text-slate-900 dark:text-white font-medium shadow-sm">${matchOptions}</select>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm whitespace-nowrap">
-          <thead><tr class="text-slate-500 text-xs border-b border-qeBorder"><th class="p-3">টিম</th><th class="p-3">পজিশন</th><th class="p-3">কিল</th><th class="p-3">টোটাল</th>${isAdmin?'<th class="p-3">সেভ</th>':''}</tr></thead>
+          <thead><tr class="text-slate-500 text-xs border-b border-slate-200 dark:border-qeBorder transition-colors"><th class="p-3 font-semibold">Team</th><th class="p-3 font-semibold">Position</th><th class="p-3 font-semibold">Kills</th><th class="p-3 font-semibold">Total</th>${isAdmin?'<th class="p-3 font-semibold">Save</th>':''}</tr></thead>
           <tbody>
             ${data.teams.map(t=>{
               const r = data.results.find(x=>x.team_id===t.id && x.match_id===selectedMatchId) || {};
-              return `<tr class="border-b border-qeBorder/60" data-team="${t.id}">
-                <td class="p-3 font-semibold">${t.team_name}</td>
-                <td class="p-3">${isAdmin ? `<input type="number" min="1" max="20" class="res-pos w-16 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs outline-none" value="${r.position||''}">` : (r.position||'-')}</td>
-                <td class="p-3">${isAdmin ? `<input type="number" min="0" class="res-kill w-16 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs outline-none" value="${r.kills||0}">` : (r.kills||0)}</td>
+              return `<tr class="border-b border-slate-100 dark:border-qeBorder/60 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors" data-team="${t.id}">
+                <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">${t.team_name}</td>
+                <td class="p-3">${isAdmin ? `<input type="number" min="1" max="20" class="res-pos w-16 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 text-xs outline-none transition-colors" value="${r.position||''}">` : (r.position||'-')}</td>
+                <td class="p-3">${isAdmin ? `<input type="number" min="0" class="res-kill w-16 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-2 py-1.5 text-xs outline-none transition-colors" value="${r.kills||0}">` : (r.kills||0)}</td>
                 <td class="p-3 font-bold text-qeRed">${r.total_points||0}</td>
-                ${isAdmin ? `<td class="p-3"><button class="save-result-btn bg-qeRed/10 text-qeRed p-2 rounded-lg" data-team="${t.id}"><i data-lucide="check" class="w-4 h-4"></i></button></td>` : ''}
+                ${isAdmin ? `<td class="p-3"><button class="save-result-btn bg-qeRed/10 hover:bg-qeRed text-qeRed hover:text-white p-2 rounded-lg transition-colors" data-team="${t.id}"><i data-lucide="check" class="w-4 h-4"></i></button></td>` : ''}
               </tr>`;
-            }).join('') || `<tr><td colspan="5" class="p-8 text-center text-slate-500">কোনো টিম নেই</td></tr>`}
+            }).join('') || `<tr><td colspan="5" class="p-8 text-center text-slate-500">No teams available</td></tr>`}
           </tbody>
         </table>
       </div>
     </div>`;
   } else {
-    html += `<div class="cut-card bg-qeCard border border-qeBorder p-8 text-center text-slate-500">এখনও কোনো ম্যাচ যোগ করা হয়নি।</div>`;
+    html += `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder p-8 text-center text-slate-500 shadow-sm transition-colors">No matches added yet.</div>`;
   }
   return html;
 }
 
 function buildPayments(){
-  let html = `<h2 class="disp text-2xl font-bold flex items-center gap-2 mb-5"><i data-lucide="wallet" class="w-6 h-6 text-qeRed"></i> পেমেন্ট</h2>`;
+  let html = `<h2 class="disp text-2xl font-bold flex items-center gap-2 mb-5"><i data-lucide="wallet" class="w-6 h-6 text-qeRed"></i> Payments</h2>`;
 
-  html += `<div class="cut-card bg-qeCard border border-qeBorder p-5 mb-5">
-    <div class="flex justify-between items-center mb-3">
-      <h3 class="font-bold disp text-sm uppercase tracking-wide text-slate-300">bKash নাম্বার</h3>
-      ${isAdmin ? `<button id="editNumbersBtn" class="text-xs text-qeRed font-bold flex items-center gap-1"><i data-lucide="edit-2" class="w-3 h-3"></i> এডিট</button>` : ''}
+  html += `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder p-5 mb-5 shadow-sm transition-colors">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-bold disp text-sm uppercase tracking-wide text-slate-600 dark:text-slate-300 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4"></i> Payment Numbers</h3>
+      ${isAdmin ? `<button id="editNumbersBtn" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2 py-1 rounded hover:bg-qeRed/20 transition-colors"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
     </div>
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap gap-3">
       ${data.numbers.length ? data.numbers.map(n=>`
-        <button class="copy-btn flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm font-mono" data-copy="${n.number}" data-label="নাম্বার">
-          <span class="text-[10px] bg-qeRed/20 text-qeRed px-1.5 py-0.5 rounded font-bold uppercase">${n.type||'Personal'}</span> ${n.number} <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
-        </button>`).join('') : '<p class="text-xs text-slate-500">এডমিন এখনও কোনো নাম্বার যোগ করেনি।</p>'}
+        <button class="copy-btn flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 transition-colors group" data-copy="${n.number}" data-label="Number">
+          <span class="text-[10px] bg-qeRed/10 text-qeRed px-2 py-0.5 rounded font-bold uppercase tracking-wider">${n.type||'Personal'}</span> 
+          <span class="text-slate-800 dark:text-slate-200 font-semibold group-hover:text-qeRed transition-colors">${n.number}</span> 
+          <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400 group-hover:text-qeRed transition-colors"></i>
+        </button>`).join('') : '<p class="text-xs text-slate-500">No payment numbers added by Admin.</p>'}
     </div>
   </div>`;
 
-  html += `<div class="cut-card bg-qeCard border border-qeBorder p-5 mb-6">
-    <h3 class="font-bold disp text-sm uppercase tracking-wide text-slate-300 mb-4">পেমেন্ট সাবমিট করুন</h3>
+  html += `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder p-5 mb-6 shadow-sm transition-colors">
+    <h3 class="font-bold disp text-sm uppercase tracking-wide text-slate-600 dark:text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit Payment</h3>
     <div class="space-y-3">
-      <select id="payTeam" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 text-sm outline-none"><option value="">-- টিম সিলেক্ট করুন (ঐচ্ছিক) --</option>${data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
-      <input id="payName" type="text" placeholder="আপনার নাম" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 text-sm outline-none">
-      <input id="payAmount" type="number" placeholder="পরিমাণ (৳)" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 text-sm outline-none">
-      <input id="paySender" type="text" placeholder="যে নাম্বার থেকে পাঠিয়েছেন" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 text-sm outline-none">
-      <input id="payTrx" type="text" placeholder="TrxID" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 text-sm outline-none">
-      <div>
-        <label class="text-xs text-slate-500 mb-1 block">স্ক্রিনশট (ঐচ্ছিক)</label>
-        <input id="payScreenshot" type="file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-slate-200 file:text-xs">
+      <select id="payTeam" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white transition-colors font-medium"><option value="">-- Select Team (Optional) --</option>${data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
+      <div class="grid grid-cols-2 gap-3">
+        <input id="payName" type="text" placeholder="Your Name" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white transition-colors">
+        <input id="payAmount" type="number" placeholder="Amount (৳)" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white transition-colors">
       </div>
-      <button id="submitPayBtn" class="w-full bg-gradient-to-r from-qeRed to-qeRedDim text-white font-bold py-3 rounded-lg text-sm active:scale-95 disp tracking-wide">এডমিনকে ভেরিফাই করতে দিন</button>
+      <input id="paySender" type="text" placeholder="Sender Number (from where you sent)" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white transition-colors">
+      <input id="payTrx" type="text" placeholder="TrxID (Required for Auto Verify)" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white transition-colors">
+      <div>
+        <label class="text-xs text-slate-500 font-medium mb-1.5 block">Screenshot (Optional)</label>
+        <input id="payScreenshot" type="file" accept="image/*" class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-100 dark:file:bg-slate-700 file:text-slate-700 dark:file:text-slate-200 file:font-semibold file:text-xs hover:file:bg-slate-200 dark:hover:file:bg-slate-600 transition-all cursor-pointer">
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <button id="autoVerifyBtn" class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm active:scale-95 disp tracking-wide shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40 transition-all flex items-center justify-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> Auto Verify (SMS)</button>
+        <button id="manualVerifyBtn" class="flex-1 bg-gradient-to-r from-qeRed to-qeRedDim text-white font-bold py-3.5 rounded-xl text-sm active:scale-95 disp tracking-wide shadow-lg shadow-qeRed/20 hover:shadow-qeRed/40 transition-all flex items-center justify-center gap-2"><i data-lucide="user-check" class="w-4 h-4"></i> Let Admin Verify</button>
+      </div>
     </div>
   </div>`;
 
-  html += `<div class="cut-card bg-qeCard border border-qeBorder overflow-hidden">
-    <div class="p-4 border-b border-qeBorder"><h3 class="font-bold disp">সকল পেমেন্ট</h3></div>
-    <div class="divide-y divide-qeBorder max-h-[420px] overflow-y-auto hide-scrollbar">
+  html += `<div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder overflow-hidden shadow-sm transition-colors">
+    <div class="p-4 border-b border-slate-200 dark:border-qeBorder transition-colors bg-slate-50 dark:bg-transparent"><h3 class="font-bold disp text-lg">Transaction History</h3></div>
+    <div class="divide-y divide-slate-100 dark:divide-qeBorder max-h-[420px] overflow-y-auto hide-scrollbar transition-colors">
       ${data.payments.map(p=>`
-        <div class="p-4 flex justify-between items-start gap-3">
+        <div class="p-4 flex justify-between items-start gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
           <div class="min-w-0">
-            <p class="font-semibold text-sm">${p.payer_name}</p>
-            <p class="text-[11px] text-slate-500">${new Date(p.created_at).toLocaleDateString('bn-BD')}</p>
-            ${isAdmin ? `<p class="text-[11px] text-slate-400 mt-1">নাম্বার: ${p.sender_number||'-'} · TrxID: ${p.trx_id||'-'}${p.verification_type==='auto_sms'?' · <span class="text-emerald-500 font-bold">SMS অটো</span>':''}</p>` : ''}
-            ${p.screenshot_url ? `<a href="${p.screenshot_url}" target="_blank" class="text-[11px] text-qeRed underline">স্ক্রিনশট দেখুন</a>` : ''}
+            <p class="font-semibold text-sm text-slate-900 dark:text-white">${p.payer_name}</p>
+            <p class="text-[11px] text-slate-500 font-medium">${new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</p>
+            ${isAdmin ? `<p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1.5 font-mono bg-slate-100 dark:bg-black/30 p-1.5 rounded-md inline-block">Num: ${p.sender_number||'-'} <br> TrxID: ${p.trx_id||'-'}</p>${p.verification_type==='auto_sms'?'<p class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold mt-1 flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> SMS Auto Match</p>':''}` : ''}
+            ${p.screenshot_url ? `<a href="${p.screenshot_url}" target="_blank" class="text-[11px] text-qeRed font-semibold underline mt-2 block flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> View Proof</a>` : ''}
           </div>
           <div class="text-right shrink-0">
-            <p class="font-bold disp text-lg ${p.status==='approved'?'text-emerald-500':p.status==='rejected'?'text-slate-500':'text-amber-500'}">৳${p.amount}</p>
-            <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${p.status==='approved'?'bg-emerald-500/20 text-emerald-500':p.status==='rejected'?'bg-slate-700 text-slate-400':'bg-amber-500/20 text-amber-500'}">${p.status==='approved'?'Approved':p.status==='rejected'?'Rejected':'Pending'}</span>
-            ${isAdmin && p.status==='pending' ? `<div class="flex gap-1 mt-2">
-              <button class="approve-pay-btn bg-emerald-600 text-white text-[10px] px-2 py-1 rounded-lg font-bold" data-id="${p.id}">Approve</button>
-              <button class="reject-pay-btn bg-slate-700 text-white text-[10px] px-2 py-1 rounded-lg font-bold" data-id="${p.id}">Reject</button>
+            <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-500':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
+            <span class="inline-block mt-1 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${p.status==='approved'?'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-500':p.status==='rejected'?'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400':'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500'}">${p.status}</span>
+            ${isAdmin && p.status==='pending' ? `<div class="flex gap-1.5 mt-3">
+              <button class="approve-pay-btn bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold transition-colors" data-id="${p.id}">Approve</button>
+              <button class="reject-pay-btn bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold transition-colors" data-id="${p.id}">Reject</button>
             </div>` : ''}
           </div>
-        </div>`).join('') || '<div class="p-8 text-center text-slate-500 text-sm">কোনো পেমেন্ট নেই</div>'}
+        </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm">No transactions found</div>'}
     </div>
   </div>`;
   return html;
 }
 
 function buildActivity(){
-  return `<h2 class="disp text-2xl font-bold flex items-center gap-2 mb-5"><i data-lucide="activity" class="w-6 h-6 text-qeRed"></i> অ্যাক্টিভিটি লগ</h2>
-  <div class="cut-card bg-qeCard border border-qeBorder overflow-hidden">
-    <div class="divide-y divide-qeBorder">
+  return `<h2 class="disp text-2xl font-bold flex items-center gap-2 mb-5"><i data-lucide="activity" class="w-6 h-6 text-qeRed"></i> System Logs</h2>
+  <div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-qeBorder overflow-hidden shadow-sm transition-colors">
+    <div class="divide-y divide-slate-100 dark:divide-qeBorder transition-colors">
       ${data.logs.map(l=>`
-        <div class="p-4 flex justify-between items-start gap-3">
+        <div class="p-4 flex justify-between items-start gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
           <div class="min-w-0">
-            <p class="text-sm font-semibold">${l.action} <span class="text-[9px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded ml-1">#${l.ref_id||''}</span></p>
-            <p class="text-xs text-slate-400 mt-0.5">${l.details}</p>
-            <p class="text-[10px] text-slate-600 mt-1">${new Date(l.created_at).toLocaleString('bn-BD')}</p>
+            <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">${l.action} <span class="text-[9px] text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded ml-1 border border-slate-200 dark:border-slate-700">#${l.ref_id||''}</span></p>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">${l.details}</p>
+            <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5 font-medium">${new Date(l.created_at).toLocaleString('en-US')}</p>
           </div>
-          ${isAdmin ? `<button class="del-log-btn text-slate-500 hover:text-qeRed p-1.5 shrink-0" data-id="${l.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
-        </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm">কোনো লগ নেই</div>'}
+          ${isAdmin ? `<button class="del-log-btn text-slate-400 hover:text-qeRed p-2 shrink-0 transition-colors" data-id="${l.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+        </div>`).join('') || '<div class="p-12 text-center text-slate-500 text-sm">No logs recorded</div>'}
     </div>
   </div>`;
 }
@@ -405,13 +442,17 @@ function buildActivity(){
 function attachListeners(){
   document.querySelectorAll('.copy-btn').forEach(b=> b.addEventListener('click', e=> copyText(e.currentTarget.dataset.copy, e.currentTarget.dataset.label)));
 
+  if(activeTab==='dashboard'){
+    document.getElementById('editSettingsBtn')?.addEventListener('click', openAppSettingsModal);
+  }
+
   if(activeTab==='teams'){
     document.getElementById('addTeamBtn')?.addEventListener('click', ()=> openTeamModal(null));
     document.querySelectorAll('.edit-team-btn').forEach(b=> b.addEventListener('click', e=> openTeamModal(data.teams.find(t=>t.id===e.currentTarget.dataset.id))));
     document.querySelectorAll('.del-team-btn').forEach(b=> b.addEventListener('click', e=>{
       const id = e.currentTarget.dataset.id;
-      confirmModal('টিম মুছে ফেলুন', 'আপনি কি নিশ্চিত? এই টিমের সব রেজাল্টও মুছে যাবে।', async ()=>{
-        try{ await api('delete_team',{id}); await loadAll(); hideModal(); render(); showToast('টিম মুছে ফেলা হয়েছে'); }
+      confirmModal('Delete Team', 'Are you sure? This will remove all associated results.', async ()=>{
+        try{ await api('delete_team',{id}); await loadAll(); hideModal(); render(); showToast('Team deleted'); }
         catch(err){ showToast(err.message,'error'); }
       });
     }));
@@ -426,20 +467,21 @@ function attachListeners(){
       const row = e.currentTarget.closest('tr');
       const position = row.querySelector('.res-pos').value;
       const kills = row.querySelector('.res-kill').value;
-      try{ await api('upsert_result', { match_id: selectedMatchId, team_id: teamId, position: Number(position), kills: Number(kills) }); await loadAll(); render(); showToast('রেজাল্ট সেভ হয়েছে'); }
+      try{ await api('upsert_result', { match_id: selectedMatchId, team_id: teamId, position: Number(position), kills: Number(kills) }); await loadAll(); render(); showToast('Result saved'); }
       catch(err){ showToast(err.message,'error'); }
     }));
   }
 
   if(activeTab==='payments'){
-    document.getElementById('submitPayBtn')?.addEventListener('click', submitPayment);
+    document.getElementById('autoVerifyBtn')?.addEventListener('click', ()=>submitPayment('auto'));
+    document.getElementById('manualVerifyBtn')?.addEventListener('click', ()=>submitPayment('manual'));
     document.getElementById('editNumbersBtn')?.addEventListener('click', openNumbersModal);
     document.querySelectorAll('.approve-pay-btn').forEach(b=> b.addEventListener('click', async e=>{
-      try{ await api('approve_payment',{id:e.currentTarget.dataset.id}); await loadAll(); render(); showToast('অ্যাপ্রুভ হয়েছে'); }
+      try{ await api('approve_payment',{id:e.currentTarget.dataset.id}); await loadAll(); render(); showToast('Payment Approved'); }
       catch(err){ showToast(err.message,'error'); }
     }));
     document.querySelectorAll('.reject-pay-btn').forEach(b=> b.addEventListener('click', async e=>{
-      try{ await api('reject_payment',{id:e.currentTarget.dataset.id}); await loadAll(); render(); showToast('রিজেক্ট করা হয়েছে'); }
+      try{ await api('reject_payment',{id:e.currentTarget.dataset.id}); await loadAll(); render(); showToast('Payment Rejected'); }
       catch(err){ showToast(err.message,'error'); }
     }));
   }
@@ -447,8 +489,8 @@ function attachListeners(){
   if(activeTab==='activity'){
     document.querySelectorAll('.del-log-btn').forEach(b=> b.addEventListener('click', e=>{
       const id = e.currentTarget.dataset.id;
-      confirmModal('লগ মুছুন', 'এই লগ এন্ট্রি স্থায়ীভাবে মুছে যাবে।', async ()=>{
-        try{ await api('delete_log',{id}); await loadAll(); hideModal(); render(); showToast('মুছে ফেলা হয়েছে'); }
+      confirmModal('Delete Log', 'This log will be permanently deleted.', async ()=>{
+        try{ await api('delete_log',{id}); await loadAll(); hideModal(); render(); showToast('Log deleted'); }
         catch(err){ showToast(err.message,'error'); }
       });
     }));
@@ -457,32 +499,77 @@ function attachListeners(){
 
 function confirmModal(title, msg, onConfirm){
   showModal(`
-    <h3 class="font-bold disp text-lg text-qeRed mb-2 text-center">${title}</h3>
-    <p class="text-xs text-slate-400 mb-6 text-center">${msg}</p>
-    <div class="flex gap-3"><button id="cm-cancel" class="flex-1 py-3 text-sm bg-slate-800 rounded-lg font-bold">বাতিল</button><button id="cm-ok" class="flex-1 py-3 text-sm bg-qeRed text-white rounded-lg font-bold">নিশ্চিত করুন</button></div>
+    <div class="text-center mb-5"><div class="w-14 h-14 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-4 scale-in"><i data-lucide="alert-triangle" class="w-7 h-7"></i></div>
+    <h3 class="font-bold disp text-xl text-slate-900 dark:text-white mb-2">${title}</h3>
+    <p class="text-sm text-slate-500 dark:text-slate-400">${msg}</p></div>
+    <div class="flex gap-3"><button id="cm-cancel" class="flex-1 py-3.5 text-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold transition-colors hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button id="cm-ok" class="flex-1 py-3.5 text-sm bg-qeRed text-white rounded-xl font-bold hover:bg-qeRedDim transition-colors shadow-lg shadow-qeRed/20">Confirm</button></div>
   `);
   document.getElementById('cm-cancel').addEventListener('click', hideModal);
   document.getElementById('cm-ok').addEventListener('click', onConfirm);
+}
+
+function openAppSettingsModal(){
+  showModal(`
+    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-qeBorder pb-3">Edit Dashboard Info</h3>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Dashboard Title</label>
+        <input id="as-title" placeholder="Title" value="${data.appSettings?.title||''}" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50 transition-colors">
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Welcome Description</label>
+        <textarea id="as-desc" placeholder="Description" rows="3" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors">${data.appSettings?.description||''}</textarea>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-8"><button id="as-cancel" class="flex-1 py-3.5 text-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="as-save" class="flex-1 py-3.5 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors">Save Settings</button></div>
+  `);
+  document.getElementById('as-cancel').addEventListener('click', hideModal);
+  document.getElementById('as-save').addEventListener('click', async ()=>{
+    const title = document.getElementById('as-title').value;
+    const description = document.getElementById('as-desc').value;
+    if(!title) return showToast('Title is required','error');
+    try{ await api('update_app_settings', { title, description }); await loadAll(); hideModal(); render(); showToast('Settings updated'); }
+    catch(err){ showToast(err.message,'error'); }
+  });
 }
 
 function openTeamModal(team){
   const main = team?.main_players || ['','','',''];
   const res = team?.reserve_players || ['','','',''];
   showModal(`
-    <h3 class="font-bold disp text-lg mb-4 border-b border-qeBorder pb-3">${team ? 'টিম এডিট' : 'নতুন টিম'}</h3>
+    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-qeBorder pb-3">${team ? 'Edit Team' : 'Add New Team'}</h3>
     <div class="space-y-3">
-      <input id="tm-name" placeholder="টিম নাম" value="${team?.team_name||''}" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none">
-      <input id="tm-slot" type="number" placeholder="স্লট নাম্বার" value="${team?.slot_no||''}" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none">
-      <p class="text-[11px] font-bold text-emerald-500 uppercase pt-1">মূল ৪ জন প্লেয়ার</p>
-      ${[0,1,2,3].map(i=>`<input class="tm-main w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none" placeholder="প্লেয়ার ${i+1}" value="${main[i]||''}">`).join('')}
-      <p class="text-[11px] font-bold text-amber-500 uppercase pt-1">৫ম/রিজার্ভ ৪ জন</p>
-      ${[0,1,2,3].map(i=>`<input class="tm-res w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none" placeholder="রিজার্ভ ${i+1}" value="${res[i]||''}">`).join('')}
-      <p class="text-[11px] font-bold text-slate-400 uppercase pt-1">টিম ম্যানেজার</p>
-      <input id="tm-mname" placeholder="ম্যানেজারের নাম" value="${team?.manager_name||''}" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none">
-      <input id="tm-mign" placeholder="ম্যানেজারের IGN" value="${team?.manager_ign||''}" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none">
-      <input id="tm-mcontact" placeholder="যোগাযোগ নাম্বার" value="${team?.manager_contact||''}" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none">
+      <div class="grid grid-cols-3 gap-3">
+        <input id="tm-name" placeholder="Team Name" value="${team?.team_name||''}" class="col-span-2 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50">
+        <input id="tm-slot" type="number" placeholder="Slot" value="${team?.slot_no||''}" class="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50">
+      </div>
+      
+      <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-white/5 mt-4">
+        <p class="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-3 flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5"></i> Main Roster</p>
+        <div class="grid grid-cols-2 gap-2">
+          ${[0,1,2,3].map(i=>`<input class="tm-main w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none text-slate-900 dark:text-white focus:border-emerald-500/50 transition-colors" placeholder="Player ${i+1}" value="${main[i]||''}">`).join('')}
+        </div>
+      </div>
+      
+      <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-white/5">
+        <p class="text-xs font-bold text-amber-600 dark:text-amber-500 uppercase mb-3 flex items-center gap-1"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Reserve</p>
+        <div class="grid grid-cols-2 gap-2">
+          ${[0,1,2,3].map(i=>`<input class="tm-res w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none text-slate-900 dark:text-white focus:border-amber-500/50 transition-colors" placeholder="Reserve ${i+1}" value="${res[i]||''}">`).join('')}
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <p class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-2">Management</p>
+        <div class="space-y-2">
+          <input id="tm-mname" placeholder="Manager Name" value="${team?.manager_name||''}" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50">
+          <div class="grid grid-cols-2 gap-2">
+            <input id="tm-mign" placeholder="Manager IGN" value="${team?.manager_ign||''}" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50">
+            <input id="tm-mcontact" placeholder="Contact Number" value="${team?.manager_contact||''}" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50">
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="flex gap-3 mt-6"><button id="tm-cancel" class="flex-1 py-3 text-sm bg-slate-800 rounded-lg font-bold">বাতিল</button><button id="tm-save" class="flex-1 py-3 text-sm bg-qeRed text-white rounded-lg font-bold">সেভ করুন</button></div>
+    <div class="flex gap-3 mt-6"><button id="tm-cancel" class="flex-1 py-3.5 text-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tm-save" class="flex-1 py-3.5 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors">Save Team</button></div>
   `);
   document.getElementById('tm-cancel').addEventListener('click', hideModal);
   document.getElementById('tm-save').addEventListener('click', async ()=>{
@@ -495,27 +582,27 @@ function openTeamModal(team){
       manager_ign: document.getElementById('tm-mign').value,
       manager_contact: document.getElementById('tm-mcontact').value
     };
-    if(!payload.team_name) return showToast('টিম নাম দিন', 'error');
+    if(!payload.team_name) return showToast('Team name is required', 'error');
     try{
       if(team) await api('update_team', { id: team.id, ...payload }); else await api('create_team', payload);
-      await loadAll(); hideModal(); render(); showToast('সেভ হয়েছে');
+      await loadAll(); hideModal(); render(); showToast('Team saved');
     } catch(err){ showToast(err.message,'error'); }
   });
 }
 
 function openMatchModal(){
   showModal(`
-    <h3 class="font-bold disp text-lg mb-4 border-b border-qeBorder pb-3">নতুন ম্যাচ যোগ করুন</h3>
-    <input id="mm-no" type="number" placeholder="ম্যাচ নম্বর" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none mb-3">
-    <input id="mm-label" placeholder="ম্যাচ লেবেল (যেমন: Day 1 - Match 1)" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none">
-    <div class="flex gap-3 mt-6"><button id="mm-cancel" class="flex-1 py-3 text-sm bg-slate-800 rounded-lg font-bold">বাতিল</button><button id="mm-save" class="flex-1 py-3 text-sm bg-qeRed text-white rounded-lg font-bold">যোগ করুন</button></div>
+    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-qeBorder pb-3">Add Match</h3>
+    <input id="mm-no" type="number" placeholder="Match Number (e.g. 1)" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none mb-3 focus:border-qeRed/50">
+    <input id="mm-label" placeholder="Match Label (e.g. Day 1 - Match 1)" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none focus:border-qeRed/50">
+    <div class="flex gap-3 mt-6"><button id="mm-cancel" class="flex-1 py-3.5 text-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="mm-save" class="flex-1 py-3.5 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors">Add Match</button></div>
   `);
   document.getElementById('mm-cancel').addEventListener('click', hideModal);
   document.getElementById('mm-save').addEventListener('click', async ()=>{
     const match_no = Number(document.getElementById('mm-no').value);
     const match_label = document.getElementById('mm-label').value;
-    if(!match_no) return showToast('ম্যাচ নম্বর দিন','error');
-    try{ const r = await api('create_match', { match_no, match_label }); await loadAll(); selectedMatchId = r.data[0].id; hideModal(); render(); showToast('ম্যাচ যোগ হয়েছে'); }
+    if(!match_no) return showToast('Match number is required','error');
+    try{ const r = await api('create_match', { match_no, match_label }); await loadAll(); selectedMatchId = r.data[0].id; hideModal(); render(); showToast('Match added'); }
     catch(err){ showToast(err.message,'error'); }
   });
 }
@@ -524,19 +611,21 @@ function openPointSettingsModal(){
   const table = data.settings?.position_table || {};
   const rows = Array.from({length:16}, (_,i)=>i+1);
   showModal(`
-    <h3 class="font-bold disp text-lg mb-4 border-b border-qeBorder pb-3">পয়েন্ট সেটিংস</h3>
-    <label class="text-xs text-slate-500 mb-1 block">প্রতি কিলে পয়েন্ট</label>
-    <input id="ps-kill" type="number" value="${data.settings?.kill_point_value||1}" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none mb-4">
-    <div class="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto hide-scrollbar pr-1">
-      ${rows.map(p=>`<div><label class="text-[10px] text-slate-500 block mb-1">পজিশন ${p}</label><input class="ps-pos w-full p-2 bg-slate-800 border border-slate-700 rounded-lg text-xs outline-none" data-pos="${p}" type="number" value="${table[p]??0}"></div>`).join('')}
+    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-qeBorder pb-3">Point Settings</h3>
+    <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Points per Kill</label>
+    <input id="ps-kill" type="number" value="${data.settings?.kill_point_value||1}" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none mb-5 focus:border-qeRed/50">
+    
+    <label class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 block">Placement Points</label>
+    <div class="grid grid-cols-4 gap-3 max-h-64 overflow-y-auto hide-scrollbar pr-1">
+      ${rows.map(p=>`<div><label class="text-[10px] text-slate-500 block mb-1 text-center font-medium">Pos ${p}</label><input class="ps-pos w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg text-xs outline-none text-center focus:border-qeRed/50" data-pos="${p}" type="number" value="${table[p]??0}"></div>`).join('')}
     </div>
-    <div class="flex gap-3 mt-6"><button id="ps-cancel" class="flex-1 py-3 text-sm bg-slate-800 rounded-lg font-bold">বাতিল</button><button id="ps-save" class="flex-1 py-3 text-sm bg-qeRed text-white rounded-lg font-bold">সেভ করুন</button></div>
+    <div class="flex gap-3 mt-8"><button id="ps-cancel" class="flex-1 py-3.5 text-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="ps-save" class="flex-1 py-3.5 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors">Save Settings</button></div>
   `);
   document.getElementById('ps-cancel').addEventListener('click', hideModal);
   document.getElementById('ps-save').addEventListener('click', async ()=>{
     const position_table = {};
     document.querySelectorAll('.ps-pos').forEach(i=> position_table[i.dataset.pos] = Number(i.value)||0);
-    try{ await api('update_point_settings', { kill_point_value: Number(document.getElementById('ps-kill').value)||1, position_table }); await loadAll(); hideModal(); render(); showToast('সেটিংস সেভ হয়েছে'); }
+    try{ await api('update_point_settings', { kill_point_value: Number(document.getElementById('ps-kill').value)||1, position_table }); await loadAll(); hideModal(); render(); showToast('Settings saved'); }
     catch(err){ showToast(err.message,'error'); }
   });
 }
@@ -544,25 +633,25 @@ function openPointSettingsModal(){
 function openNumbersModal(){
   const nums = data.numbers.length ? data.numbers : [{type:'Personal', number:''}];
   showModal(`
-    <h3 class="font-bold disp text-lg mb-4 border-b border-qeBorder pb-3">bKash নাম্বার এডিট</h3>
-    <div id="numsList" class="space-y-2">
+    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-qeBorder pb-3">Payment Numbers</h3>
+    <div id="numsList" class="space-y-3">
       ${nums.map((n,i)=>`<div class="flex gap-2 num-row">
-        <select class="num-type bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-2"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
-        <input class="num-value flex-1 p-2 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none" placeholder="017XXXXXXXX" value="${n.number||''}">
-        <button class="num-remove text-qeRed p-2"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <select class="num-type bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-2 py-2 outline-none font-medium"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
+        <input class="num-value flex-1 p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono focus:border-qeRed/50 transition-colors" placeholder="017XXXXXXXX" value="${n.number||''}">
+        <button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-3 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>`).join('')}
     </div>
-    <button id="num-add" class="w-full mt-3 py-2 border border-dashed border-slate-700 rounded-lg text-xs text-slate-400">+ আরও নাম্বার</button>
-    <div class="flex gap-3 mt-6"><button id="num-cancel" class="flex-1 py-3 text-sm bg-slate-800 rounded-lg font-bold">বাতিল</button><button id="num-save" class="flex-1 py-3 text-sm bg-qeRed text-white rounded-lg font-bold">সেভ করুন</button></div>
+    <button id="num-add" class="w-full mt-4 py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-500 rounded-xl text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Number</button>
+    <div class="flex gap-3 mt-6"><button id="num-cancel" class="flex-1 py-3.5 text-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="num-save" class="flex-1 py-3.5 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors">Save Numbers</button></div>
   `);
   lucide.createIcons();
   document.getElementById('num-cancel').addEventListener('click', hideModal);
   document.getElementById('num-add').addEventListener('click', ()=>{
     const div = document.createElement('div');
-    div.className = 'flex gap-2 num-row mt-2';
-    div.innerHTML = `<select class="num-type bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-2"><option>Personal</option><option>Agent</option><option>Merchant</option></select>
-      <input class="num-value flex-1 p-2 bg-slate-800 border border-slate-700 rounded-lg text-sm outline-none" placeholder="017XXXXXXXX">
-      <button class="num-remove text-qeRed p-2"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+    div.className = 'flex gap-2 num-row mt-3 fade-in';
+    div.innerHTML = `<select class="num-type bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-2 py-2 outline-none font-medium"><option>Personal</option><option>Agent</option><option>Merchant</option></select>
+      <input class="num-value flex-1 p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono focus:border-qeRed/50 transition-colors" placeholder="017XXXXXXXX">
+      <button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-3 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
     document.getElementById('numsList').appendChild(div);
     lucide.createIcons();
     div.querySelector('.num-remove').addEventListener('click', ()=> div.remove());
@@ -570,12 +659,12 @@ function openNumbersModal(){
   document.querySelectorAll('.num-remove').forEach(b=> b.addEventListener('click', e=> e.currentTarget.closest('.num-row').remove()));
   document.getElementById('num-save').addEventListener('click', async ()=>{
     const numbers = Array.from(document.querySelectorAll('.num-row')).map(r=>({ type: r.querySelector('.num-type').value, number: r.querySelector('.num-value').value })).filter(n=>n.number);
-    try{ await api('update_bkash_numbers', { numbers }); await loadAll(); hideModal(); render(); showToast('নাম্বার সেভ হয়েছে'); }
+    try{ await api('update_bkash_numbers', { numbers }); await loadAll(); hideModal(); render(); showToast('Numbers saved'); }
     catch(err){ showToast(err.message,'error'); }
   });
 }
 
-async function submitPayment(){
+async function submitPayment(method){
   const payer_name = document.getElementById('payName').value;
   const amount = document.getElementById('payAmount').value;
   const team_id = document.getElementById('payTeam').value || null;
@@ -583,7 +672,14 @@ async function submitPayment(){
   const trx_id = document.getElementById('payTrx').value;
   const file = document.getElementById('payScreenshot').files[0];
 
-  if(!payer_name || !amount) return showToast('নাম এবং পরিমাণ দিন','error');
+  if(!payer_name || !amount) return showToast('Name and amount required', 'error');
+  if(method === 'auto' && !trx_id) return showToast('TrxID is required for Auto Verification', 'error');
+  if(method === 'auto' && !sender_number) return showToast('Sender Number is required for Auto Verification', 'error');
+
+  const btnText = method === 'auto' ? document.getElementById('autoVerifyBtn').innerHTML : document.getElementById('manualVerifyBtn').innerHTML;
+  if(method === 'auto') document.getElementById('autoVerifyBtn').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Submitting...';
+  else document.getElementById('manualVerifyBtn').innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Submitting...';
+  lucide.createIcons();
 
   let screenshot_url = null;
   try {
@@ -594,13 +690,18 @@ async function submitPayment(){
     }
     const res = await fetch('/api/payment-submit', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ team_id, payer_name, amount, trx_id, sender_number, screenshot_url })
+      body: JSON.stringify({ team_id, payer_name, amount, trx_id, sender_number, screenshot_url, verify_method: method })
     });
     const json = await res.json();
-    if(!res.ok) throw new Error(json.error||'এরর হয়েছে');
+    if(!res.ok) throw new Error(json.error||'Submission failed');
     await loadAll(); render();
-    showToast('পেমেন্ট সাবমিট হয়েছে, এডমিন রিভিউ করবেন');
-  } catch(err){ showToast(err.message,'error'); }
+    if(method === 'auto') showToast('Auto verify requested. Validating SMS...');
+    else showToast('Payment submitted for manual review');
+  } catch(err){ 
+    showToast(err.message,'error'); 
+    if(method === 'auto') document.getElementById('autoVerifyBtn').innerHTML = btnText;
+    else document.getElementById('manualVerifyBtn').innerHTML = btnText;
+  }
 }
 
 function doLogout(){
@@ -608,11 +709,11 @@ function doLogout(){
 }
 
 document.getElementById('adminBtn').addEventListener('click', ()=>{
-  if(isAdmin){ doLogout(); render(); showToast('লগআউট হয়েছে'); return; }
+  if(isAdmin){ doLogout(); render(); showToast('Logged out successfully'); return; }
   showModal(`
-    <div class="text-center mb-5"><div class="w-14 h-14 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-3 scale-in"><i data-lucide="shield-check" class="w-7 h-7"></i></div><h3 class="font-bold disp text-xl">এডমিন লগইন</h3></div>
-    <input type="password" id="adminPassInput" class="w-full p-3 rounded-lg bg-slate-800 border border-slate-700 text-sm text-center tracking-widest font-mono outline-none" placeholder="পাসওয়ার্ড দিন">
-    <div class="flex gap-3 mt-6"><button id="al-cancel" class="flex-1 py-3 text-sm bg-slate-800 rounded-lg font-bold">বাতিল</button><button id="al-ok" class="flex-1 py-3 text-sm bg-qeRed text-white rounded-lg font-bold">লগইন</button></div>
+    <div class="text-center mb-6"><div class="w-16 h-16 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-4 scale-in"><i data-lucide="shield-check" class="w-8 h-8"></i></div><h3 class="font-bold disp text-2xl text-slate-900 dark:text-white">Admin Login</h3><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Enter your password to manage the system</p></div>
+    <input type="password" id="adminPassInput" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-center tracking-widest font-mono outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors" placeholder="••••••••">
+    <div class="flex gap-3 mt-6"><button id="al-cancel" class="flex-1 py-3.5 text-sm bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="al-ok" class="flex-1 py-3.5 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors">Login</button></div>
   `);
   document.getElementById('al-cancel').addEventListener('click', hideModal);
   document.getElementById('al-ok').addEventListener('click', async ()=>{
@@ -620,11 +721,22 @@ document.getElementById('adminBtn').addEventListener('click', ()=>{
     try{
       const res = await fetch('/api/admin-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password }) });
       const json = await res.json();
-      if(!res.ok) throw new Error(json.error||'ভুল পাসওয়ার্ড');
+      if(!res.ok) throw new Error(json.error||'Invalid Password');
       adminToken = json.token; isAdmin = true; localStorage.setItem('qe_admin_token', adminToken);
-      hideModal(); render(); showToast('লগইন সফল হয়েছে!');
+      hideModal(); render(); showToast('Login successful!');
     } catch(err){ showToast(err.message,'error'); }
   });
+});
+
+document.getElementById('themeToggleBtn').addEventListener('click', () => {
+  const html = document.documentElement;
+  if(html.classList.contains('dark')) {
+    html.classList.remove('dark');
+    localStorage.setItem('qe_theme', 'light');
+  } else {
+    html.classList.add('dark');
+    localStorage.setItem('qe_theme', 'dark');
+  }
 });
 
 document.querySelectorAll('.nav-btn').forEach(btn=>{
@@ -641,7 +753,7 @@ async function init(){
   try{
     const cfg = await (await fetch('/api/config')).json();
     supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-  } catch(e){ showToast('কনফিগারেশন লোড ব্যর্থ হয়েছে','error'); }
+  } catch(e){ showToast('Failed to load config','error'); }
   await loadAll();
   render();
 }
