@@ -44,15 +44,12 @@ tailwind.config = {
   .fade-in { animation: fadeIn .4s cubic-bezier(.16,1,.3,1) forwards; }
   @keyframes fadeIn { from {opacity: 0; transform: translateY(10px)} to {opacity: 1; transform: translateY(0)} }
   
-  .toast-in { animation: toastIn .3s ease-out forwards; }
-  @keyframes toastIn { from {opacity: 0; transform: translateX(110%)} to {opacity: 1; transform: translateX(0)} }
-  
   ::selection { background: #c8203d; color: #fff; }
 </style>
 </head>
 <body class="text-slate-900 dark:text-slate-100 flex flex-col h-full w-full">
 
-<header class="glass z-40 shrink-0 border-b px-4 py-3 relative mesh-lines transition-all duration-300 shadow-sm">
+<header class="glass z-40 shrink-0 border-b border-slate-200 dark:border-white/5 px-4 py-3 relative mesh-lines transition-all duration-300 shadow-sm">
   <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
     <div class="flex items-center gap-3 min-w-0">
       <img src="/assets/logo-transparent.png" class="w-10 h-10 object-contain drop-shadow-lg" alt="QE">
@@ -62,25 +59,26 @@ tailwind.config = {
       </div>
     </div>
     <div class="flex items-center gap-3 shrink-0">
-      <button onclick="toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-300 dark:border-slate-800">
+      <button onclick="window.toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-300 dark:border-slate-800">
         <div class="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300 dark:translate-x-6 flex items-center justify-center">
           <i data-lucide="sun" class="w-2.5 h-2.5 text-amber-500 dark:hidden"></i>
           <i data-lucide="moon" class="w-2.5 h-2.5 text-indigo-500 hidden dark:block"></i>
         </div>
       </button>
-      <button onclick="toggleAdmin()" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-xl border border-qeRed/20 active:scale-95 transition-all hover:bg-qeRed hover:text-white shadow-sm">
+      <button onclick="window.toggleAdmin()" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-xl border border-qeRed/20 active:scale-95 transition-all hover:bg-qeRed hover:text-white shadow-sm">
         <i data-lucide="shield" class="w-3.5 h-3.5"></i> <span id="adminBtnText">Admin</span>
       </button>
     </div>
   </div>
 </header>
 
-<div class="w-full bg-white dark:bg-[#0a0a0f] border-b border-slate-200 dark:border-white/5 py-1.5 shrink-0 transition-colors duration-300 z-30 relative shadow-sm">
+<div class="w-full bg-white dark:bg-[#0a0a0f] border-b border-slate-200 dark:border-white/5 py-2 shrink-0 transition-colors duration-300 z-30 relative shadow-sm">
   <div class="flex items-center justify-center gap-2 text-[10px] md:text-[11px] text-slate-700 dark:text-slate-400 font-semibold">
     <span>Developed by <a href="https://linkedin.com/in/RahatAhmedX" target="_blank" class="text-qeRed font-bold hover:underline">Rahat</a></span>
     <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
-    <a href="https://github.com/Rahat0764" target="_blank" class="font-bold hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> GitHub
+    <a href="https://github.com/Rahat0764" target="_blank" class="font-bold text-slate-800 dark:text-slate-300 hover:text-qeRed dark:hover:text-qeRed flex items-center gap-1.5 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      GitHub
     </a>
   </div>
 </div>
@@ -89,810 +87,941 @@ tailwind.config = {
   <main id="app" class="max-w-6xl mx-auto fade-in"></main>
 </div>
 
-<nav class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-md glass z-40 rounded-2xl border shadow-2xl transition-all duration-300">
+<nav class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-md glass z-40 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl transition-all duration-300">
   <div class="flex justify-around items-center h-16 px-2">
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="tournaments"><i data-lucide="crosshair" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Events</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="teams"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Teams</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="standings"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Rank</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" data-tab="payments"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Pay</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('dashboard')" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('tournaments')" data-tab="tournaments"><i data-lucide="crosshair" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Events</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('teams')" data-tab="teams"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Teams</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('standings')" data-tab="standings"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Rank</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('payments')" data-tab="payments"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Pay</span></button>
   </div>
 </nav>
 
-<div id="modalContainer" class="fixed inset-0 bg-slate-900/60 dark:bg-black/80 z-50 hidden flex justify-center items-center px-4 backdrop-blur-md overflow-y-auto py-8 transition-all"></div>
-<div id="toast-container" class="fixed top-24 right-4 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+<div id="modalContainer" class="fixed inset-0 bg-slate-900/60 dark:bg-black/80 z-[100] hidden flex justify-center items-center px-4 backdrop-blur-md overflow-y-auto py-8 transition-all"></div>
+<div id="imagePreviewModal" class="fixed inset-0 bg-slate-900/90 dark:bg-black/95 z-[200] hidden flex flex-col justify-center items-center px-4 backdrop-blur-lg overflow-y-auto transition-all">
+  <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-white/10 flex flex-col items-center">
+    <h3 class="font-bold disp text-xl mb-4 text-slate-900 dark:text-white" id="ipm-title">Preview Image</h3>
+    <div id="ipm-canvas-container" class="w-full bg-slate-100 dark:bg-black/50 rounded-2xl flex items-center justify-center overflow-hidden mb-6 min-h-[250px] relative border border-slate-200 dark:border-white/5">
+      <canvas id="ipm-canvas" class="max-w-full max-h-[400px] object-contain"></canvas>
+    </div>
+    <div class="flex gap-3 w-full">
+      <button onclick="window.closeImagePreview()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold transition-colors">Cancel</button>
+      <button id="ipm-confirm" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 flex items-center justify-center gap-2"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload</button>
+    </div>
+  </div>
+</div>
+<div id="toast-container" class="fixed top-24 right-4 z-[300] flex flex-col gap-2 pointer-events-none"></div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/+esm';
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/+esm';
 
-let supabase = null;
-let activeTab = localStorage.getItem('qe_tab') || 'dashboard';
-let adminToken = localStorage.getItem('qe_admin_token') || null;
-let isAdmin = !!adminToken;
-
-let data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [], appSettings: null, tournaments: [], players: [], player_stats: [] };
-let timers = [];
-window.selectedPlayerCount = 1;
-
-window.showToast = (msg, type='success') => {
-  const c = document.getElementById('toast-container');
-  const t = document.createElement('div');
-  const colors = type==='success' ? 'bg-emerald-600' : (type==='error' ? 'bg-qeRed' : 'bg-slate-800');
-  t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl text-white ${colors} text-sm font-bold max-w-xs border border-white/20 backdrop-blur-lg`;
-  t.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5 shrink-0"></i><span>${msg}</span>`;
-  c.appendChild(t); lucide.createIcons();
-  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(20px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3200);
-};
-
-window.copyText = (text, label) => {
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(() => window.showToast(`${label} copied!`))
-    .catch(() => fallbackCopyText(text, label));
-  } else {
-    fallbackCopyText(text, label);
-  }
-};
-
-const fallbackCopyText = (text, label) => {
-  const ta = document.createElement('textarea'); ta.value = text;
-  ta.style.position = 'fixed'; ta.style.top = '-9999px';
-  document.body.appendChild(ta); ta.focus(); ta.select();
-  try { document.execCommand('copy'); window.showToast(`${label} copied!`); } 
-  catch(err) { window.showToast('Failed to copy', 'error'); }
-  document.body.removeChild(ta);
-};
-
-const showModal = (html) => {
-  const mc = document.getElementById('modalContainer');
-  mc.innerHTML = `<div class="bg-white dark:bg-[#131319] w-full max-w-lg rounded-3xl p-6 border border-slate-200 dark:border-white/10 fade-in shadow-2xl relative my-auto max-h-[85vh] overflow-y-auto hide-scrollbar text-slate-900 dark:text-white transition-colors">${html}</div>`;
-  mc.classList.remove('hidden');
-  lucide.createIcons();
-  mc.onclick = (e) => { if(e.target === mc) hideModal(); };
-};
-const hideModal = () => document.getElementById('modalContainer').classList.add('hidden');
-window.hideModal = hideModal;
-
-async function api(action, payload, isPublic = false) {
-  const endpoint = isPublic ? '/api/public-submit' : '/api/admin-write';
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken || '' },
-    body: JSON.stringify({ action, payload })
-  });
-  const json = await res.json();
-  if(!res.ok){
-    if(res.status === 401){ window.doLogout(); window.showToast('Session expired', 'error'); }
-    throw new Error(json.error || 'Server error');
-  }
-  return json;
-}
-
-async function uploadFileToSupabase(bucket, fileInputId) {
-  const fileInput = document.getElementById(fileInputId);
-  if(!fileInput || !fileInput.files || !fileInput.files[0]) return null;
-  const file = fileInput.files[0];
-  const ext = file.name.split('.').pop();
-  const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.${ext}`;
-  
-  const { data, error } = await supabase.storage.from(bucket).upload(path, file);
-  if (error) throw error;
-  
-  const { data: pubData } = supabase.storage.from(bucket).getPublicUrl(path);
-  return pubData.publicUrl;
-}
-
-async function loadAll() {
-  try {
-    const [t, m, r, s, p, l, n, as, tr, pl, ps] = await Promise.all([
-      supabase.from('teams').select('*').order('created_at'),
-      supabase.from('matches').select('*').order('match_no'),
-      supabase.from('match_results').select('*'),
-      supabase.from('point_settings').select('*').eq('id',1).single(),
-      supabase.from('payments').select('*').order('created_at', { ascending: false }),
-      supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(40),
-      supabase.from('bkash_numbers').select('*').eq('id',1).single(),
-      supabase.from('app_settings').select('*').eq('id',1).single(),
-      supabase.from('tournaments').select('*').order('created_at', {ascending: false}),
-      supabase.from('players').select('*'),
-      supabase.from('player_stats').select('*')
-    ]);
-    data = { 
-      teams: t.data||[], matches: m.data||[], results: r.data||[], 
-      settings: s.data||{kill_point_value:1, position_table:{}}, payments: p.data||[], 
-      logs: l.data||[], numbers: n.data?.numbers||[], appSettings: as.data||null,
-      tournaments: tr.data||[], players: pl.data||[], player_stats: ps.data||[]
-    };
-  } catch(e) { console.error(e); }
-}
-
-function updateNav(){
-  document.querySelectorAll('.nav-btn').forEach(b=>{
-    if(b.dataset.tab === activeTab){ b.classList.add('text-qeRed'); b.classList.remove('text-slate-500', 'dark:text-slate-500'); }
-    else { b.classList.remove('text-qeRed'); b.classList.add('text-slate-500', 'dark:text-slate-500'); }
-  });
-}
-
-function clearTimers(){ timers.forEach(clearInterval); timers = []; }
-
-window.render = () => {
-  clearTimers();
+  window.supabase = null;
+  window.activeTab = localStorage.getItem('qe_tab') || 'dashboard';
+  window.adminToken = localStorage.getItem('qe_admin_token') || null;
+  window.isAdmin = !!window.adminToken;
+  window.data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [], appSettings: null, tournaments: [], players: [], player_stats: [] };
+  window.timers = [];
   window.selectedPlayerCount = 1;
-  const app = document.getElementById('app');
-  if(activeTab==='dashboard') app.innerHTML = buildDashboard();
-  else if(activeTab==='tournaments') app.innerHTML = buildTournaments();
-  else if(activeTab==='teams') app.innerHTML = buildTeams();
-  else if(activeTab==='standings') app.innerHTML = buildStandings();
-  else if(activeTab==='payments') app.innerHTML = buildPayments();
-  else if(activeTab==='activity') app.innerHTML = buildActivity();
-  lucide.createIcons();
-  updateNav();
-  document.getElementById('adminBtnText').innerText = isAdmin ? 'Logout' : 'Admin';
-}
+  window.pendingImageUploadCallback = null;
 
-function statCard(label, value, icon, grad){
-  return `<div class="cut-card ${grad} p-5 relative overflow-hidden shadow-lg border border-white/20 dark:border-white/5 transition-transform hover:-translate-y-1">
-    <i data-lucide="${icon}" class="absolute -right-3 -bottom-3 w-24 h-24 text-white/20 dark:text-white/5"></i>
-    <span class="text-[10px] font-bold uppercase tracking-widest text-white/90 dark:text-white/70 block mb-1">${label}</span>
-    <h3 class="text-3xl font-bold disp text-white relative z-10">${value}</h3>
-  </div>`;
-}
+  window.showToast = (msg, type='success') => {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    const colors = type==='success' ? 'bg-emerald-600' : (type==='error' ? 'bg-qeRed' : 'bg-slate-800');
+    t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl text-white ${colors} text-sm font-bold max-w-xs border border-white/20 backdrop-blur-lg`;
+    t.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5 shrink-0"></i><span>${msg}</span>`;
+    c.appendChild(t); lucide.createIcons();
+    setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(20px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3200);
+  };
 
-function buildDashboard(){
-  const totalTeams = data.teams?.length || 0;
-  const totalMatches = data.matches?.length || 0;
-  const totalFund = (data.payments||[]).filter(p=>p.status==='approved').reduce((s,p)=>s+Number(p.amount||0),0);
-  const pendingCount = (data.payments||[]).filter(p=>p.status==='pending').length;
-  
-  const appTitle = data.appSettings?.title || 'QE SCRIM Dashboard';
-  const appDesc = data.appSettings?.description || 'Manage teams, standings, and automated payments all in one place.';
-
-  let html = `
-  <div class="mb-6 cut-card mesh-lines bg-gradient-to-br from-qeRedDim/10 to-white dark:to-qeCard border border-slate-200 dark:border-white/5 p-6 md:p-8 relative overflow-hidden shadow-sm transition-colors">
-    <img src="/assets/logo-transparent.png" class="absolute -right-4 -top-6 w-40 opacity-10 dark:opacity-20 pointer-events-none mix-blend-overlay">
-    <div class="flex justify-between items-start relative z-10">
-      <div>
-        <p class="text-qeRed font-bold text-[10px] uppercase tracking-[0.2em] mb-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-qeRed animate-pulse"></span> Welcome</p>
-        <h2 class="disp text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">${appTitle}</h2>
-        <p class="text-sm text-slate-700 dark:text-slate-400 max-w-md transition-colors leading-relaxed font-semibold">${appDesc}</p>
-        ${isAdmin ? `<p class="mt-3 text-[11px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 w-max rounded-lg border border-emerald-200 dark:border-emerald-500/20"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin Mode Active</p>` : ''}
-      </div>
-      ${isAdmin ? `<button onclick="openAppSettingsModal()" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 p-2 rounded-xl border border-slate-200 dark:border-slate-700 active:scale-95 shadow-sm hover:text-qeRed transition-colors"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
-    </div>
-  </div>
-  
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-    ${statCard('Total Teams', totalTeams, 'swords', 'bg-gradient-to-br from-indigo-500 to-indigo-600')}
-    ${statCard('Total Matches', totalMatches, 'gamepad-2', 'bg-gradient-to-br from-qeRed to-qeRedDim')}
-    ${statCard('Total Fund', '৳'+totalFund, 'wallet', 'bg-gradient-to-br from-emerald-500 to-emerald-600')}
-    ${statCard('Pending Pay', pendingCount, 'clock', 'bg-gradient-to-br from-amber-500 to-amber-600')}
-  </div>
-  
-  <div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-white/5 overflow-hidden shadow-sm transition-colors">
-    <div class="p-4 border-b border-slate-200 dark:border-white/5 flex items-center gap-2 transition-colors bg-slate-50 dark:bg-transparent"><i data-lucide="activity" class="w-4 h-4 text-qeRed"></i><h3 class="font-bold disp tracking-wide text-lg text-slate-900 dark:text-white">Recent Activity</h3></div>
-    <div class="divide-y divide-slate-100 dark:divide-white/5 max-h-80 overflow-y-auto hide-scrollbar transition-colors">
-      ${(data.logs||[]).slice(0,8).map(l=>`
-        <div class="p-4 flex gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-          <div class="w-8 h-8 rounded-xl bg-qeRed/10 border border-qeRed/20 text-qeRed flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="bell" class="w-4 h-4"></i></div>
-          <div class="min-w-0"><p class="text-sm font-bold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">${l.details}</p><p class="text-[10px] text-slate-500 mt-1.5 font-bold">${new Date(l.created_at).toLocaleString('en-US')}</p></div>
-        </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No recent activity</div>'}
-    </div>
-  </div>`;
-  return html;
-}
-
-function startCountdown(elementId, deadlineStr) {
-  const el = document.getElementById(elementId);
-  if(!el) return;
-  const target = new Date(deadlineStr).getTime();
-  const timer = setInterval(()=>{
-    const now = new Date().getTime();
-    const diff = target - now;
-    if(diff <= 0) { clearInterval(timer); el.innerHTML = "Registration Closed"; return; }
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    el.innerHTML = `Ends in: <span class="text-qeRed font-bold">${d}d ${h}h ${m}m</span>`;
-  }, 1000);
-  timers.push(timer);
-}
-
-function buildTournaments(){
-  let html = `<div class="flex justify-between items-center mb-6">
-    <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="crosshair" class="w-6 h-6 text-qeRed"></i> Tournaments</h2>
-    ${isAdmin ? `<button onclick="openTourModal()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Event</button>` : ''}
-  </div><div class="space-y-5">`;
-
-  if(!data.tournaments.length) html += `<div class="glass p-10 text-center text-slate-500 rounded-3xl border border-slate-200 dark:border-white/5 font-medium">No active tournaments available.</div>`;
-
-  data.tournaments.forEach(t => {
-    const isClosed = new Date(t.deadline).getTime() < new Date().getTime();
-    html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 relative overflow-hidden group hover:shadow-xl transition-all bg-white dark:bg-transparent">
-      <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-qeRed/10 dark:from-qeRed/20 to-transparent blur-2xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>
-      ${isAdmin ? `<button class="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 hover:text-qeRed transition-colors z-10 border border-slate-200 dark:border-slate-700" onclick="openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
-      
-      <div class="flex items-center gap-3 mb-4 relative z-10">
-        <div class="w-10 h-10 rounded-full bg-qeRed/10 border border-qeRed/20 flex items-center justify-center text-qeRed shadow-sm"><i data-lucide="award" class="w-5 h-5"></i></div>
-        <div>
-          <h3 class="disp text-xl font-bold text-slate-900 dark:text-white leading-tight">${t.title}</h3>
-          <p class="text-xs text-slate-600 dark:text-slate-400 font-bold mt-0.5" id="timer-${t.id}">${isClosed ? 'Registration Closed' : 'Loading...'}</p>
-        </div>
-      </div>
-      <p class="text-sm text-slate-700 dark:text-slate-300 mb-5 whitespace-pre-line relative z-10 leading-relaxed font-medium">${t.description || ''}</p>
-      
-      <div class="grid grid-cols-2 gap-3 mb-5 relative z-10">
-        <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-2xl border border-slate-200 dark:border-white/5">
-          <p class="text-[10px] uppercase text-slate-500 dark:text-slate-400 font-bold mb-1 tracking-wide">Entry Fee</p>
-          <p class="font-bold text-lg text-emerald-600 dark:text-emerald-400 disp">৳${t.entry_fee}</p>
-        </div>
-        <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-2xl border border-slate-200 dark:border-white/5">
-          <p class="text-[10px] uppercase text-slate-500 dark:text-slate-400 font-bold mb-1 tracking-wide">Status</p>
-          <p class="font-bold text-sm text-slate-800 dark:text-slate-200 uppercase tracking-wider mt-1.5 ${isClosed?'text-qeRed dark:text-qeRed':''}">${isClosed?'Closed':t.status}</p>
-        </div>
-      </div>
-      ${!isClosed ? `<button onclick="activeTab='payments'; render();" class="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 font-bold text-sm shadow-md active:scale-95 transition-all disp tracking-wide text-lg relative z-10">Register & Pay Now</button>` : ''}
-    </div>`;
-  });
-  html += `</div>`;
-  
-  setTimeout(()=>{
-    data.tournaments.forEach(t => { if(t.deadline) startCountdown(`timer-${t.id}`, t.deadline); });
-  }, 100);
-
-  return html;
-}
-
-function buildTeams(){
-  let html = `<div class="flex justify-between items-center mb-6">
-    <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="users" class="w-6 h-6 text-qeRed"></i> Teams</h2>
-    <div class="flex gap-2">
-      <button onclick="openPlayerForm()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 hover:border-qeRed/50 transition-colors"><i data-lucide="user-plus" class="inline w-3.5 h-3.5"></i> Player</button>
-      ${isAdmin ? `<button onclick="openTeamModal(null)" class="bg-qeRed text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3.5 h-3.5"></i> Team</button>` : ''}
-    </div>
-  </div>`;
-
-  if(isAdmin) {
-    const pendingPl = data.players.filter(p=>p.status==='pending');
-    if(pendingPl.length){
-      html += `<div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm"><h3 class="text-xs font-bold text-amber-700 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Approvals</h3><div class="space-y-2.5">`;
-      pendingPl.forEach(p=>{
-        html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-7 h-7 rounded object-cover bg-slate-100"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="api('approve_player', {id:'${p.id}'}).then(()=>loadAll().then(render))" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="api('delete_player', {id:'${p.id}'}).then(()=>loadAll().then(render))" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
-      });
-      html += `</div></div>`;
-    }
-  }
-
-  html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-5">`;
-  if(!data.teams?.length) html += `<div class="col-span-full p-10 text-center text-slate-500 cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-white/5 shadow-sm font-medium">No teams added yet.</div>`;
-  
-  data.teams.forEach(t=>{
-    const pMain = data.players.filter(p=>p.team_id===t.id && p.role==='main' && p.status==='approved');
-    const pBench = data.players.filter(p=>p.team_id===t.id && p.role==='bench' && p.status==='approved');
-    const logo = t.logo_url || '/assets/logo-transparent.png';
-    
-    html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-5 relative shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-transparent">
-      ${isAdmin ? `<div class="absolute top-4 right-4 flex gap-1"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
-      <div class="flex items-center gap-4 mb-5">
-        <div class="relative">
-          <img src="${logo}" class="w-14 h-14 rounded-2xl object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm p-1">
-          <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-lg bg-qeRed text-white flex items-center justify-center font-bold text-xs shadow-md border border-white dark:border-[#131319]">${t.slot_no||'?'}</div>
-        </div>
-        <div><h3 class="font-bold text-xl disp text-slate-900 dark:text-white">${t.team_name}</h3><p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5">MGR: ${t.manager_name||'None'}</p></div>
-      </div>
-      
-      <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 flex items-center gap-1.5 px-1"><i data-lucide="users" class="w-3 h-3"></i> Main Roster</p>
-      <div class="space-y-2 mb-4">
-        ${pMain.map(p=>`<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-8 h-8 rounded-lg object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`).join('') || `<p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p>`}
-      </div>
-      
-      ${pBench.length ? `<button onclick="document.getElementById('bench-${t.id}').classList.toggle('hidden')" class="text-[10px] w-full py-2.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Toggle Bench (${pBench.length}) <i data-lucide="chevron-down" class="inline w-3 h-3"></i></button>
-      <div id="bench-${t.id}" class="hidden space-y-2 mb-4">
-        ${pBench.map(p=>`<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-8 h-8 rounded-lg object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`).join('')}
-      </div>` : ''}
-    </div>`;
-  });
-  return html + `</div>`;
-}
-
-function buildPayments(){
-  let html = `<div class="flex justify-between items-center mb-6"><h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="wallet" class="w-6 h-6 text-qeRed"></i> Payments</h2></div>`;
-  
-  html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
-      ${isAdmin ? `<button onclick="openNumbersModal()" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
-    </div>
-    <div class="flex flex-wrap gap-3">
-      ${data.numbers?.length ? data.numbers.map(n=>`
-        <button onclick="window.copyText('${n.number}', 'Number')" class="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto">
-          <span class="text-[10px] bg-qeRed/10 text-qeRed px-2 py-1 rounded border border-qeRed/20 font-bold uppercase tracking-wider">${n.type||'Personal'}</span> 
-          <span class="text-slate-800 dark:text-slate-200 font-bold group-hover:text-qeRed transition-colors">${n.number}</span> 
-          <i data-lucide="copy" class="w-4 h-4 text-slate-400 group-hover:text-qeRed transition-colors ml-auto sm:ml-2"></i>
-        </button>`).join('') : '<p class="text-xs text-slate-500 font-medium">No payment numbers added.</p>'}
-    </div>
-  </div>`;
-
-  html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent">
-    <h3 class="font-bold disp text-lg mb-5 flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="send" class="w-5 h-5 text-qeRed"></i> Submit Payment</h3>
-    <div class="space-y-4">
-      <div>
-        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">1. Select Tournament</label>
-        <select id="payTour" onchange="window.updateCalc()" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Event --</option>${data.tournaments.filter(x=>x.status==='active').map(t=>`<option value="${t.id}" data-fee="${t.entry_fee}">${t.title} (৳${t.entry_fee})</option>`).join('')}</select>
-      </div>
-      <div>
-        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">2. Select Team</label>
-        <select id="payTeam" onchange="window.onPayTeamChange(event)" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Team --</option>${data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
-      </div>
-      
-      <div id="payerContainer" class="hidden space-y-4 fade-in">
-        <div>
-          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">3. Select Payer</label>
-          <select id="payPayer" onchange="window.onPayerChange()" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"></select>
-        </div>
-
-        <div id="hostCountContainer" class="hidden fade-in p-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl">
-          <label class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-400 mb-2.5 block tracking-wide text-center">How many players are you paying for?</label>
-          <div class="grid grid-cols-6 gap-2">
-            ${[1,2,3,4,5,6].map(i=> `<button class="pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700" onclick="window.updateCountButtons(${i})" data-count="${i}">${i}</button>`).join('')}
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 gap-4 mt-4">
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">Sender Number (bKash/Nagad/Rocket)</label><input id="paySender" type="number" placeholder="017..." class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors"></div>
-      </div>
-      
-      <div class="p-5 bg-slate-100 dark:bg-[#0a0a0f] rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner mt-4">
-        <div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400 mb-2.5"><span>Entry Fee (Total):</span><span id="lblBase" class="text-slate-800 dark:text-slate-200">৳0</span></div>
-        <div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400 mb-3.5 border-b border-slate-200 dark:border-white/10 pb-3"><span>Cashout Charge (1.85%):</span><span id="lblFee" class="text-amber-600 dark:text-amber-500">৳0</span></div>
-        <div class="flex justify-between font-bold text-xl disp text-qeRed"><span>Total To Send:</span><span id="lblTotal">৳0</span></div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">TrxID (Required)</label><input id="payTrx" type="text" placeholder="Transaction ID" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors uppercase"></div>
-        <div>
-          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">Screenshot Proof</label>
-          <input id="payScreenshot" type="file" accept="image/*" class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:text-slate-800 dark:file:text-slate-200 file:font-bold file:text-xs hover:file:bg-slate-300 dark:hover:file:bg-slate-600 transition-all cursor-pointer p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900 h-[54px]">
-        </div>
-      </div>
-      
-      <div class="flex flex-col sm:flex-row gap-3 pt-3">
-        <button id="autoVerifyBtn" onclick="window.doPaymentSubmit('auto')" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 hover:to-emerald-700 transition-all"><i data-lucide="zap" class="w-4 h-4"></i> Auto Verify (SMS)</button>
-        <button id="manualVerifyBtn" onclick="window.doPaymentSubmit('manual')" class="flex-1 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-slate-800/20 dark:shadow-white/20 flex items-center justify-center gap-2 hover:bg-slate-900 dark:hover:bg-slate-200 transition-all"><i data-lucide="shield-check" class="w-4 h-4"></i> Let Admin Verify</button>
-      </div>
-    </div>
-  </div>`;
-  
-  html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm transition-colors bg-white dark:bg-transparent">
-    <div class="p-5 border-b border-slate-200 dark:border-white/5 transition-colors bg-slate-50 dark:bg-transparent"><h3 class="font-bold disp text-lg text-slate-900 dark:text-white">Transaction History</h3></div>
-    <div class="divide-y divide-slate-100 dark:divide-white/5 max-h-[420px] overflow-y-auto hide-scrollbar transition-colors">
-      ${(data.payments||[]).map(p=>`
-        <div class="p-5 flex justify-between items-start gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-          <div class="min-w-0">
-            <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${p.payer_name}</p>
-            <p class="text-[11px] text-slate-500 font-medium mt-0.5">${new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</p>
-            ${isAdmin ? `<div class="mt-2 space-y-1"><p class="text-[10px] text-slate-600 dark:text-slate-400 font-mono bg-slate-100 dark:bg-black/40 px-2 py-1 rounded border border-slate-200 dark:border-white/5 inline-block font-semibold">Num: ${p.sender_number||'-'} | TrxID: ${p.trx_id||'-'}</p>${p.verification_type==='auto_sms'?'<p class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> Auto Matched</p>':''}</div>` : ''}
-            ${p.screenshot_url ? `<a href="${p.screenshot_url}" target="_blank" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</a>` : ''}
-          </div>
-          <div class="text-right shrink-0">
-            <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
-            <span class="inline-block mt-1 text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${p.status==='approved'?'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400':p.status==='rejected'?'bg-slate-100 border-slate-300 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400':'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}">${p.status}</span>
-            ${isAdmin && p.status==='pending' ? `<div class="flex gap-1.5 mt-3">
-              <button onclick="api('approve_payment',{id:'${p.id}'}).then(()=>loadAll().then(render))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
-              <button onclick="api('reject_payment',{id:'${p.id}'}).then(()=>loadAll().then(render))" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-            </div>` : ''}
-          </div>
-        </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No transactions found</div>'}
-    </div>
-  </div>`;
-  return html;
-}
-
-function buildStandings(){
-  let html = `<div class="flex justify-between items-center mb-6"><h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="bar-chart-2" class="w-6 h-6 text-qeRed"></i> Leaderboards</h2>
-  ${isAdmin ? `<button onclick="openStatForm()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold active:scale-95 shadow-lg shadow-qeRed/30 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Stats</button>` : `<button onclick="openStatForm()" class="bg-slate-800 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-xl text-xs font-bold active:scale-95 shadow-md">Submit Stats</button>`}
-  </div>`;
-
-  if(isAdmin) {
-    const pStats = data.player_stats.filter(s=>s.status==='pending');
-    if(pStats.length){
-      html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Stats</h3><div class="space-y-2.5">`;
-      pStats.forEach(s=>{
-        const pName = data.players.find(x=>x.id===s.player_id)?.name || 'Unknown';
-        html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<a href="${s.screenshot_url}" target="_blank" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</a>`:''}</div><div><button onclick="api('approve_stat',{id:'${s.id}'}).then(()=>{loadAll().then(render)})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="api('delete_stat',{id:'${s.id}'}).then(()=>{loadAll().then(render)})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
-      });
-      html += `</div></div>`;
-    }
-  }
-
-  const pTotals = {};
-  data.player_stats.filter(s=>s.status==='approved').forEach(s=>{
-    if(!pTotals[s.player_id]) pTotals[s.player_id] = {k:0, d:0, s:0};
-    pTotals[s.player_id].k += s.kills; pTotals[s.player_id].d += Number(s.damage); pTotals[s.player_id].s += Number(s.survived_minutes);
-  });
-  const mvps = Object.entries(pTotals).map(([id, st])=>({ id, pl: data.players.find(p=>p.id===id), ...st })).filter(x=>x.pl).sort((a,b)=>b.k - a.k || b.d - a.d);
-
-  html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent"><h3 class="font-bold disp text-xl mb-5 text-emerald-600 dark:text-emerald-500 flex items-center gap-2"><i data-lucide="crosshair" class="w-5 h-5"></i> Top Fraggers (MVP)</h3>
-  <div class="space-y-3">`;
-  mvps.slice(0,10).forEach((m, i)=>{
-    html += `<div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-3.5 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-emerald-500/30 transition-colors"><div class="flex items-center gap-3.5"><span class="w-8 h-8 flex items-center justify-center rounded-xl font-bold disp text-lg ${i===0?'bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30':i===1?'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800 shadow-md':i===2?'bg-gradient-to-br from-orange-600 to-orange-800 text-white shadow-md':'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}">${i+1}</span><div><p class="font-bold text-sm text-slate-800 dark:text-slate-200 leading-tight">${m.pl.name}</p><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${m.pl.uid}</p></div></div><div class="text-right"><p class="font-bold text-qeRed text-2xl disp leading-none">${m.k} <span class="text-xs text-slate-400 font-bold uppercase tracking-widest ml-0.5">Kills</span></p><p class="text-[10px] text-slate-500 font-bold mt-1 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md inline-block">${m.d} DMG</p></div></div>`;
-  });
-  if(!mvps.length) html += `<div class="p-8 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-slate-500 font-medium"><i data-lucide="shield-question" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>No verified stats yet.</div>`;
-  html += `</div></div>`;
-
-  return html;
-}
-
-function buildActivity(){ return `<div class="p-8 text-center text-slate-500 font-medium">Activity Logs (Restricted view)</div>`; }
-
-function attachListeners(){
-  // Kept Empty because we moved all listeners to inline onclick for better reliability after render() updates DOM.
-}
-
-// Payment Helper Functions
-window.updateCalc = () => {
-  const tourSel = document.getElementById('payTour');
-  const payerSel = document.getElementById('payPayer');
-  const hostCont = document.getElementById('hostCountContainer');
-
-  if (!tourSel) return;
-  const opt = tourSel.options[tourSel.selectedIndex];
-  if(!opt || !opt.value) return;
-
-  if(payerSel && payerSel.value === 'host') {
-     hostCont.classList.remove('hidden');
-  } else {
-     window.selectedPlayerCount = 1;
-     if(hostCont) hostCont.classList.add('hidden');
-  }
-  
-  const basePerPlayer = Number(opt.dataset.fee) || 0;
-  const base = basePerPlayer * window.selectedPlayerCount;
-  const fee = Number((base * 0.0185).toFixed(2));
-  const total = base + fee;
-  
-  document.getElementById('lblBase').innerText = `৳${base}`;
-  document.getElementById('lblFee').innerText = `৳${fee}`;
-  document.getElementById('lblTotal').innerText = `৳${total}`;
-};
-
-window.updateCountButtons = (count) => {
-  window.selectedPlayerCount = count;
-  document.querySelectorAll('.pay-count-btn').forEach(btn => {
-    if(parseInt(btn.dataset.count) === count) {
-       btn.className = 'pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-indigo-600 text-white border-indigo-600 shadow-md';
+  window.copyText = (text, label) => {
+    const fallbackCopyText = (t, l) => {
+      const ta = document.createElement('textarea'); ta.value = t;
+      ta.style.position = 'fixed'; ta.style.top = '-9999px';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); window.showToast(`${l} copied!`); } 
+      catch(err) { window.showToast('Failed to copy', 'error'); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => window.showToast(`${label} copied!`)).catch(() => fallbackCopyText(text, label));
     } else {
-       btn.className = 'pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700';
+      fallbackCopyText(text, label);
     }
-  });
-  window.updateCalc();
-};
+  };
 
-window.onPayerChange = () => { window.updateCalc(); };
+  window.showModal = (html) => {
+    const mc = document.getElementById('modalContainer');
+    mc.innerHTML = `<div class="bg-white/95 dark:bg-[#131319]/95 backdrop-blur-2xl w-full max-w-lg rounded-3xl p-6 border border-slate-200 dark:border-white/10 fade-in shadow-2xl relative my-auto max-h-[85vh] overflow-y-auto hide-scrollbar text-slate-900 dark:text-white transition-colors">${html}</div>`;
+    mc.classList.remove('hidden');
+    lucide.createIcons();
+    mc.onclick = (e) => { if(e.target === mc) window.hideModal(); };
+  };
+  
+  window.hideModal = () => document.getElementById('modalContainer').classList.add('hidden');
 
-window.onPayTeamChange = (e) => {
-  const tId = e.target.value; 
-  const payerCont = document.getElementById('payerContainer');
-  const payerSel = document.getElementById('payPayer');
-  
-  if(!tId) { 
-    payerCont.classList.add('hidden'); 
-    return; 
-  }
-  
-  const pls = data.players.filter(p=>p.team_id===tId && p.status==='approved');
-  
-  let optionsHTML = `<option value="">-- Choose Payer --</option>`;
-  optionsHTML += `<option value="host" class="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10">Host (Pay for multiple members)</option>`;
-  
-  if(pls.length > 0) {
-     optionsHTML += `<optgroup label="Team Members">`;
-     pls.forEach(p => {
-       optionsHTML += `<option value="${p.name} (UID: ${p.uid})" class="text-slate-800 dark:text-slate-200 font-bold">${p.name} - UID: ${p.uid}</option>`;
-     });
-     optionsHTML += `</optgroup>`;
-  } else {
-     optionsHTML += `<option disabled>No approved players yet</option>`;
+  window.api = async (action, payload, isPublic = false) => {
+    const endpoint = isPublic ? '/api/public-submit' : '/api/admin-write';
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': window.adminToken || '' },
+      body: JSON.stringify({ action, payload })
+    });
+    const json = await res.json();
+    if(!res.ok){
+      if(res.status === 401){ window.doLogout(); window.showToast('Session expired', 'error'); }
+      throw new Error(json.error || 'Server error');
+    }
+    return json;
   }
 
-  payerSel.innerHTML = optionsHTML;
-  payerCont.classList.remove('hidden');
-  payerSel.value = '';
-  window.updateCalc();
-};
+  window.uploadFileToSupabase = async (bucket, fileInputId) => {
+    const fileInput = document.getElementById(fileInputId);
+    if(!fileInput || !fileInput.files || !fileInput.files[0]) return null;
+    const file = fileInput.files[0];
+    const ext = file.name.split('.').pop();
+    const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.${ext}`;
+    
+    const { data, error } = await window.supabase.storage.from(bucket).upload(path, file);
+    if (error) throw error;
+    
+    const { data: pubData } = window.supabase.storage.from(bucket).getPublicUrl(path);
+    return pubData.publicUrl;
+  }
 
-window.doPaymentSubmit = async (method) => {
-  const btn = method==='auto' ? document.getElementById('autoVerifyBtn') : document.getElementById('manualVerifyBtn');
-  const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
-  try {
+  window.triggerImageUpload = (inputId, type) => {
+    const input = document.getElementById(inputId);
+    if (!input.files || input.files.length === 0) return;
+    
+    const file = input.files[0];
+    if (file.size > 10 * 1024 * 1024) {
+      window.showToast("File is too large! Maximum is 10MB.", "error");
+      input.value = ""; return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        document.getElementById('imagePreviewModal').classList.remove('hidden');
+        const canvas = document.getElementById('ipm-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let targetWidth = img.width;
+        let targetHeight = img.height;
+        
+        if (targetWidth > 1200 || targetHeight > 1200) {
+          const ratio = Math.min(1200 / targetWidth, 1200 / targetHeight);
+          targetWidth *= ratio; targetHeight *= ratio;
+        }
+
+        canvas.width = targetWidth; canvas.height = targetHeight;
+        
+        if (type === 'avatar') {
+          document.getElementById('ipm-title').innerText = "Crop Avatar";
+          canvas.style.borderRadius = "50%";
+          canvas.style.objectFit = "cover";
+          canvas.style.width = "200px"; canvas.style.height = "200px";
+        } else if (type === 'banner') {
+          document.getElementById('ipm-title').innerText = "Event Banner Preview";
+          canvas.style.borderRadius = "16px";
+          canvas.style.objectFit = "cover";
+          canvas.style.width = "100%"; canvas.style.height = "180px";
+        } else {
+          document.getElementById('ipm-title').innerText = "Proof Screenshot Preview";
+          canvas.style.borderRadius = "8px";
+          canvas.style.objectFit = "contain";
+          canvas.style.width = "auto"; canvas.style.height = "auto";
+        }
+
+        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+        document.getElementById('ipm-confirm').onclick = async () => {
+          const btn = document.getElementById('ipm-confirm');
+          const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Uploading...'; lucide.createIcons();
+          try {
+            const url = await window.uploadFileToSupabase(type === 'avatar' ? 'player-avatars' : (type === 'banner' ? 'team-logos' : 'stat-proofs'), inputId);
+            if (window.pendingImageUploadCallback) window.pendingImageUploadCallback(url);
+            window.closeImagePreview();
+            window.showToast("Image Uploaded Successfully");
+          } catch(err) {
+            window.showToast(err.message, 'error');
+            btn.innerHTML = og; lucide.createIcons();
+          }
+        };
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.closeImagePreview = () => {
+    document.getElementById('imagePreviewModal').classList.add('hidden');
+    window.pendingImageUploadCallback = null;
+  };
+
+  window.viewFullImage = (url) => {
+    window.showModal(`<img src="${url}" class="w-full rounded-2xl object-contain">`);
+  };
+
+  window.loadAll = async () => {
+    try {
+      const [t, m, r, s, p, l, n, as, tr, pl, ps] = await Promise.all([
+        window.supabase.from('teams').select('*').order('created_at'),
+        window.supabase.from('matches').select('*').order('match_no'),
+        window.supabase.from('match_results').select('*'),
+        window.supabase.from('point_settings').select('*').eq('id',1).single(),
+        window.supabase.from('payments').select('*').order('created_at', { ascending: false }),
+        window.supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(40),
+        window.supabase.from('bkash_numbers').select('*').eq('id',1).single(),
+        window.supabase.from('app_settings').select('*').eq('id',1).single(),
+        window.supabase.from('tournaments').select('*').order('created_at', {ascending: false}),
+        window.supabase.from('players').select('*'),
+        window.supabase.from('player_stats').select('*')
+      ]);
+      window.data = { 
+        teams: t.data||[], matches: m.data||[], results: r.data||[], 
+        settings: s.data||{kill_point_value:1, position_table:{}}, payments: p.data||[], 
+        logs: l.data||[], numbers: n.data?.numbers||[], appSettings: as.data||null,
+        tournaments: tr.data||[], players: pl.data||[], player_stats: ps.data||[]
+      };
+    } catch(e) { console.error(e); }
+  }
+
+  window.updateNav = () => {
+    document.querySelectorAll('.nav-btn').forEach(b=>{
+      if(b.dataset.tab === window.activeTab){ b.classList.add('text-qeRed'); b.classList.remove('text-slate-500', 'dark:text-slate-500'); }
+      else { b.classList.remove('text-qeRed'); b.classList.add('text-slate-500', 'dark:text-slate-500'); }
+    });
+  }
+
+  window.clearTimers = () => { window.timers.forEach(clearInterval); window.timers = []; }
+
+  window.changeTab = (tab) => {
+    window.activeTab = tab;
+    localStorage.setItem('qe_tab', tab);
+    const app = document.getElementById('app');
+    app.classList.remove('fade-in'); void app.offsetWidth; app.classList.add('fade-in');
+    window.render();
+  };
+
+  window.render = () => {
+    window.clearTimers();
+    window.selectedPlayerCount = 1;
+    const app = document.getElementById('app');
+    if(window.activeTab==='dashboard') app.innerHTML = window.buildDashboard();
+    else if(window.activeTab==='tournaments') app.innerHTML = window.buildTournaments();
+    else if(window.activeTab==='teams') app.innerHTML = window.buildTeams();
+    else if(window.activeTab==='standings') app.innerHTML = window.buildStandings();
+    else if(window.activeTab==='payments') app.innerHTML = window.buildPayments();
+    else if(window.activeTab==='activity') app.innerHTML = window.buildActivity();
+    lucide.createIcons();
+    window.updateNav();
+    document.getElementById('adminBtnText').innerText = window.isAdmin ? 'Logout' : 'Admin';
+  }
+
+  window.statCard = (label, value, icon, grad) => {
+    return `<div class="cut-card ${grad} p-5 relative overflow-hidden shadow-lg border border-white/20 dark:border-white/5 transition-transform hover:-translate-y-1">
+      <i data-lucide="${icon}" class="absolute -right-3 -bottom-3 w-24 h-24 text-white/20 dark:text-white/5"></i>
+      <span class="text-[10px] font-bold uppercase tracking-widest text-white/90 dark:text-white/70 block mb-1">${label}</span>
+      <h3 class="text-3xl font-bold disp text-white relative z-10">${value}</h3>
+    </div>`;
+  }
+
+  window.buildDashboard = () => {
+    const totalTeams = window.data.teams?.length || 0;
+    const totalMatches = window.data.matches?.length || 0;
+    const totalFund = (window.data.payments||[]).filter(p=>p.status==='approved').reduce((s,p)=>s+Number(p.amount||0),0);
+    const pendingCount = (window.data.payments||[]).filter(p=>p.status==='pending').length;
+    
+    const appTitle = window.data.appSettings?.title || 'QE SCRIM Dashboard';
+    const appDesc = window.data.appSettings?.description || 'Manage teams, standings, and automated payments all in one place.';
+
+    let html = `
+    <div class="mb-6 cut-card mesh-lines bg-gradient-to-br from-qeRedDim/10 to-white dark:to-qeCard border border-slate-200 dark:border-white/5 p-6 md:p-8 relative overflow-hidden shadow-sm transition-colors">
+      <img src="/assets/logo-transparent.png" class="absolute -right-4 -top-6 w-40 opacity-10 dark:opacity-20 pointer-events-none mix-blend-overlay">
+      <div class="flex justify-between items-start relative z-10">
+        <div>
+          <p class="text-qeRed font-bold text-[10px] uppercase tracking-[0.2em] mb-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-qeRed animate-pulse"></span> Welcome</p>
+          <h2 class="disp text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">${appTitle}</h2>
+          <p class="text-sm text-slate-700 dark:text-slate-400 max-w-md transition-colors leading-relaxed font-semibold">${appDesc}</p>
+          ${window.isAdmin ? `<p class="mt-3 text-[11px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 w-max rounded-lg border border-emerald-200 dark:border-emerald-500/20"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin Mode Active</p>` : ''}
+        </div>
+        ${window.isAdmin ? `<button onclick="window.openAppSettingsModal()" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 p-2 rounded-xl border border-slate-200 dark:border-slate-700 active:scale-95 shadow-sm hover:text-qeRed transition-colors"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+      ${window.statCard('Total Teams', totalTeams, 'swords', 'bg-gradient-to-br from-indigo-500 to-indigo-600')}
+      ${window.statCard('Total Matches', totalMatches, 'gamepad-2', 'bg-gradient-to-br from-qeRed to-qeRedDim')}
+      ${window.statCard('Total Fund', '৳'+totalFund, 'wallet', 'bg-gradient-to-br from-emerald-500 to-emerald-600')}
+      ${window.statCard('Pending Pay', pendingCount, 'clock', 'bg-gradient-to-br from-amber-500 to-amber-600')}
+    </div>
+    
+    <div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-white/5 overflow-hidden shadow-sm transition-colors">
+      <div class="p-4 border-b border-slate-200 dark:border-white/5 flex items-center gap-2 transition-colors bg-slate-50 dark:bg-transparent"><i data-lucide="activity" class="w-4 h-4 text-qeRed"></i><h3 class="font-bold disp tracking-wide text-lg text-slate-900 dark:text-white">Recent Activity</h3></div>
+      <div class="divide-y divide-slate-100 dark:divide-white/5 max-h-80 overflow-y-auto hide-scrollbar transition-colors">
+        ${(window.data.logs||[]).slice(0,8).map(l=>`
+          <div class="p-4 flex gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+            <div class="w-8 h-8 rounded-xl bg-qeRed/10 border border-qeRed/20 text-qeRed flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="bell" class="w-4 h-4"></i></div>
+            <div class="min-w-0"><p class="text-sm font-bold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">${l.details}</p><p class="text-[10px] text-slate-500 mt-1.5 font-bold">${new Date(l.created_at).toLocaleString('en-US')}</p></div>
+          </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No recent activity</div>'}
+      </div>
+    </div>`;
+    return html;
+  }
+
+  window.startCountdown = (elementId, deadlineStr) => {
+    const el = document.getElementById(elementId);
+    if(!el) return;
+    const target = new Date(deadlineStr).getTime();
+    const timer = setInterval(()=>{
+      const now = new Date().getTime();
+      const diff = target - now;
+      if(diff <= 0) { clearInterval(timer); el.innerHTML = "Registration Closed"; return; }
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      el.innerHTML = `Ends in: <span class="text-white font-bold bg-qeRed/80 px-2 py-0.5 rounded-lg shadow-sm">${d}d ${h}h ${m}m</span>`;
+    }, 1000);
+    window.timers.push(timer);
+  }
+
+  window.buildTournaments = () => {
+    let html = `<div class="flex justify-between items-center mb-6">
+      <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="crosshair" class="w-6 h-6 text-qeRed"></i> Tournaments</h2>
+      ${window.isAdmin ? `<button onclick="window.openTourModal()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Event</button>` : ''}
+    </div><div class="space-y-5">`;
+
+    if(!window.data.tournaments.length) html += `<div class="glass p-10 text-center text-slate-500 rounded-3xl border border-slate-200 dark:border-white/5 font-medium">No active tournaments available.</div>`;
+
+    window.data.tournaments.forEach(t => {
+      const isClosed = new Date(t.deadline).getTime() < new Date().getTime();
+      const bannerBg = t.banner_id ? `background-image: linear-gradient(to right, rgba(10,10,15,0.95), rgba(10,10,15,0.7)), url('${t.banner_id}'); background-size: cover; background-position: center;` : '';
+      
+      html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 relative overflow-hidden group hover:shadow-xl transition-all ${t.banner_id ? 'text-white' : 'bg-white dark:bg-transparent text-slate-900 dark:text-white'}" style="${bannerBg}">
+        ${!t.banner_id ? `<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-qeRed/10 dark:from-qeRed/20 to-transparent blur-2xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>` : ''}
+        ${window.isAdmin ? `<button class="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg ${t.banner_id?'text-white bg-black/50':'text-slate-500'} hover:text-qeRed transition-colors z-10 border border-slate-200 dark:border-slate-700 backdrop-blur-sm" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
+        
+        <div class="flex items-center gap-3 mb-4 relative z-10">
+          <div class="w-12 h-12 rounded-2xl bg-qeRed/20 border border-qeRed/30 flex items-center justify-center text-qeRed shadow-lg backdrop-blur-sm"><i data-lucide="award" class="w-6 h-6"></i></div>
+          <div>
+            <h3 class="disp text-2xl font-bold leading-tight drop-shadow-md">${t.title}</h3>
+            <p class="text-xs font-bold mt-1 tracking-wide ${t.banner_id?'text-slate-300':'text-slate-600 dark:text-slate-400'}" id="timer-${t.id}">${isClosed ? 'Registration Closed' : 'Loading...'}</p>
+          </div>
+        </div>
+        <p class="text-sm mb-5 whitespace-pre-line relative z-10 leading-relaxed font-medium drop-shadow-sm ${t.banner_id?'text-slate-200':'text-slate-700 dark:text-slate-300'}">${t.description || ''}</p>
+        
+        <div class="grid grid-cols-2 gap-3 mb-5 relative z-10">
+          <div class="${t.banner_id?'bg-black/40':'bg-slate-50 dark:bg-black/20'} p-3.5 rounded-2xl border ${t.banner_id?'border-white/10':'border-slate-200 dark:border-white/5'} backdrop-blur-md">
+            <p class="text-[10px] uppercase font-bold mb-1 tracking-wide ${t.banner_id?'text-slate-400':'text-slate-500 dark:text-slate-400'}">Entry Fee</p>
+            <p class="font-bold text-xl text-emerald-500 disp drop-shadow-md">৳${t.entry_fee}</p>
+          </div>
+          <div class="${t.banner_id?'bg-black/40':'bg-slate-50 dark:bg-black/20'} p-3.5 rounded-2xl border ${t.banner_id?'border-white/10':'border-slate-200 dark:border-white/5'} backdrop-blur-md">
+            <p class="text-[10px] uppercase font-bold mb-1 tracking-wide ${t.banner_id?'text-slate-400':'text-slate-500 dark:text-slate-400'}">Status</p>
+            <p class="font-bold text-sm uppercase tracking-wider mt-1.5 ${isClosed?'text-qeRed':'text-emerald-400'}">${isClosed?'Closed':t.status}</p>
+          </div>
+        </div>
+        ${!isClosed ? `<button onclick="window.changeTab('payments');" class="w-full py-4 rounded-xl ${t.banner_id?'bg-qeRed text-white hover:bg-qeRedDim':'bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900'} font-bold shadow-xl active:scale-95 transition-all disp tracking-wide text-lg relative z-10 border border-white/10">Register & Pay Now</button>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+    
+    setTimeout(()=>{
+      window.data.tournaments.forEach(t => { if(t.deadline) window.startCountdown(`timer-${t.id}`, t.deadline); });
+    }, 100);
+
+    return html;
+  }
+
+  window.buildTeams = () => {
+    let html = `<div class="flex justify-between items-center mb-6">
+      <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="users" class="w-6 h-6 text-qeRed"></i> Teams</h2>
+      <div class="flex gap-2">
+        <button onclick="window.openPlayerForm()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 hover:border-qeRed/50 transition-colors"><i data-lucide="user-plus" class="inline w-3.5 h-3.5"></i> Player</button>
+        ${window.isAdmin ? `<button onclick="window.openTeamModal(null)" class="bg-qeRed text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3.5 h-3.5"></i> Team</button>` : ''}
+      </div>
+    </div>`;
+
+    if(window.isAdmin) {
+      const pendingPl = window.data.players.filter(p=>p.status==='pending');
+      if(pendingPl.length){
+        html += `<div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm"><h3 class="text-xs font-bold text-amber-700 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Approvals</h3><div class="space-y-2.5">`;
+        pendingPl.forEach(p=>{
+          const ava = p.avatar_id ? p.avatar_id : '/assets/logo-transparent.png';
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" class="w-8 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_id}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.appPl('${p.id}')" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.rejPl('${p.id}')" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+        });
+        html += `</div></div>`;
+      }
+    }
+
+    html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-5">`;
+    if(!window.data.teams?.length) html += `<div class="col-span-full p-10 text-center text-slate-500 cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-white/5 shadow-sm font-medium">No teams added yet.</div>`;
+    
+    window.data.teams.forEach(t=>{
+      const pMain = window.data.players.filter(p=>p.team_id===t.id && p.role==='main' && p.status==='approved');
+      const pBench = window.data.players.filter(p=>p.team_id===t.id && p.role==='bench' && p.status==='approved');
+      const logo = t.logo_id ? t.logo_id : '/assets/logo-transparent.png';
+      
+      html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-5 relative shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-transparent">
+        ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
+        <div class="flex items-center gap-4 mb-5">
+          <div class="relative">
+            <img src="${logo}" class="w-14 h-14 rounded-2xl object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm p-0.5 cursor-pointer" onclick="${t.logo_id?`window.viewFullImage('${t.logo_id}')`:''}">
+            <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-lg bg-qeRed text-white flex items-center justify-center font-bold text-xs shadow-md border border-white dark:border-[#131319]">${t.slot_no||'?'}</div>
+          </div>
+          <div><h3 class="font-bold text-xl disp text-slate-900 dark:text-white">${t.team_name}</h3><p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5">MGR: ${t.manager_name||'None'}</p></div>
+        </div>
+        
+        <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 flex items-center gap-1.5 px-1"><i data-lucide="users" class="w-3 h-3"></i> Main Roster</p>
+        <div class="space-y-2 mb-4">
+          ${pMain.map(p=>{
+            const ava = p.avatar_id ? p.avatar_id : '/assets/logo-transparent.png';
+            return `<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 cursor-pointer" onclick="${p.avatar_id?`window.viewFullImage('${p.avatar_id}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
+          }).join('') || `<p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p>`}
+        </div>
+        
+        ${pBench.length ? `<button onclick="document.getElementById('bench-${t.id}').classList.toggle('hidden')" class="text-[10px] w-full py-2.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Toggle Bench (${pBench.length}) <i data-lucide="chevron-down" class="inline w-3 h-3"></i></button>
+        <div id="bench-${t.id}" class="hidden space-y-2 mb-4">
+          ${pBench.map(p=>{
+            const ava = p.avatar_id ? p.avatar_id : '/assets/logo-transparent.png';
+            return `<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50 cursor-pointer" onclick="${p.avatar_id?`window.viewFullImage('${p.avatar_id}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
+          }).join('')}
+        </div>` : ''}
+      </div>`;
+    });
+    return html + `</div>`;
+  }
+
+  window.buildPayments = () => {
+    let html = `<div class="flex justify-between items-center mb-6"><h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="wallet" class="w-6 h-6 text-qeRed"></i> Payments</h2></div>`;
+    
+    html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
+        ${window.isAdmin ? `<button onclick="window.openNumbersModal()" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
+      </div>
+      <div class="flex flex-wrap gap-3">
+        ${window.data.numbers?.length ? window.data.numbers.map(n=>`
+          <button onclick="window.copyText('${n.number}', 'Number')" class="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto">
+            <span class="text-[10px] bg-qeRed/10 text-qeRed px-2 py-1 rounded border border-qeRed/20 font-bold uppercase tracking-wider">${n.type||'Personal'}</span> 
+            <span class="text-slate-800 dark:text-slate-200 font-bold group-hover:text-qeRed transition-colors">${n.number}</span> 
+            <i data-lucide="copy" class="w-4 h-4 text-slate-400 group-hover:text-qeRed transition-colors ml-auto sm:ml-2"></i>
+          </button>`).join('') : '<p class="text-xs text-slate-500 font-medium">No payment numbers added.</p>'}
+      </div>
+    </div>`;
+
+    html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent">
+      <h3 class="font-bold disp text-lg mb-5 flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="send" class="w-5 h-5 text-qeRed"></i> Submit Payment</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">1. Select Tournament</label>
+          <select id="payTour" onchange="window.updateCalc()" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Event --</option>${window.data.tournaments.filter(x=>x.status==='active').map(t=>`<option value="${t.id}" data-fee="${t.entry_fee}">${t.title} (৳${t.entry_fee})</option>`).join('')}</select>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">2. Select Team</label>
+          <select id="payTeam" onchange="window.onPayTeamChange(event)" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Team --</option>${window.data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
+        </div>
+        
+        <div id="payerContainer" class="hidden space-y-4 fade-in">
+          <div>
+            <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">3. Select Payer</label>
+            <select id="payPayer" onchange="window.onPayerChange()" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"></select>
+          </div>
+
+          <div id="hostCountContainer" class="hidden fade-in p-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl">
+            <label class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-400 mb-2.5 block tracking-wide text-center">How many players are you paying for?</label>
+            <div class="grid grid-cols-6 gap-2">
+              ${[1,2,3,4,5,6].map(i=> `<button class="pay-count-btn py-2.5 rounded-xl font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700" onclick="window.updateCountButtons(${i})" data-count="${i}">${i}</button>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 mt-4">
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">Sender Number (bKash/Nagad/Rocket)</label><input id="paySender" type="number" placeholder="017..." class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors"></div>
+        </div>
+        
+        <div class="p-5 bg-slate-100 dark:bg-[#0a0a0f] rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner mt-4">
+          <div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400 mb-2.5"><span>Entry Fee (Total):</span><span id="lblBase" class="text-slate-800 dark:text-slate-200">৳0</span></div>
+          <div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400 mb-3.5 border-b border-slate-200 dark:border-white/10 pb-3"><span>Cashout Charge (1.85%):</span><span id="lblFee" class="text-amber-600 dark:text-amber-500">৳0</span></div>
+          <div class="flex justify-between font-bold text-xl disp text-qeRed"><span>Total To Send:</span><span id="lblTotal">৳0</span></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">TrxID (Required)</label><input id="payTrx" type="text" placeholder="Transaction ID" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors uppercase"></div>
+          <div>
+            <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">Screenshot Proof</label>
+            <div class="relative w-full">
+              <input id="payScreenshot" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('payScreenshot', 'proof')">
+              <button class="w-full text-xs text-slate-500 dark:text-slate-400 py-3.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i> Choose Image...</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-3 pt-3">
+          <button id="autoVerifyBtn" onclick="window.doPaymentSubmit('auto')" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 hover:to-emerald-700 transition-all"><i data-lucide="zap" class="w-4 h-4"></i> Auto Verify (SMS)</button>
+          <button id="manualVerifyBtn" onclick="window.doPaymentSubmit('manual')" class="flex-1 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-slate-800/20 dark:shadow-white/20 flex items-center justify-center gap-2 hover:bg-slate-900 dark:hover:bg-slate-200 transition-all"><i data-lucide="shield-check" class="w-4 h-4"></i> Let Admin Verify</button>
+        </div>
+      </div>
+    </div>`;
+    
+    html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm transition-colors bg-white dark:bg-transparent">
+      <div class="p-5 border-b border-slate-200 dark:border-white/5 transition-colors bg-slate-50 dark:bg-transparent"><h3 class="font-bold disp text-lg text-slate-900 dark:text-white">Transaction History</h3></div>
+      <div class="divide-y divide-slate-100 dark:divide-white/5 max-h-[420px] overflow-y-auto hide-scrollbar transition-colors">
+        ${(window.data.payments||[]).map(p=>`
+          <div class="p-5 flex justify-between items-start gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+            <div class="min-w-0">
+              <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${p.payer_name}</p>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">${new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</p>
+              ${window.isAdmin ? `<div class="mt-2 space-y-1"><p class="text-[10px] text-slate-600 dark:text-slate-400 font-mono bg-slate-100 dark:bg-black/40 px-2 py-1 rounded border border-slate-200 dark:border-white/5 inline-block font-semibold">Num: ${p.sender_number||'-'} | TrxID: ${p.trx_id||'-'}</p>${p.verification_type==='auto_sms'?'<p class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> Auto Matched</p>':''}</div>` : ''}
+              ${p.proof_id ? `<button onclick="window.viewFullImage('${p.proof_id}')" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</button>` : ''}
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
+              <span class="inline-block mt-1 text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${p.status==='approved'?'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400':p.status==='rejected'?'bg-slate-100 border-slate-300 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400':'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}">${p.status}</span>
+              ${window.isAdmin && p.status==='pending' ? `<div class="flex gap-1.5 mt-3">
+                <button onclick="window.api('approve_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                <button onclick="window.api('reject_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+              </div>` : ''}
+            </div>
+          </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No transactions found</div>'}
+      </div>
+    </div>`;
+    return html;
+  }
+
+  window.buildStandings = () => {
+    let html = `<div class="flex justify-between items-center mb-6"><h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="bar-chart-2" class="w-6 h-6 text-qeRed"></i> Leaderboards</h2>
+    ${window.isAdmin ? `<button onclick="window.openStatForm()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold active:scale-95 shadow-lg shadow-qeRed/30 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Stats</button>` : `<button onclick="window.openStatForm()" class="bg-slate-800 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-xl text-xs font-bold active:scale-95 shadow-md">Submit Stats</button>`}
+    </div>`;
+
+    if(window.isAdmin) {
+      const pStats = window.data.player_stats.filter(s=>s.status==='pending');
+      if(pStats.length){
+        html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Stats</h3><div class="space-y-2.5">`;
+        pStats.forEach(s=>{
+          const pName = window.data.players.find(x=>x.id===s.player_id)?.name || 'Unknown';
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.proof_id?`<button onclick="window.viewFullImage('${s.proof_id}')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</button>`:''}</div><div><button onclick="window.api('approve_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.api('delete_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+        });
+        html += `</div></div>`;
+      }
+    }
+
+    const pTotals = {};
+    window.data.player_stats.filter(s=>s.status==='approved').forEach(s=>{
+      if(!pTotals[s.player_id]) pTotals[s.player_id] = {k:0, d:0, s:0};
+      pTotals[s.player_id].k += s.kills; pTotals[s.player_id].d += Number(s.damage); pTotals[s.player_id].s += Number(s.survived_minutes);
+    });
+    const mvps = Object.entries(pTotals).map(([id, st])=>({ id, pl: window.data.players.find(p=>p.id===id), ...st })).filter(x=>x.pl).sort((a,b)=>b.k - a.k || b.d - a.d);
+
+    html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent"><h3 class="font-bold disp text-xl mb-5 text-emerald-600 dark:text-emerald-500 flex items-center gap-2"><i data-lucide="crosshair" class="w-5 h-5"></i> Top Fraggers (MVP)</h3>
+    <div class="space-y-3">`;
+    mvps.slice(0,10).forEach((m, i)=>{
+      html += `<div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-3.5 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-emerald-500/30 transition-colors"><div class="flex items-center gap-3.5"><span class="w-8 h-8 flex items-center justify-center rounded-xl font-bold disp text-lg ${i===0?'bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30':i===1?'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800 shadow-md':i===2?'bg-gradient-to-br from-orange-600 to-orange-800 text-white shadow-md':'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}">${i+1}</span><div><p class="font-bold text-sm text-slate-800 dark:text-slate-200 leading-tight">${m.pl.name}</p><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${m.pl.uid}</p></div></div><div class="text-right"><p class="font-bold text-qeRed text-2xl disp leading-none">${m.k} <span class="text-xs text-slate-400 font-bold uppercase tracking-widest ml-0.5">Kills</span></p><p class="text-[10px] text-slate-500 font-bold mt-1 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md inline-block">${m.d} DMG</p></div></div>`;
+    });
+    if(!mvps.length) html += `<div class="p-8 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-slate-500 font-medium"><i data-lucide="shield-question" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>No verified stats yet.</div>`;
+    html += `</div></div>`;
+
+    return html;
+  }
+
+  window.buildActivity = () => { return `<div class="p-8 text-center text-slate-500 font-medium">Activity Logs (Restricted view)</div>`; }
+
+  window.updateCalc = () => {
     const tourSel = document.getElementById('payTour');
-    const tId = tourSel.value; 
-    const tmId = document.getElementById('payTeam').value;
-    const payerVal = document.getElementById('payPayer')?.value;
-    const trx = document.getElementById('payTrx').value;
-    const sNum = document.getElementById('paySender').value;
-    
-    if(!tId || !tmId) throw new Error('Tournament and Team are required');
-    if(!payerVal) throw new Error('Please select who is paying');
-    if(method==='auto' && (!trx || !sNum)) throw new Error('TrxID and Sender Number required for Auto Verify');
-    
-    let finalName = payerVal;
-    if(payerVal === 'host') {
-      const tName = data.teams.find(t=>t.id===tmId)?.team_name || 'Unknown Team';
-      finalName = `Host (${window.selectedPlayerCount} Players) - ${tName}`;
-    }
+    const payerSel = document.getElementById('payPayer');
+    const hostCont = document.getElementById('hostCountContainer');
 
-    let screenshot_url = null;
-    const fileInput = document.getElementById('payScreenshot');
-    if(fileInput.files.length > 0) {
-      screenshot_url = await uploadFileToSupabase('payment-proofs', 'payScreenshot');
-    }
+    if (!tourSel) return;
+    const opt = tourSel.options[tourSel.selectedIndex];
+    if(!opt || !opt.value) return;
 
-    const basePerPlayer = Number(tourSel.options[tourSel.selectedIndex].dataset.fee);
+    if(payerSel && payerSel.value === 'host') {
+       hostCont.classList.remove('hidden');
+    } else {
+       window.selectedPlayerCount = 1;
+       if(hostCont) hostCont.classList.add('hidden');
+    }
+    
+    const basePerPlayer = Number(opt.dataset.fee) || 0;
     const base = basePerPlayer * window.selectedPlayerCount;
     const fee = Number((base * 0.0185).toFixed(2));
-
-    await fetch('/api/payment-submit', { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url, verify_method: method })
-    }).then(async r=>{if(!r.ok) throw new Error((await r.json()).error);});
+    const total = base + fee;
     
-    showToast('Payment submitted successfully'); loadAll().then(render);
-  } catch(e) { showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
-};
+    document.getElementById('lblBase').innerText = `৳${base}`;
+    document.getElementById('lblFee').innerText = `৳${fee}`;
+    document.getElementById('lblTotal').innerText = `৳${total}`;
+  };
 
-window.openTourModal = (id) => {
-  const t = id ? data.tournaments.find(x=>x.id===id) : null;
-  showModal(`
-    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="${t?'edit-2':'plus-circle'}" class="inline w-5 h-5 text-qeRed mb-1"></i> ${t?'Edit Event':'Add Event'}</h3>
-    <div class="space-y-4">
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Tournament Name</label>
-      <input id="tr-title" placeholder="Event Name" value="${t?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Description</label>
-      <textarea id="tr-desc" rows="3" placeholder="Details..." class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50">${t?.description||''}</textarea></div>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Entry Fee (৳)</label>
-        <input id="tr-fee" type="number" placeholder="0" value="${t?.entry_fee||0}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Status</label>
-        <select id="tr-status" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold appearance-none"><option value="active" ${t?.status==='active'?'selected':''}>Active</option><option value="closed" ${t?.status==='closed'?'selected':''}>Closed</option></select></div>
-      </div>
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Registration Deadline</label>
-      <input id="tr-deadline" type="datetime-local" value="${t?.deadline ? new Date(new Date(t.deadline).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,16) : ''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
-    </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tr-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-qeRedDim transition-colors shadow-lg shadow-qeRed/20"><i data-lucide="save" class="w-4 h-4"></i> Save Event</button></div>
-  `);
-  document.getElementById('tr-save').onclick = async () => {
-    const btn = document.getElementById('tr-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+  window.updateCountButtons = (count) => {
+    window.selectedPlayerCount = count;
+    document.querySelectorAll('.pay-count-btn').forEach(btn => {
+      if(parseInt(btn.dataset.count) === count) {
+         btn.className = 'pay-count-btn py-2.5 rounded-xl font-bold text-sm border transition-all bg-indigo-600 text-white border-indigo-600 shadow-md';
+      } else {
+         btn.className = 'pay-count-btn py-2.5 rounded-xl font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700';
+      }
+    });
+    window.updateCalc();
+  };
+
+  window.onPayerChange = () => { window.updateCalc(); };
+
+  window.onPayTeamChange = (e) => {
+    const tId = e.target.value; 
+    const payerCont = document.getElementById('payerContainer');
+    const payerSel = document.getElementById('payPayer');
+    
+    if(!tId) { 
+      payerCont.classList.add('hidden'); 
+      return; 
+    }
+    
+    const pls = window.data.players.filter(p=>p.team_id===tId && p.status==='approved');
+    
+    let optionsHTML = `<option value="">-- Choose Payer --</option>`;
+    optionsHTML += `<option value="host" class="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10">Host (Pay for multiple members)</option>`;
+    
+    if(pls.length > 0) {
+       optionsHTML += `<optgroup label="Team Members">`;
+       pls.forEach(p => {
+         optionsHTML += `<option value="${p.name} (UID: ${p.uid})" class="text-slate-800 dark:text-slate-200 font-bold">${p.name} - UID: ${p.uid}</option>`;
+       });
+       optionsHTML += `</optgroup>`;
+    } else {
+       optionsHTML += `<option disabled>No approved players yet</option>`;
+    }
+
+    payerSel.innerHTML = optionsHTML;
+    payerCont.classList.remove('hidden');
+    payerSel.value = '';
+    window.updateCalc();
+  };
+
+  window.doPaymentSubmit = async (method) => {
+    const btn = method==='auto' ? document.getElementById('autoVerifyBtn') : document.getElementById('manualVerifyBtn');
+    const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
     try {
-      const payload = {
-        title: document.getElementById('tr-title').value, description: document.getElementById('tr-desc').value,
-        entry_fee: Number(document.getElementById('tr-fee').value) || 0, status: document.getElementById('tr-status').value,
-        deadline: document.getElementById('tr-deadline').value ? new Date(document.getElementById('tr-deadline').value).toISOString() : null
-      };
-      if(!payload.title) throw new Error("Title is required");
-      if(t) await api('update_tournament', { id: t.id, ...payload }); else await api('create_tournament', payload);
-      hideModal(); await loadAll(); render(); showToast("Event saved successfully");
-    } catch(e){ showToast(e.message, 'error'); btn.innerHTML=og; lucide.createIcons(); }
-  }
-};
+      const tourSel = document.getElementById('payTour');
+      const tId = tourSel.value; 
+      const tmId = document.getElementById('payTeam').value;
+      const payerVal = document.getElementById('payPayer')?.value;
+      const trx = document.getElementById('payTrx').value;
+      const sNum = document.getElementById('paySender').value;
+      
+      if(!tId || !tmId) throw new Error('Tournament and Team are required');
+      if(!payerVal) throw new Error('Please select who is paying');
+      if(method==='auto' && (!trx || !sNum)) throw new Error('TrxID and Sender Number required for Auto Verify');
+      
+      let finalName = payerVal;
+      if(payerVal === 'host') {
+        const tName = window.data.teams.find(t=>t.id===tmId)?.team_name || 'Unknown Team';
+        finalName = `Host (${window.selectedPlayerCount} Players) - ${tName}`;
+      }
 
-window.openTeamModal = (id) => {
-  const team = data.teams.find(t=>t.id===id);
-  showModal(`
-    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3">${team ? 'Edit Team' : 'Add New Team'}</h3>
-    <div class="space-y-4">
-      <div class="grid grid-cols-3 gap-3">
-        <input id="tm-name" placeholder="Team Name" value="${team?.team_name||''}" class="col-span-2 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
-        <input id="tm-slot" type="number" placeholder="Slot" value="${team?.slot_no||''}" class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors text-center font-bold">
-      </div>
-      <div>
-        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">Team Logo (Optional)</label>
-        <input id="tm-logo" type="file" accept="image/*" class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:text-slate-800 dark:file:text-slate-200 file:font-bold file:text-xs hover:file:bg-slate-300 dark:hover:file:bg-slate-600 transition-all cursor-pointer p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900">
-      </div>
-      <div class="pt-2">
-        <p class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 dark:border-white/5 pb-2">Management Info</p>
-        <div class="space-y-3">
-          <input id="tm-mname" placeholder="Manager Name" value="${team?.manager_name||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
-          <div class="grid grid-cols-2 gap-3">
-            <input id="tm-mign" placeholder="Manager IGN" value="${team?.manager_ign||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
-            <input id="tm-mcontact" placeholder="Contact Number" value="${team?.manager_contact||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors">
+      const basePerPlayer = Number(tourSel.options[tourSel.selectedIndex].dataset.fee);
+      const base = basePerPlayer * window.selectedPlayerCount;
+      const fee = Number((base * 0.0185).toFixed(2));
+
+      let proof_id = null;
+      if(document.getElementById('payScreenshot').files.length > 0) {
+        window.pendingImageUploadCallback = async (fileId) => {
+          await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, proof_id: fileId, verify_method: method }, true);
+          window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
+        };
+        window.triggerImageUpload('payScreenshot', 'proof');
+      } else {
+        await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, proof_id: null, verify_method: method }, true);
+        window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
+      }
+    } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+  };
+
+  window.openTourModal = (id) => {
+    const t = id ? window.data.tournaments.find(x=>x.id===id) : null;
+    window.showModal(`
+      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="${t?'edit-2':'plus-circle'}" class="inline w-5 h-5 text-qeRed mb-1"></i> ${t?'Edit Event':'Add Event'}</h3>
+      <div class="space-y-4">
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Tournament Name</label>
+        <input id="tr-title" placeholder="Event Name" value="${t?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Description</label>
+        <textarea id="tr-desc" rows="3" placeholder="Details..." class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50">${t?.description||''}</textarea></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Entry Fee (৳)</label>
+          <input id="tr-fee" type="number" placeholder="0" value="${t?.entry_fee||0}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Status</label>
+          <select id="tr-status" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold appearance-none"><option value="active" ${t?.status==='active'?'selected':''}>Active</option><option value="closed" ${t?.status==='closed'?'selected':''}>Closed</option></select></div>
+        </div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Registration Deadline</label>
+        <input id="tr-deadline" type="datetime-local" value="${t?.deadline ? new Date(new Date(t.deadline).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,16) : ''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+        <div>
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Event Banner (Landscape)</label>
+          <div class="relative w-full">
+            <input id="tr-banner" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('tr-banner', 'banner')">
+            <button class="w-full text-xs text-slate-500 dark:text-slate-400 py-3.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i> Upload Banner...</button>
           </div>
         </div>
       </div>
-    </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tm-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save Team</button></div>
-  `);
-  document.getElementById('tm-save').onclick = async () => {
-    const btn = document.getElementById('tm-save');
-    const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
-    try{
-      let logo_url = team?.logo_url || null;
-      if(document.getElementById('tm-logo').files.length > 0){
-         logo_url = await uploadFileToSupabase('team-logos', 'tm-logo');
-      }
-      const payload = {
-        team_name: document.getElementById('tm-name').value, slot_no: Number(document.getElementById('tm-slot').value)||null,
-        manager_name: document.getElementById('tm-mname').value, manager_ign: document.getElementById('tm-mign').value,
-        manager_contact: document.getElementById('tm-mcontact').value, logo_url
-      };
-      if(!payload.team_name) throw new Error('Team name is required');
-      if(team) await api('update_team', { id: team.id, ...payload }); else await api('create_team', payload);
-      hideModal(); await loadAll(); render(); showToast('Team saved successfully');
-    } catch(err){ showToast(err.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
-  };
-}
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tr-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-qeRedDim transition-colors shadow-lg shadow-qeRed/20"><i data-lucide="save" class="w-4 h-4"></i> Save Event</button></div>
+    `);
+    
+    document.getElementById('tr-save').onclick = async () => {
+      const btn = document.getElementById('tr-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+      try {
+        const payload = {
+          title: document.getElementById('tr-title').value, description: document.getElementById('tr-desc').value,
+          entry_fee: Number(document.getElementById('tr-fee').value) || 0, status: document.getElementById('tr-status').value,
+          deadline: document.getElementById('tr-deadline').value ? new Date(document.getElementById('tr-deadline').value).toISOString() : null,
+          banner_id: t?.banner_id || null
+        };
+        if(!payload.title) throw new Error("Title is required");
 
-window.openPlayerForm = () => {
-  showModal(`
-    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="user-plus" class="inline w-5 h-5 text-qeRed mb-1"></i> Add Player</h3>
-    <div class="space-y-4">
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Team</label><select id="pl-team" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white appearance-none"><option value="">-- Choose Team --</option>${data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select></div>
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">In-Game Name</label><input id="pl-name" placeholder="IGN" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-bold"></div>
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Game UID</label><input id="pl-uid" placeholder="Numeric ID" type="number" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold"></div>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Role</label><select id="pl-role" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white appearance-none"><option value="main">Main Roster</option><option value="bench">Bench/Reserve</option></select></div>
+        const saveFn = async (fileId) => {
+          if (fileId) payload.banner_id = fileId;
+          if(t) await window.api('update_tournament', { id: t.id, ...payload }); else await window.api('create_tournament', payload);
+          window.hideModal(); await window.loadAll(); window.render(); window.showToast("Event saved successfully");
+        };
+
+        if (document.getElementById('tr-banner').files.length > 0) {
+          window.pendingImageUploadCallback = saveFn;
+          window.triggerImageUpload('tr-banner', 'banner');
+        } else {
+          await saveFn(null);
+        }
+      } catch(e){ window.showToast(e.message, 'error'); btn.innerHTML=og; lucide.createIcons(); }
+    }
+  };
+
+  window.openTeamModal = (id) => {
+    const team = window.data.teams.find(t=>t.id===id);
+    window.showModal(`
+      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3">${team ? 'Edit Team' : 'Add New Team'}</h3>
+      <div class="space-y-4">
+        <div class="grid grid-cols-3 gap-3">
+          <input id="tm-name" placeholder="Team Name" value="${team?.team_name||''}" class="col-span-2 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
+          <input id="tm-slot" type="number" placeholder="Slot" value="${team?.slot_no||''}" class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors text-center font-bold">
+        </div>
         <div>
-          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Avatar Image</label>
-          <input id="pl-pic" type="file" accept="image/*" class="w-full text-transparent file:mr-0 file:w-full file:py-2.5 file:px-2 file:rounded-lg file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:text-slate-800 dark:file:text-slate-200 file:font-bold file:text-xs hover:file:bg-slate-300 dark:hover:file:bg-slate-600 transition-all cursor-pointer p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900 h-[54px]">
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">Team Logo (Optional)</label>
+          <div class="relative w-full">
+            <input id="tm-logo" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('tm-logo', 'avatar')">
+            <button class="w-full text-xs text-slate-500 dark:text-slate-400 py-3.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i> Upload Logo...</button>
+          </div>
+        </div>
+        <div class="pt-2">
+          <p class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 dark:border-white/5 pb-2">Management Info</p>
+          <div class="space-y-3">
+            <input id="tm-mname" placeholder="Manager Name" value="${team?.manager_name||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
+            <div class="grid grid-cols-2 gap-3">
+              <input id="tm-mign" placeholder="Manager IGN" value="${team?.manager_ign||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
+              <input id="tm-mcontact" placeholder="Contact Number" value="${team?.manager_contact||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors">
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="pl-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit Request</button></div>
-  `);
-  document.getElementById('pl-save').onclick = async () => {
-    const btn = document.getElementById('pl-save');
-    const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Uploading...'; lucide.createIcons();
-    try{
-      let avatar_url = null;
-      if(document.getElementById('pl-pic').files.length > 0){
-        avatar_url = await uploadFileToSupabase('player-avatars', 'pl-pic');
-      }
-      const p = { team_id: document.getElementById('pl-team').value, name: document.getElementById('pl-name').value, uid: document.getElementById('pl-uid').value, role: document.getElementById('pl-role').value, avatar_url };
-      if(!p.team_id || !p.name || !p.uid) throw new Error('Fill required fields');
-      await api('submit_player', p, !isAdmin); hideModal(); loadAll().then(render); showToast(isAdmin?'Player added':'Player submitted for approval');
-    } catch(e) { showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
-  };
-};
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tm-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save Team</button></div>
+    `);
 
-window.openStatForm = () => {
-  showModal(`
-    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="bar-chart" class="inline w-5 h-5 text-qeRed mb-1"></i> Submit Stats</h3>
-    <div class="space-y-4">
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Event/Match</label><select id="st-match" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Match --</option>${data.matches.map(t=>`<option value="${t.id}">${t.match_label}</option>`).join('')}</select></div>
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Player</label><select id="st-player" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Player --</option>${data.players.filter(x=>x.status==='approved').map(t=>`<option value="${t.id}" data-team="${t.team_id}">${t.name} (${t.uid})</option>`).join('')}</select></div>
-      
-      <div class="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-[#0a0a0f] p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner">
-        <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Kills</label><input id="st-k" placeholder="0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
-        <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Assists</label><input id="st-a" placeholder="0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
-        <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Damage</label><input id="st-d" placeholder="0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
-        <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Survival (Min)</label><input id="st-s" placeholder="0.0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
-      </div>
-      
-      <div>
-        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Result Screenshot (Required)</label>
-        <input id="st-pic" type="file" accept="image/*" class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:text-slate-800 dark:file:text-slate-200 file:font-bold file:text-xs hover:file:bg-slate-300 dark:hover:file:bg-slate-600 transition-all cursor-pointer p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900 h-[54px]">
-      </div>
-    </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
-  `);
-  document.getElementById('st-save').onclick = async () => {
-    const btn = document.getElementById('st-save');
-    const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...'; lucide.createIcons();
-    try{
-      const opt = document.getElementById('st-player').options[document.getElementById('st-player').selectedIndex];
-      if(!opt.value) throw new Error('Select a player');
-      
-      let screenshot_url = null;
-      if(document.getElementById('st-pic').files.length > 0){
-        screenshot_url = await uploadFileToSupabase('stat-proofs', 'st-pic');
-      } else { throw new Error('Screenshot proof is required'); }
+    document.getElementById('tm-save').onclick = async () => {
+      const btn = document.getElementById('tm-save');
+      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+      try{
+        const payload = {
+          team_name: document.getElementById('tm-name').value, slot_no: Number(document.getElementById('tm-slot').value)||null,
+          manager_name: document.getElementById('tm-mname').value, manager_ign: document.getElementById('tm-mign').value,
+          manager_contact: document.getElementById('tm-mcontact').value, logo_id: team?.logo_id || null
+        };
+        if(!payload.team_name) throw new Error('Team name is required');
 
-      const p = { match_id: document.getElementById('st-match').value, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), screenshot_url };
-      if(!p.match_id) throw new Error('Select a match');
-      
-      await api('submit_stats', p, !isAdmin); hideModal(); loadAll().then(render); showToast(isAdmin?'Stats saved':'Stats submitted for review');
-    } catch(e) { showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
-  };
-};
+        const saveFn = async (fileId) => {
+          if (fileId) payload.logo_id = fileId;
+          if(team) await window.api('update_team', { id: team.id, ...payload }); else await window.api('create_team', payload);
+          window.hideModal(); await window.loadAll(); window.render(); window.showToast('Team saved successfully');
+        };
 
-window.openAdminLogin = () => {
-  showModal(`
-    <div class="text-center mb-8"><div class="w-16 h-16 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-4 border border-qeRed/20 shadow-inner"><i data-lucide="shield-check" class="w-8 h-8"></i></div><h3 class="font-bold disp text-3xl text-slate-900 dark:text-white">Admin Access</h3><p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-medium">Verify your identity to enter control room</p></div>
-    <div class="relative">
-      <input type="password" id="adminPassInput" class="w-full p-4 pr-12 rounded-2xl bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/10 text-lg text-center tracking-widest font-mono outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors shadow-inner" placeholder="••••••••">
-      <button id="togglePassBtn" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white p-2 transition-colors"><i data-lucide="eye" class="w-5 h-5"></i></button>
-    </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="al-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 hover:bg-qeRedDim transition-all hover:-translate-y-0.5">Authenticate</button></div>
-  `);
-  
-  document.getElementById('togglePassBtn').onclick = () => {
-    const inp = document.getElementById('adminPassInput');
-    const icon = document.querySelector('#togglePassBtn i');
-    if(inp.type === 'password') { inp.type = 'text'; icon.setAttribute('data-lucide', 'eye-off'); }
-    else { inp.type = 'password'; icon.setAttribute('data-lucide', 'eye'); }
-    lucide.createIcons();
-  };
-
-  document.getElementById('al-ok').addEventListener('click', async ()=>{
-    const password = document.getElementById('adminPassInput').value;
-    const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Verifying...'; lucide.createIcons();
-    try{
-      const res = await fetch('/api/admin-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password }) });
-      const json = await res.json();
-      if(!res.ok) throw new Error(json.error||'Invalid Password');
-      adminToken = json.token; isAdmin = true; localStorage.setItem('qe_admin_token', adminToken);
-      hideModal(); await loadAll(); render(); showToast('Access Granted');
-    } catch(err){ showToast(err.message,'error'); btn.innerHTML = og; lucide.createIcons(); }
-  });
-};
-
-window.openAppSettingsModal = () => {
-  showModal(`
-    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="settings" class="inline w-5 h-5 text-qeRed mb-1"></i> Dashboard Settings</h3>
-    <div class="space-y-4">
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Dashboard Title</label><input id="as-title" placeholder="Title" value="${data.appSettings?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors"></div>
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Welcome Description</label><textarea id="as-desc" placeholder="Description" rows="3" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50 transition-colors leading-relaxed">${data.appSettings?.description||''}</textarea></div>
-    </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="save" class="w-4 h-4"></i> Save Settings</button></div>
-  `);
-  document.getElementById('as-save').onclick = async () => {
-    const btn = document.getElementById('as-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
-    const title = document.getElementById('as-title').value; const description = document.getElementById('as-desc').value;
-    if(!title) { showToast('Title is required','error'); btn.innerHTML=og; lucide.createIcons(); return; }
-    try{ await api('update_app_settings', { title, description }); await loadAll(); hideModal(); render(); showToast('Settings updated'); }catch(e){showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
-  };
-};
-
-window.openNumbersModal = () => {
-  const nums = data.numbers?.length ? data.numbers : [{type:'Personal', number:''}];
-  showModal(`
-    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="smartphone" class="inline w-5 h-5 text-qeRed mb-1"></i> Edit Payment Numbers</h3>
-    <div id="numsList" class="space-y-3">
-      ${nums.map((n,i)=>`<div class="flex gap-2 num-row fade-in">
-        <select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
-        <input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50 transition-colors" placeholder="017XXXXXXXX" value="${n.number||''}">
-        <button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>`).join('')}
-    </div>
-    <button id="num-add" class="w-full mt-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Account</button>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="num-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save Numbers</button></div>
-  `);
-  lucide.createIcons();
-  document.getElementById('num-add').onclick = ()=>{
-    const div = document.createElement('div'); div.className = 'flex gap-2 num-row mt-3 fade-in';
-    div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
-    document.getElementById('numsList').appendChild(div); lucide.createIcons();
-    div.querySelector('.num-remove').onclick = ()=> div.remove();
-  };
-  document.querySelectorAll('.num-remove').forEach(b=> b.onclick = e=> e.currentTarget.closest('.num-row').remove());
-  document.getElementById('num-save').onclick = async ()=>{
-    const btn = document.getElementById('num-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
-    const numbers = Array.from(document.querySelectorAll('.num-row')).map(r=>({ type: r.querySelector('.num-type').value, number: r.querySelector('.num-value').value })).filter(n=>n.number);
-    try{ await api('update_bkash_numbers', { numbers }); await loadAll(); hideModal(); render(); showToast('Numbers updated'); }catch(e){showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
-  };
-};
-
-window.toggleTheme = () => {
-  const html = document.documentElement;
-  if(html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('qe_theme', 'light'); } 
-  else { html.classList.add('dark'); localStorage.setItem('qe_theme', 'dark'); }
-};
-
-window.toggleAdmin = () => {
-  if (isAdmin) {
-    isAdmin = false; adminToken = null; localStorage.removeItem('qe_admin_token');
-    render();
-    showToast('Logged out successfully');
-  } else {
-    window.openAdminLogin();
+        if(document.getElementById('tm-logo').files.length > 0){
+           window.pendingImageUploadCallback = saveFn;
+           window.triggerImageUpload('tm-logo', 'avatar');
+        } else {
+           await saveFn(null);
+        }
+      } catch(err){ window.showToast(err.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+    };
   }
-};
 
-document.querySelectorAll('.nav-btn').forEach(btn=>{ btn.addEventListener('click', e=>{ activeTab = e.currentTarget.dataset.tab; localStorage.setItem('qe_tab', activeTab); const app = document.getElementById('app'); app.classList.remove('fade-in'); void app.offsetWidth; app.classList.add('fade-in'); render(); }); });
+  window.openPlayerForm = () => {
+    window.showModal(`
+      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="user-plus" class="inline w-5 h-5 text-qeRed mb-1"></i> Add Player</h3>
+      <div class="space-y-4">
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Team</label><select id="pl-team" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white appearance-none"><option value="">-- Choose Team --</option>${window.data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">In-Game Name</label><input id="pl-name" placeholder="IGN" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-bold"></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Game UID</label><input id="pl-uid" placeholder="Numeric ID" type="number" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Role</label><select id="pl-role" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white appearance-none"><option value="main">Main Roster</option><option value="bench">Bench/Reserve</option></select></div>
+          <div>
+            <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Avatar Image</label>
+            <div class="relative w-full">
+              <input id="pl-pic" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('pl-pic', 'avatar')">
+              <button class="w-full text-xs text-slate-500 dark:text-slate-400 py-3.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i> Upload...</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="pl-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit Request</button></div>
+    `);
+    document.getElementById('pl-save').onclick = async () => {
+      const btn = document.getElementById('pl-save');
+      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
+      try{
+        const p = { team_id: document.getElementById('pl-team').value, name: document.getElementById('pl-name').value, uid: document.getElementById('pl-uid').value, role: document.getElementById('pl-role').value, avatar_id: null };
+        if(!p.team_id || !p.name || !p.uid) throw new Error('Fill required fields');
 
-async function init(){
-  try{ const cfg = await (await fetch('/api/config')).json(); supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey); } catch(e){ showToast('Config failed','error'); }
-  await loadAll(); render();
-}
-init();
+        const saveFn = async (fileId) => {
+          if (fileId) p.avatar_id = fileId;
+          await window.api('submit_player', p, true); window.hideModal(); await window.loadAll(); window.render(); window.showToast(window.isAdmin?'Player added':'Player submitted for approval');
+        };
+
+        if(document.getElementById('pl-pic').files.length > 0){
+          window.pendingImageUploadCallback = saveFn;
+          window.triggerImageUpload('pl-pic', 'avatar');
+        } else {
+          await saveFn(null);
+        }
+      } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+    };
+  };
+
+  window.openStatForm = () => {
+    window.showModal(`
+      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="bar-chart" class="inline w-5 h-5 text-qeRed mb-1"></i> Submit Stats</h3>
+      <div class="space-y-4">
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Event/Match</label><select id="st-match" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Match --</option>${window.data.matches.map(t=>`<option value="${t.id}">${t.match_label}</option>`).join('')}</select></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Player</label><select id="st-player" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Player --</option>${window.data.players.filter(x=>x.status==='approved').map(t=>`<option value="${t.id}" data-team="${t.team_id}">${t.name} (${t.uid})</option>`).join('')}</select></div>
+        
+        <div class="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-[#0a0a0f] p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner">
+          <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Kills</label><input id="st-k" placeholder="0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
+          <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Assists</label><input id="st-a" placeholder="0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
+          <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Damage</label><input id="st-d" placeholder="0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
+          <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Survival (Min)</label><input id="st-s" placeholder="0.0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
+        </div>
+        
+        <div>
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Result Screenshot (Required)</label>
+          <div class="relative w-full">
+            <input id="st-pic" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('st-pic', 'proof')">
+            <button class="w-full text-xs text-slate-500 dark:text-slate-400 py-3.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i> Upload Proof...</button>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
+    `);
+    document.getElementById('st-save').onclick = async () => {
+      const btn = document.getElementById('st-save');
+      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
+      try{
+        const opt = document.getElementById('st-player').options[document.getElementById('st-player').selectedIndex];
+        if(!opt.value) throw new Error('Select a player');
+        
+        const p = { match_id: document.getElementById('st-match').value, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), proof_id: null };
+        if(!p.match_id) throw new Error('Select a match');
+
+        const saveFn = async (fileId) => {
+          if (!fileId) { window.showToast('Screenshot proof is required','error'); btn.innerHTML=ogHtml; lucide.createIcons(); return; }
+          p.proof_id = fileId;
+          await window.api('submit_stats', p, true); window.hideModal(); window.loadAll().then(window.render); window.showToast(window.isAdmin?'Stats saved':'Stats submitted for review');
+        };
+
+        if(document.getElementById('st-pic').files.length > 0){
+          window.pendingImageUploadCallback = saveFn;
+          window.triggerImageUpload('st-pic', 'proof');
+        } else { throw new Error('Screenshot proof is required'); }
+
+      } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+    };
+  };
+
+  window.openAdminLogin = () => {
+    window.showModal(`
+      <div class="text-center mb-8"><div class="w-16 h-16 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-4 border border-qeRed/20 shadow-inner"><i data-lucide="shield-check" class="w-8 h-8"></i></div><h3 class="font-bold disp text-3xl text-slate-900 dark:text-white">Admin Access</h3><p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-medium">Verify your identity to enter control room</p></div>
+      <div class="relative">
+        <input type="password" id="adminPassInput" class="w-full p-4 pr-12 rounded-2xl bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/10 text-lg text-center tracking-widest font-mono outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors shadow-inner" placeholder="••••••••">
+        <button id="togglePassBtn" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white p-2 transition-colors"><i data-lucide="eye" class="w-5 h-5"></i></button>
+      </div>
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="al-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 hover:bg-qeRedDim transition-all hover:-translate-y-0.5">Authenticate</button></div>
+    `);
+    
+    document.getElementById('togglePassBtn').onclick = () => {
+      const inp = document.getElementById('adminPassInput');
+      const icon = document.querySelector('#togglePassBtn i');
+      if(inp.type === 'password') { inp.type = 'text'; icon.setAttribute('data-lucide', 'eye-off'); }
+      else { inp.type = 'password'; icon.setAttribute('data-lucide', 'eye'); }
+      lucide.createIcons();
+    };
+
+    document.getElementById('al-ok').addEventListener('click', async ()=>{
+      const password = document.getElementById('adminPassInput').value;
+      const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Verifying...'; lucide.createIcons();
+      try{
+        const res = await fetch('/api/admin-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password }) });
+        const json = await res.json();
+        if(!res.ok) throw new Error(json.error||'Invalid Password');
+        window.adminToken = json.token; window.isAdmin = true; localStorage.setItem('qe_admin_token', window.adminToken);
+        window.hideModal(); await window.loadAll(); window.render(); window.showToast('Access Granted');
+      } catch(err){ window.showToast(err.message,'error'); btn.innerHTML = og; lucide.createIcons(); }
+    });
+  };
+
+  window.openAppSettingsModal = () => {
+    window.showModal(`
+      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="settings" class="inline w-5 h-5 text-qeRed mb-1"></i> Dashboard Settings</h3>
+      <div class="space-y-4">
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Dashboard Title</label><input id="as-title" placeholder="Title" value="${window.data.appSettings?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors"></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Welcome Description</label><textarea id="as-desc" placeholder="Description" rows="3" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50 transition-colors leading-relaxed">${window.data.appSettings?.description||''}</textarea></div>
+      </div>
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="save" class="w-4 h-4"></i> Save Settings</button></div>
+    `);
+    document.getElementById('as-save').onclick = async () => {
+      const btn = document.getElementById('as-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+      const title = document.getElementById('as-title').value; const description = document.getElementById('as-desc').value;
+      if(!title) { window.showToast('Title is required','error'); btn.innerHTML=og; lucide.createIcons(); return; }
+      try{ await window.api('update_app_settings', { title, description }); await window.loadAll(); window.hideModal(); window.render(); window.showToast('Settings updated'); }catch(e){window.showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
+    };
+  };
+
+  window.openNumbersModal = () => {
+    const nums = window.data.numbers?.length ? window.data.numbers : [{type:'Personal', number:''}];
+    window.showModal(`
+      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="smartphone" class="inline w-5 h-5 text-qeRed mb-1"></i> Edit Payment Numbers</h3>
+      <div id="numsList" class="space-y-3">
+        ${nums.map((n,i)=>`<div class="flex gap-2 num-row fade-in">
+          <select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
+          <input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50 transition-colors" placeholder="017XXXXXXXX" value="${n.number||''}">
+          <button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>`).join('')}
+      </div>
+      <button id="num-add" class="w-full mt-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Account</button>
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="num-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save</button></div>
+    `);
+    lucide.createIcons();
+    document.getElementById('num-add').onclick = ()=>{
+      const div = document.createElement('div'); div.className = 'flex gap-2 num-row mt-3 fade-in';
+      div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+      document.getElementById('numsList').appendChild(div); lucide.createIcons();
+      div.querySelector('.num-remove').onclick = ()=> div.remove();
+    };
+    document.querySelectorAll('.num-remove').forEach(b=> b.onclick = e=> e.currentTarget.closest('.num-row').remove());
+    document.getElementById('num-save').onclick = async ()=>{
+      const btn = document.getElementById('num-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+      const numbers = Array.from(document.querySelectorAll('.num-row')).map(r=>({ type: r.querySelector('.num-type').value, number: r.querySelector('.num-value').value })).filter(n=>n.number);
+      try{ await window.api('update_bkash_numbers', { numbers }); await window.loadAll(); window.hideModal(); window.render(); window.showToast('Numbers updated'); }catch(e){window.showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
+    };
+  };
+
+  async function init(){
+    try{ const cfg = await (await fetch('/api/config')).json(); window.supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey); } catch(e){ window.showToast('Config failed','error'); }
+    await window.loadAll(); window.render();
+  }
+  init();
 </script>
 </body>
 </html>
