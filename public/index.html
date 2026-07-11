@@ -25,7 +25,7 @@ tailwind.config = {
 </script>
 <style>
   * { -webkit-tap-highlight-color: transparent; }
-  html,body { background: #f1f5f9; transition: background 0.4s ease; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+  html,body { background: #f8fafc; transition: background 0.4s ease; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
   html.dark, html.dark body { background: #050508; }
   body { font-family: 'Inter', 'Hind Siliguri', sans-serif; }
   .disp { font-family: 'Rajdhani', sans-serif; letter-spacing: .02em; }
@@ -62,13 +62,13 @@ tailwind.config = {
       </div>
     </div>
     <div class="flex items-center gap-3 shrink-0">
-      <button id="themeToggleBtn" class="relative w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-400/30 dark:border-slate-800">
+      <button onclick="toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-300 dark:border-slate-800">
         <div class="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300 dark:translate-x-6 flex items-center justify-center">
           <i data-lucide="sun" class="w-2.5 h-2.5 text-amber-500 dark:hidden"></i>
           <i data-lucide="moon" class="w-2.5 h-2.5 text-indigo-500 hidden dark:block"></i>
         </div>
       </button>
-      <button id="mainAdminBtn" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-xl border border-qeRed/20 active:scale-95 transition-all hover:bg-qeRed hover:text-white shadow-sm">
+      <button onclick="toggleAdmin()" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-xl border border-qeRed/20 active:scale-95 transition-all hover:bg-qeRed hover:text-white shadow-sm">
         <i data-lucide="shield" class="w-3.5 h-3.5"></i> <span id="adminBtnText">Admin</span>
       </button>
     </div>
@@ -112,47 +112,39 @@ let isAdmin = !!adminToken;
 
 let data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [], appSettings: null, tournaments: [], players: [], player_stats: [] };
 let timers = [];
+window.selectedPlayerCount = 1;
 
-const showToast = (msg, type='success') => {
+window.showToast = (msg, type='success') => {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
   const colors = type==='success' ? 'bg-emerald-600' : (type==='error' ? 'bg-qeRed' : 'bg-slate-800');
-  t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl text-white ${colors} text-sm font-semibold max-w-xs border border-white/20 backdrop-blur-lg`;
+  t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl text-white ${colors} text-sm font-bold max-w-xs border border-white/20 backdrop-blur-lg`;
   t.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5 shrink-0"></i><span>${msg}</span>`;
   c.appendChild(t); lucide.createIcons();
   setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(20px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3200);
 };
 
-const copyText = (text, label) => {
+window.copyText = (text, label) => {
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(() => {
-      showToast(`${label} copied!`);
-    }).catch(() => fallbackCopyText(text, label));
+    navigator.clipboard.writeText(text).then(() => window.showToast(`${label} copied!`))
+    .catch(() => fallbackCopyText(text, label));
   } else {
     fallbackCopyText(text, label);
   }
 };
 
 const fallbackCopyText = (text, label) => {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.top = '-9999px';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  try {
-    document.execCommand('copy');
-    showToast(`${label} copied!`);
-  } catch(err) {
-    showToast('Failed to copy', 'error');
-  }
+  const ta = document.createElement('textarea'); ta.value = text;
+  ta.style.position = 'fixed'; ta.style.top = '-9999px';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); window.showToast(`${label} copied!`); } 
+  catch(err) { window.showToast('Failed to copy', 'error'); }
   document.body.removeChild(ta);
 };
 
 const showModal = (html) => {
   const mc = document.getElementById('modalContainer');
-  mc.innerHTML = `<div class="bg-white/95 dark:bg-[#131319]/95 backdrop-blur-2xl w-full max-w-lg rounded-3xl p-6 border border-slate-200 dark:border-white/10 fade-in shadow-2xl relative my-auto max-h-[85vh] overflow-y-auto hide-scrollbar text-slate-900 dark:text-white transition-colors">${html}</div>`;
+  mc.innerHTML = `<div class="bg-white dark:bg-[#131319] w-full max-w-lg rounded-3xl p-6 border border-slate-200 dark:border-white/10 fade-in shadow-2xl relative my-auto max-h-[85vh] overflow-y-auto hide-scrollbar text-slate-900 dark:text-white transition-colors">${html}</div>`;
   mc.classList.remove('hidden');
   lucide.createIcons();
   mc.onclick = (e) => { if(e.target === mc) hideModal(); };
@@ -169,7 +161,7 @@ async function api(action, payload, isPublic = false) {
   });
   const json = await res.json();
   if(!res.ok){
-    if(res.status === 401){ doLogout(); showToast('Session expired', 'error'); }
+    if(res.status === 401){ window.doLogout(); window.showToast('Session expired', 'error'); }
     throw new Error(json.error || 'Server error');
   }
   return json;
@@ -222,8 +214,9 @@ function updateNav(){
 
 function clearTimers(){ timers.forEach(clearInterval); timers = []; }
 
-function render(){
+window.render = () => {
   clearTimers();
+  window.selectedPlayerCount = 1;
   const app = document.getElementById('app');
   if(activeTab==='dashboard') app.innerHTML = buildDashboard();
   else if(activeTab==='tournaments') app.innerHTML = buildTournaments();
@@ -232,7 +225,6 @@ function render(){
   else if(activeTab==='payments') app.innerHTML = buildPayments();
   else if(activeTab==='activity') app.innerHTML = buildActivity();
   lucide.createIcons();
-  attachListeners();
   updateNav();
   document.getElementById('adminBtnText').innerText = isAdmin ? 'Logout' : 'Admin';
 }
@@ -261,10 +253,10 @@ function buildDashboard(){
       <div>
         <p class="text-qeRed font-bold text-[10px] uppercase tracking-[0.2em] mb-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-qeRed animate-pulse"></span> Welcome</p>
         <h2 class="disp text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">${appTitle}</h2>
-        <p class="text-sm text-slate-700 dark:text-slate-400 max-w-md transition-colors leading-relaxed font-medium">${appDesc}</p>
-        ${isAdmin ? `<p class="mt-3 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 w-max rounded-lg border border-emerald-200 dark:border-emerald-500/20"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin Mode Active</p>` : ''}
+        <p class="text-sm text-slate-700 dark:text-slate-400 max-w-md transition-colors leading-relaxed font-semibold">${appDesc}</p>
+        ${isAdmin ? `<p class="mt-3 text-[11px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 w-max rounded-lg border border-emerald-200 dark:border-emerald-500/20"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin Mode Active</p>` : ''}
       </div>
-      ${isAdmin ? `<button id="editSettingsBtn" class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 p-2 rounded-xl border border-slate-200 dark:border-slate-700 active:scale-95 shadow-sm hover:text-qeRed transition-colors"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
+      ${isAdmin ? `<button onclick="openAppSettingsModal()" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 p-2 rounded-xl border border-slate-200 dark:border-slate-700 active:scale-95 shadow-sm hover:text-qeRed transition-colors"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
     </div>
   </div>
   
@@ -281,7 +273,7 @@ function buildDashboard(){
       ${(data.logs||[]).slice(0,8).map(l=>`
         <div class="p-4 flex gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
           <div class="w-8 h-8 rounded-xl bg-qeRed/10 border border-qeRed/20 text-qeRed flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="bell" class="w-4 h-4"></i></div>
-          <div class="min-w-0"><p class="text-sm font-bold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">${l.details}</p><p class="text-[10px] text-slate-500 mt-1.5 font-semibold">${new Date(l.created_at).toLocaleString('en-US')}</p></div>
+          <div class="min-w-0"><p class="text-sm font-bold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">${l.details}</p><p class="text-[10px] text-slate-500 mt-1.5 font-bold">${new Date(l.created_at).toLocaleString('en-US')}</p></div>
         </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No recent activity</div>'}
     </div>
   </div>`;
@@ -307,7 +299,7 @@ function startCountdown(elementId, deadlineStr) {
 function buildTournaments(){
   let html = `<div class="flex justify-between items-center mb-6">
     <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="crosshair" class="w-6 h-6 text-qeRed"></i> Tournaments</h2>
-    ${isAdmin ? `<button id="addTourBtn" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Event</button>` : ''}
+    ${isAdmin ? `<button onclick="openTourModal()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Event</button>` : ''}
   </div><div class="space-y-5">`;
 
   if(!data.tournaments.length) html += `<div class="glass p-10 text-center text-slate-500 rounded-3xl border border-slate-200 dark:border-white/5 font-medium">No active tournaments available.</div>`;
@@ -316,7 +308,7 @@ function buildTournaments(){
     const isClosed = new Date(t.deadline).getTime() < new Date().getTime();
     html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 relative overflow-hidden group hover:shadow-xl transition-all bg-white dark:bg-transparent">
       <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-qeRed/10 dark:from-qeRed/20 to-transparent blur-2xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>
-      ${isAdmin ? `<button class="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors z-10 border border-slate-200 dark:border-slate-700" onclick="editTour('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
+      ${isAdmin ? `<button class="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 hover:text-qeRed transition-colors z-10 border border-slate-200 dark:border-slate-700" onclick="openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
       
       <div class="flex items-center gap-3 mb-4 relative z-10">
         <div class="w-10 h-10 rounded-full bg-qeRed/10 border border-qeRed/20 flex items-center justify-center text-qeRed shadow-sm"><i data-lucide="award" class="w-5 h-5"></i></div>
@@ -354,7 +346,7 @@ function buildTeams(){
     <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="users" class="w-6 h-6 text-qeRed"></i> Teams</h2>
     <div class="flex gap-2">
       <button onclick="openPlayerForm()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 hover:border-qeRed/50 transition-colors"><i data-lucide="user-plus" class="inline w-3.5 h-3.5"></i> Player</button>
-      ${isAdmin ? `<button id="addTeamBtn" class="bg-qeRed text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3.5 h-3.5"></i> Team</button>` : ''}
+      ${isAdmin ? `<button onclick="openTeamModal(null)" class="bg-qeRed text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3.5 h-3.5"></i> Team</button>` : ''}
     </div>
   </div>`;
 
@@ -363,7 +355,7 @@ function buildTeams(){
     if(pendingPl.length){
       html += `<div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm"><h3 class="text-xs font-bold text-amber-700 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Approvals</h3><div class="space-y-2.5">`;
       pendingPl.forEach(p=>{
-        html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-7 h-7 rounded object-cover bg-slate-100"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-normal">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="appPl('${p.id}')" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="rejPl('${p.id}')" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+        html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-7 h-7 rounded object-cover bg-slate-100"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="api('approve_player', {id:'${p.id}'}).then(()=>loadAll().then(render))" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="api('delete_player', {id:'${p.id}'}).then(()=>loadAll().then(render))" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
       });
       html += `</div></div>`;
     }
@@ -384,17 +376,17 @@ function buildTeams(){
           <img src="${logo}" class="w-14 h-14 rounded-2xl object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm p-1">
           <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-lg bg-qeRed text-white flex items-center justify-center font-bold text-xs shadow-md border border-white dark:border-[#131319]">${t.slot_no||'?'}</div>
         </div>
-        <div><h3 class="font-bold text-xl disp text-slate-900 dark:text-white">${t.team_name}</h3><p class="text-[10px] text-slate-500 font-bold uppercase tracking-wide mt-0.5">MGR: ${t.manager_name||'None'}</p></div>
+        <div><h3 class="font-bold text-xl disp text-slate-900 dark:text-white">${t.team_name}</h3><p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5">MGR: ${t.manager_name||'None'}</p></div>
       </div>
       
       <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 flex items-center gap-1.5 px-1"><i data-lucide="users" class="w-3 h-3"></i> Main Roster</p>
       <div class="space-y-2 mb-4">
-        ${pMain.map(p=>`<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-8 h-8 rounded-lg object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5">UID: ${p.uid}</p></div></div>`).join('') || `<p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p>`}
+        ${pMain.map(p=>`<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-8 h-8 rounded-lg object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`).join('') || `<p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p>`}
       </div>
       
       ${pBench.length ? `<button onclick="document.getElementById('bench-${t.id}').classList.toggle('hidden')" class="text-[10px] w-full py-2.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Toggle Bench (${pBench.length}) <i data-lucide="chevron-down" class="inline w-3 h-3"></i></button>
       <div id="bench-${t.id}" class="hidden space-y-2 mb-4">
-        ${pBench.map(p=>`<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-8 h-8 rounded-lg object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5">UID: ${p.uid}</p></div></div>`).join('')}
+        ${pBench.map(p=>`<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${p.avatar_url||'/assets/logo-transparent.png'}" class="w-8 h-8 rounded-lg object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`).join('')}
       </div>` : ''}
     </div>`;
   });
@@ -406,12 +398,12 @@ function buildPayments(){
   
   html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
-      ${isAdmin ? `<button id="editNumbersBtn" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
+      <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
+      ${isAdmin ? `<button onclick="openNumbersModal()" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
     </div>
     <div class="flex flex-wrap gap-3">
       ${data.numbers?.length ? data.numbers.map(n=>`
-        <button class="copy-btn flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto" data-copy="${n.number}" data-label="Number">
+        <button onclick="window.copyText('${n.number}', 'Number')" class="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto">
           <span class="text-[10px] bg-qeRed/10 text-qeRed px-2 py-1 rounded border border-qeRed/20 font-bold uppercase tracking-wider">${n.type||'Personal'}</span> 
           <span class="text-slate-800 dark:text-slate-200 font-bold group-hover:text-qeRed transition-colors">${n.number}</span> 
           <i data-lucide="copy" class="w-4 h-4 text-slate-400 group-hover:text-qeRed transition-colors ml-auto sm:ml-2"></i>
@@ -423,30 +415,30 @@ function buildPayments(){
     <h3 class="font-bold disp text-lg mb-5 flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="send" class="w-5 h-5 text-qeRed"></i> Submit Payment</h3>
     <div class="space-y-4">
       <div>
-        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">1. Select Tournament</label>
-        <select id="payTour" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Event --</option>${data.tournaments.filter(x=>x.status==='active').map(t=>`<option value="${t.id}" data-fee="${t.entry_fee}">${t.title} (৳${t.entry_fee})</option>`).join('')}</select>
+        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">1. Select Tournament</label>
+        <select id="payTour" onchange="window.updateCalc()" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Event --</option>${data.tournaments.filter(x=>x.status==='active').map(t=>`<option value="${t.id}" data-fee="${t.entry_fee}">${t.title} (৳${t.entry_fee})</option>`).join('')}</select>
       </div>
       <div>
-        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">2. Select Team</label>
-        <select id="payTeam" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Team --</option>${data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
+        <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">2. Select Team</label>
+        <select id="payTeam" onchange="window.onPayTeamChange(event)" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Team --</option>${data.teams.map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
       </div>
       
       <div id="payerContainer" class="hidden space-y-4 fade-in">
         <div>
-          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">3. Select Payer</label>
-          <select id="payPayer" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"></select>
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">3. Select Payer</label>
+          <select id="payPayer" onchange="window.onPayerChange()" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"></select>
         </div>
 
         <div id="hostCountContainer" class="hidden fade-in p-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl">
           <label class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-400 mb-2.5 block tracking-wide text-center">How many players are you paying for?</label>
           <div class="grid grid-cols-6 gap-2">
-            ${[1,2,3,4,5,6].map(i=> `<button class="pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all ${i===1 ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700'}" data-count="${i}">${i}</button>`).join('')}
+            ${[1,2,3,4,5,6].map(i=> `<button class="pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700" onclick="window.updateCountButtons(${i})" data-count="${i}">${i}</button>`).join('')}
           </div>
         </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 mt-4">
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">Sender Number (bKash/Nagad/Rocket)</label><input id="paySender" type="number" placeholder="017..." class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors"></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">Sender Number (bKash/Nagad/Rocket)</label><input id="paySender" type="number" placeholder="017..." class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors"></div>
       </div>
       
       <div class="p-5 bg-slate-100 dark:bg-[#0a0a0f] rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner mt-4">
@@ -456,16 +448,16 @@ function buildPayments(){
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">TrxID (Required)</label><input id="payTrx" type="text" placeholder="Transaction ID" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors uppercase"></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">TrxID (Required)</label><input id="payTrx" type="text" placeholder="Transaction ID" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors uppercase"></div>
         <div>
-          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">Screenshot Proof</label>
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">Screenshot Proof</label>
           <input id="payScreenshot" type="file" accept="image/*" class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:text-slate-800 dark:file:text-slate-200 file:font-bold file:text-xs hover:file:bg-slate-300 dark:hover:file:bg-slate-600 transition-all cursor-pointer p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900 h-[54px]">
         </div>
       </div>
       
       <div class="flex flex-col sm:flex-row gap-3 pt-3">
-        <button id="autoVerifyBtn" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 hover:to-emerald-700 transition-all"><i data-lucide="zap" class="w-4 h-4"></i> Auto Verify (SMS)</button>
-        <button id="manualVerifyBtn" class="flex-1 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-slate-800/20 dark:shadow-white/20 flex items-center justify-center gap-2 hover:bg-slate-900 dark:hover:bg-slate-200 transition-all"><i data-lucide="shield-check" class="w-4 h-4"></i> Let Admin Verify</button>
+        <button id="autoVerifyBtn" onclick="window.doPaymentSubmit('auto')" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 hover:to-emerald-700 transition-all"><i data-lucide="zap" class="w-4 h-4"></i> Auto Verify (SMS)</button>
+        <button id="manualVerifyBtn" onclick="window.doPaymentSubmit('manual')" class="flex-1 bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-bold py-4 rounded-xl text-sm active:scale-95 disp tracking-wider shadow-lg shadow-slate-800/20 dark:shadow-white/20 flex items-center justify-center gap-2 hover:bg-slate-900 dark:hover:bg-slate-200 transition-all"><i data-lucide="shield-check" class="w-4 h-4"></i> Let Admin Verify</button>
       </div>
     </div>
   </div>`;
@@ -485,8 +477,8 @@ function buildPayments(){
             <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
             <span class="inline-block mt-1 text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${p.status==='approved'?'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400':p.status==='rejected'?'bg-slate-100 border-slate-300 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400':'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}">${p.status}</span>
             ${isAdmin && p.status==='pending' ? `<div class="flex gap-1.5 mt-3">
-              <button class="approve-pay-btn bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm" data-id="${p.id}"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
-              <button class="reject-pay-btn bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors" data-id="${p.id}"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+              <button onclick="api('approve_payment',{id:'${p.id}'}).then(()=>loadAll().then(render))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+              <button onclick="api('reject_payment',{id:'${p.id}'}).then(()=>loadAll().then(render))" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
             </div>` : ''}
           </div>
         </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No transactions found</div>'}
@@ -506,7 +498,7 @@ function buildStandings(){
       html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Stats</h3><div class="space-y-2.5">`;
       pStats.forEach(s=>{
         const pName = data.players.find(x=>x.id===s.player_id)?.name || 'Unknown';
-        html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<a href="${s.screenshot_url}" target="_blank" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</a>`:''}</div><div><button onclick="api('approve_stat',{id:'${s.id}'}).then(()=>{loadAll().then(render)})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="api('delete_stat',{id:'${s.id}'}).then(()=>{loadAll().then(render)})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+        html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<a href="${s.screenshot_url}" target="_blank" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</a>`:''}</div><div><button onclick="api('approve_stat',{id:'${s.id}'}).then(()=>{loadAll().then(render)})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="api('delete_stat',{id:'${s.id}'}).then(()=>{loadAll().then(render)})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
       });
       html += `</div></div>`;
     }
@@ -519,7 +511,7 @@ function buildStandings(){
   });
   const mvps = Object.entries(pTotals).map(([id, st])=>({ id, pl: data.players.find(p=>p.id===id), ...st })).filter(x=>x.pl).sort((a,b)=>b.k - a.k || b.d - a.d);
 
-  html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent"><h3 class="font-bold disp text-xl mb-5 text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><i data-lucide="crosshair" class="w-5 h-5"></i> Top Fraggers (MVP)</h3>
+  html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent"><h3 class="font-bold disp text-xl mb-5 text-emerald-600 dark:text-emerald-500 flex items-center gap-2"><i data-lucide="crosshair" class="w-5 h-5"></i> Top Fraggers (MVP)</h3>
   <div class="space-y-3">`;
   mvps.slice(0,10).forEach((m, i)=>{
     html += `<div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-3.5 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-emerald-500/30 transition-colors"><div class="flex items-center gap-3.5"><span class="w-8 h-8 flex items-center justify-center rounded-xl font-bold disp text-lg ${i===0?'bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30':i===1?'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800 shadow-md':i===2?'bg-gradient-to-br from-orange-600 to-orange-800 text-white shadow-md':'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}">${i+1}</span><div><p class="font-bold text-sm text-slate-800 dark:text-slate-200 leading-tight">${m.pl.name}</p><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${m.pl.uid}</p></div></div><div class="text-right"><p class="font-bold text-qeRed text-2xl disp leading-none">${m.k} <span class="text-xs text-slate-400 font-bold uppercase tracking-widest ml-0.5">Kills</span></p><p class="text-[10px] text-slate-500 font-bold mt-1 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md inline-block">${m.d} DMG</p></div></div>`;
@@ -533,162 +525,154 @@ function buildStandings(){
 function buildActivity(){ return `<div class="p-8 text-center text-slate-500 font-medium">Activity Logs (Restricted view)</div>`; }
 
 function attachListeners(){
-  document.querySelectorAll('.copy-btn').forEach(b => {
-    b.addEventListener('click', (e) => {
-      e.preventDefault();
-      copyText(e.currentTarget.dataset.copy, e.currentTarget.dataset.label);
-    });
-  });
-
-  if(activeTab==='payments'){
-    let selectedPlayerCount = 1;
-    const tourSel = document.getElementById('payTour');
-    const payerSel = document.getElementById('payPayer');
-    const hostCont = document.getElementById('hostCountContainer');
-
-    const updateCalc = () => {
-      const opt = tourSel.options[tourSel.selectedIndex];
-      if(!opt || !opt.value) return;
-
-      if(payerSel && payerSel.value === 'host') {
-         // Keep selectedPlayerCount 
-      } else {
-         selectedPlayerCount = 1;
-      }
-
-      const basePerPlayer = Number(opt.dataset.fee) || 0;
-      const base = basePerPlayer * selectedPlayerCount;
-      const fee = Number((base * 0.0185).toFixed(2));
-      const total = base + fee;
-      
-      document.getElementById('lblBase').innerText = `৳${base}`;
-      document.getElementById('lblFee').innerText = `৳${fee}`;
-      document.getElementById('lblTotal').innerText = `৳${total}`;
-    };
-
-    tourSel?.addEventListener('change', updateCalc);
-
-    payerSel?.addEventListener('change', (e) => {
-      if(e.target.value === 'host') {
-        hostCont.classList.remove('hidden');
-        updateCountButtons(selectedPlayerCount);
-      } else {
-        hostCont.classList.add('hidden');
-        selectedPlayerCount = 1;
-      }
-      updateCalc();
-    });
-
-    const updateCountButtons = (count) => {
-      document.querySelectorAll('.pay-count-btn').forEach(btn => {
-        if(parseInt(btn.dataset.count) === count) {
-           btn.className = 'pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-indigo-600 text-white border-indigo-600 shadow-md';
-        } else {
-           btn.className = 'pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700';
-        }
-      });
-    };
-
-    document.querySelectorAll('.pay-count-btn').forEach(b => {
-      b.addEventListener('click', (e) => {
-         e.preventDefault();
-         selectedPlayerCount = parseInt(e.currentTarget.dataset.count);
-         updateCountButtons(selectedPlayerCount);
-         updateCalc();
-      });
-    });
-
-    document.getElementById('payTeam')?.addEventListener('change', (e)=>{
-      const tId = e.target.value; 
-      const payerCont = document.getElementById('payerContainer');
-      
-      if(!tId) { 
-        payerCont.classList.add('hidden'); 
-        return; 
-      }
-      
-      const pls = data.players.filter(p=>p.team_id===tId && p.status==='approved');
-      
-      let optionsHTML = `<option value="">-- Choose Payer --</option>`;
-      optionsHTML += `<option value="host" class="font-bold text-indigo-600 dark:text-indigo-400">Host (Pay for multiple members)</option>`;
-      
-      if(pls.length > 0) {
-         optionsHTML += `<optgroup label="Team Members">`;
-         pls.forEach(p => {
-           optionsHTML += `<option value="${p.name} (UID: ${p.uid})" class="text-slate-800 dark:text-slate-200 font-bold">${p.name} - UID: ${p.uid}</option>`;
-         });
-         optionsHTML += `</optgroup>`;
-      } else {
-         optionsHTML += `<option disabled>No approved players yet</option>`;
-      }
-
-      payerSel.innerHTML = optionsHTML;
-      payerCont.classList.remove('hidden');
-      payerSel.value = '';
-      payerSel.dispatchEvent(new Event('change'));
-    });
-
-    const doSubmit = async (method) => {
-      const btn = method==='auto' ? document.getElementById('autoVerifyBtn') : document.getElementById('manualVerifyBtn');
-      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
-      try {
-        const tId = tourSel.value; const tmId = document.getElementById('payTeam').value;
-        const payerVal = document.getElementById('payPayer')?.value;
-        const trx = document.getElementById('payTrx').value;
-        const sNum = document.getElementById('paySender').value;
-        
-        if(!tId || !tmId) throw new Error('Tournament and Team are required');
-        if(!payerVal) throw new Error('Please select who is paying');
-        if(method==='auto' && (!trx || !sNum)) throw new Error('TrxID and Sender Number required for Auto Verify');
-        
-        let finalName = payerVal;
-        if(payerVal === 'host') {
-          const tName = data.teams.find(t=>t.id===tmId)?.team_name || 'Unknown Team';
-          finalName = `Host (${selectedPlayerCount} Players) - ${tName}`;
-        }
-
-        let screenshot_url = null;
-        const fileInput = document.getElementById('payScreenshot');
-        if(fileInput.files.length > 0) {
-          screenshot_url = await uploadFileToSupabase('payment-proofs', 'payScreenshot');
-        }
-
-        const basePerPlayer = Number(tourSel.options[tourSel.selectedIndex].dataset.fee);
-        const base = basePerPlayer * selectedPlayerCount;
-        const fee = Number((base * 0.0185).toFixed(2));
-
-        await fetch('/api/payment-submit', { method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url, verify_method: method })
-        }).then(async r=>{if(!r.ok) throw new Error((await r.json()).error);});
-        
-        showToast('Payment submitted successfully'); loadAll().then(render);
-      } catch(e) { showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
-    };
-    
-    document.getElementById('autoVerifyBtn')?.addEventListener('click', ()=>doSubmit('auto'));
-    document.getElementById('manualVerifyBtn')?.addEventListener('click', ()=>doSubmit('manual'));
-    document.getElementById('editNumbersBtn')?.addEventListener('click', openNumbersModal);
-    
-    document.querySelectorAll('.approve-pay-btn').forEach(b=> b.addEventListener('click', async e=>{
-      try{ await api('approve_payment',{id:e.currentTarget.dataset.id}); await loadAll(); render(); showToast('Payment Approved'); }
-      catch(err){ showToast(err.message,'error'); }
-    }));
-    document.querySelectorAll('.reject-pay-btn').forEach(b=> b.addEventListener('click', async e=>{
-      try{ await api('reject_payment',{id:e.currentTarget.dataset.id}); await loadAll(); render(); showToast('Payment Rejected'); }
-      catch(err){ showToast(err.message,'error'); }
-    }));
-  }
-  
-  if(activeTab==='teams'){
-    document.getElementById('addTeamBtn')?.addEventListener('click', ()=> openTeamModal(null));
-  }
-  if(activeTab==='dashboard'){
-    document.getElementById('editSettingsBtn')?.addEventListener('click', openAppSettingsModal);
-  }
+  // Kept Empty because we moved all listeners to inline onclick for better reliability after render() updates DOM.
 }
 
-window.appPl = (id) => { api('approve_player', {id}).then(()=>loadAll().then(render)); };
-window.rejPl = (id) => { api('delete_player', {id}).then(()=>loadAll().then(render)); };
+// Payment Helper Functions
+window.updateCalc = () => {
+  const tourSel = document.getElementById('payTour');
+  const payerSel = document.getElementById('payPayer');
+  const hostCont = document.getElementById('hostCountContainer');
+
+  if (!tourSel) return;
+  const opt = tourSel.options[tourSel.selectedIndex];
+  if(!opt || !opt.value) return;
+
+  if(payerSel && payerSel.value === 'host') {
+     hostCont.classList.remove('hidden');
+  } else {
+     window.selectedPlayerCount = 1;
+     if(hostCont) hostCont.classList.add('hidden');
+  }
+  
+  const basePerPlayer = Number(opt.dataset.fee) || 0;
+  const base = basePerPlayer * window.selectedPlayerCount;
+  const fee = Number((base * 0.0185).toFixed(2));
+  const total = base + fee;
+  
+  document.getElementById('lblBase').innerText = `৳${base}`;
+  document.getElementById('lblFee').innerText = `৳${fee}`;
+  document.getElementById('lblTotal').innerText = `৳${total}`;
+};
+
+window.updateCountButtons = (count) => {
+  window.selectedPlayerCount = count;
+  document.querySelectorAll('.pay-count-btn').forEach(btn => {
+    if(parseInt(btn.dataset.count) === count) {
+       btn.className = 'pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-indigo-600 text-white border-indigo-600 shadow-md';
+    } else {
+       btn.className = 'pay-count-btn py-2.5 rounded-lg font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700';
+    }
+  });
+  window.updateCalc();
+};
+
+window.onPayerChange = () => { window.updateCalc(); };
+
+window.onPayTeamChange = (e) => {
+  const tId = e.target.value; 
+  const payerCont = document.getElementById('payerContainer');
+  const payerSel = document.getElementById('payPayer');
+  
+  if(!tId) { 
+    payerCont.classList.add('hidden'); 
+    return; 
+  }
+  
+  const pls = data.players.filter(p=>p.team_id===tId && p.status==='approved');
+  
+  let optionsHTML = `<option value="">-- Choose Payer --</option>`;
+  optionsHTML += `<option value="host" class="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10">Host (Pay for multiple members)</option>`;
+  
+  if(pls.length > 0) {
+     optionsHTML += `<optgroup label="Team Members">`;
+     pls.forEach(p => {
+       optionsHTML += `<option value="${p.name} (UID: ${p.uid})" class="text-slate-800 dark:text-slate-200 font-bold">${p.name} - UID: ${p.uid}</option>`;
+     });
+     optionsHTML += `</optgroup>`;
+  } else {
+     optionsHTML += `<option disabled>No approved players yet</option>`;
+  }
+
+  payerSel.innerHTML = optionsHTML;
+  payerCont.classList.remove('hidden');
+  payerSel.value = '';
+  window.updateCalc();
+};
+
+window.doPaymentSubmit = async (method) => {
+  const btn = method==='auto' ? document.getElementById('autoVerifyBtn') : document.getElementById('manualVerifyBtn');
+  const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
+  try {
+    const tourSel = document.getElementById('payTour');
+    const tId = tourSel.value; 
+    const tmId = document.getElementById('payTeam').value;
+    const payerVal = document.getElementById('payPayer')?.value;
+    const trx = document.getElementById('payTrx').value;
+    const sNum = document.getElementById('paySender').value;
+    
+    if(!tId || !tmId) throw new Error('Tournament and Team are required');
+    if(!payerVal) throw new Error('Please select who is paying');
+    if(method==='auto' && (!trx || !sNum)) throw new Error('TrxID and Sender Number required for Auto Verify');
+    
+    let finalName = payerVal;
+    if(payerVal === 'host') {
+      const tName = data.teams.find(t=>t.id===tmId)?.team_name || 'Unknown Team';
+      finalName = `Host (${window.selectedPlayerCount} Players) - ${tName}`;
+    }
+
+    let screenshot_url = null;
+    const fileInput = document.getElementById('payScreenshot');
+    if(fileInput.files.length > 0) {
+      screenshot_url = await uploadFileToSupabase('payment-proofs', 'payScreenshot');
+    }
+
+    const basePerPlayer = Number(tourSel.options[tourSel.selectedIndex].dataset.fee);
+    const base = basePerPlayer * window.selectedPlayerCount;
+    const fee = Number((base * 0.0185).toFixed(2));
+
+    await fetch('/api/payment-submit', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url, verify_method: method })
+    }).then(async r=>{if(!r.ok) throw new Error((await r.json()).error);});
+    
+    showToast('Payment submitted successfully'); loadAll().then(render);
+  } catch(e) { showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+};
+
+window.openTourModal = (id) => {
+  const t = id ? data.tournaments.find(x=>x.id===id) : null;
+  showModal(`
+    <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="${t?'edit-2':'plus-circle'}" class="inline w-5 h-5 text-qeRed mb-1"></i> ${t?'Edit Event':'Add Event'}</h3>
+    <div class="space-y-4">
+      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Tournament Name</label>
+      <input id="tr-title" placeholder="Event Name" value="${t?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Description</label>
+      <textarea id="tr-desc" rows="3" placeholder="Details..." class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50">${t?.description||''}</textarea></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Entry Fee (৳)</label>
+        <input id="tr-fee" type="number" placeholder="0" value="${t?.entry_fee||0}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Status</label>
+        <select id="tr-status" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold appearance-none"><option value="active" ${t?.status==='active'?'selected':''}>Active</option><option value="closed" ${t?.status==='closed'?'selected':''}>Closed</option></select></div>
+      </div>
+      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Registration Deadline</label>
+      <input id="tr-deadline" type="datetime-local" value="${t?.deadline ? new Date(new Date(t.deadline).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,16) : ''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+    </div>
+    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tr-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-qeRedDim transition-colors shadow-lg shadow-qeRed/20"><i data-lucide="save" class="w-4 h-4"></i> Save Event</button></div>
+  `);
+  document.getElementById('tr-save').onclick = async () => {
+    const btn = document.getElementById('tr-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+    try {
+      const payload = {
+        title: document.getElementById('tr-title').value, description: document.getElementById('tr-desc').value,
+        entry_fee: Number(document.getElementById('tr-fee').value) || 0, status: document.getElementById('tr-status').value,
+        deadline: document.getElementById('tr-deadline').value ? new Date(document.getElementById('tr-deadline').value).toISOString() : null
+      };
+      if(!payload.title) throw new Error("Title is required");
+      if(t) await api('update_tournament', { id: t.id, ...payload }); else await api('create_tournament', payload);
+      hideModal(); await loadAll(); render(); showToast("Event saved successfully");
+    } catch(e){ showToast(e.message, 'error'); btn.innerHTML=og; lucide.createIcons(); }
+  }
+};
 
 window.openTeamModal = (id) => {
   const team = data.teams.find(t=>t.id===id);
@@ -751,7 +735,7 @@ window.openPlayerForm = () => {
         </div>
       </div>
     </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button id="pl-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit Request</button></div>
+    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="pl-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit Request</button></div>
   `);
   document.getElementById('pl-save').onclick = async () => {
     const btn = document.getElementById('pl-save');
@@ -772,8 +756,8 @@ window.openStatForm = () => {
   showModal(`
     <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="bar-chart" class="inline w-5 h-5 text-qeRed mb-1"></i> Submit Stats</h3>
     <div class="space-y-4">
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Event/Match</label><select id="st-match" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white"><option value="">-- Choose Match --</option>${data.matches.map(t=>`<option value="${t.id}">${t.match_label}</option>`).join('')}</select></div>
-      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Player</label><select id="st-player" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white"><option value="">-- Choose Player --</option>${data.players.filter(x=>x.status==='approved').map(t=>`<option value="${t.id}" data-team="${t.team_id}">${t.name} (${t.uid})</option>`).join('')}</select></div>
+      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Event/Match</label><select id="st-match" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Match --</option>${data.matches.map(t=>`<option value="${t.id}">${t.match_label}</option>`).join('')}</select></div>
+      <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Player</label><select id="st-player" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Player --</option>${data.players.filter(x=>x.status==='approved').map(t=>`<option value="${t.id}" data-team="${t.team_id}">${t.name} (${t.uid})</option>`).join('')}</select></div>
       
       <div class="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-[#0a0a0f] p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner">
         <div><label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Kills</label><input id="st-k" placeholder="0" type="number" class="w-full p-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white text-center focus:border-qeRed/50"></div>
@@ -787,7 +771,7 @@ window.openStatForm = () => {
         <input id="st-pic" type="file" accept="image/*" class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:text-slate-800 dark:file:text-slate-200 file:font-bold file:text-xs hover:file:bg-slate-300 dark:hover:file:bg-slate-600 transition-all cursor-pointer p-1.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900 h-[54px]">
       </div>
     </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
+    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
   `);
   document.getElementById('st-save').onclick = async () => {
     const btn = document.getElementById('st-save');
@@ -829,14 +813,14 @@ window.openAdminLogin = () => {
 
   document.getElementById('al-ok').addEventListener('click', async ()=>{
     const password = document.getElementById('adminPassInput').value;
-    const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = 'Verifying...';
+    const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Verifying...'; lucide.createIcons();
     try{
       const res = await fetch('/api/admin-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password }) });
       const json = await res.json();
       if(!res.ok) throw new Error(json.error||'Invalid Password');
       adminToken = json.token; isAdmin = true; localStorage.setItem('qe_admin_token', adminToken);
       hideModal(); await loadAll(); render(); showToast('Access Granted');
-    } catch(err){ showToast(err.message,'error'); btn.innerHTML = og; }
+    } catch(err){ showToast(err.message,'error'); btn.innerHTML = og; lucide.createIcons(); }
   });
 };
 
@@ -847,12 +831,13 @@ window.openAppSettingsModal = () => {
       <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Dashboard Title</label><input id="as-title" placeholder="Title" value="${data.appSettings?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors"></div>
       <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Welcome Description</label><textarea id="as-desc" placeholder="Description" rows="3" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50 transition-colors leading-relaxed">${data.appSettings?.description||''}</textarea></div>
     </div>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save Settings</button></div>
+    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="save" class="w-4 h-4"></i> Save Settings</button></div>
   `);
   document.getElementById('as-save').onclick = async () => {
+    const btn = document.getElementById('as-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
     const title = document.getElementById('as-title').value; const description = document.getElementById('as-desc').value;
-    if(!title) return showToast('Title is required','error');
-    try{ await api('update_app_settings', { title, description }); await loadAll(); hideModal(); render(); showToast('Settings updated'); }catch(e){showToast(e.message,'error');}
+    if(!title) { showToast('Title is required','error'); btn.innerHTML=og; lucide.createIcons(); return; }
+    try{ await api('update_app_settings', { title, description }); await loadAll(); hideModal(); render(); showToast('Settings updated'); }catch(e){showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
   };
 };
 
@@ -862,49 +847,46 @@ window.openNumbersModal = () => {
     <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="smartphone" class="inline w-5 h-5 text-qeRed mb-1"></i> Edit Payment Numbers</h3>
     <div id="numsList" class="space-y-3">
       ${nums.map((n,i)=>`<div class="flex gap-2 num-row fade-in">
-        <select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
+        <select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
         <input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50 transition-colors" placeholder="017XXXXXXXX" value="${n.number||''}">
         <button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>`).join('')}
     </div>
     <button id="num-add" class="w-full mt-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Account</button>
-    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="num-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save</button></div>
+    <div class="flex gap-3 mt-8"><button onclick="hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="num-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save Numbers</button></div>
   `);
   lucide.createIcons();
   document.getElementById('num-add').onclick = ()=>{
     const div = document.createElement('div'); div.className = 'flex gap-2 num-row mt-3 fade-in';
-    div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+    div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
     document.getElementById('numsList').appendChild(div); lucide.createIcons();
     div.querySelector('.num-remove').onclick = ()=> div.remove();
   };
   document.querySelectorAll('.num-remove').forEach(b=> b.onclick = e=> e.currentTarget.closest('.num-row').remove());
   document.getElementById('num-save').onclick = async ()=>{
+    const btn = document.getElementById('num-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
     const numbers = Array.from(document.querySelectorAll('.num-row')).map(r=>({ type: r.querySelector('.num-type').value, number: r.querySelector('.num-value').value })).filter(n=>n.number);
-    try{ await api('update_bkash_numbers', { numbers }); await loadAll(); hideModal(); render(); showToast('Numbers updated'); }catch(e){showToast(e.message,'error');}
+    try{ await api('update_bkash_numbers', { numbers }); await loadAll(); hideModal(); render(); showToast('Numbers updated'); }catch(e){showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
   };
 };
 
-document.getElementById('themeToggleBtn').addEventListener('click', () => {
+window.toggleTheme = () => {
   const html = document.documentElement;
   if(html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('qe_theme', 'light'); } 
   else { html.classList.add('dark'); localStorage.setItem('qe_theme', 'dark'); }
-});
+};
 
-document.querySelectorAll('.nav-btn').forEach(btn=>{ btn.addEventListener('click', e=>{ activeTab = e.currentTarget.dataset.tab; localStorage.setItem('qe_tab', activeTab); const app = document.getElementById('app'); app.classList.remove('fade-in'); void app.offsetWidth; app.classList.add('fade-in'); render(); }); });
-
-function doLogout(){
-  isAdmin = false; adminToken = null; localStorage.removeItem('qe_admin_token');
-}
-
-document.getElementById('mainAdminBtn').addEventListener('click', () => {
+window.toggleAdmin = () => {
   if (isAdmin) {
-    doLogout();
+    isAdmin = false; adminToken = null; localStorage.removeItem('qe_admin_token');
     render();
     showToast('Logged out successfully');
   } else {
-    openAdminLogin();
+    window.openAdminLogin();
   }
-});
+};
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{ btn.addEventListener('click', e=>{ activeTab = e.currentTarget.dataset.tab; localStorage.setItem('qe_tab', activeTab); const app = document.getElementById('app'); app.classList.remove('fade-in'); void app.offsetWidth; app.classList.add('fade-in'); render(); }); });
 
 async function init(){
   try{ const cfg = await (await fetch('/api/config')).json(); supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey); } catch(e){ showToast('Config failed','error'); }
