@@ -1,4 +1,3 @@
-// filepath: api/telegram-callback.js
 const { getAdminClient, refId } = require('../lib/server');
 
 function page(title, message, ok) {
@@ -26,6 +25,12 @@ module.exports = async (req, res) => {
   }
 
   const sb = getAdminClient();
+  
+  const { data: existing } = await sb.from('payments').select('status').eq('id', id).single();
+  if (existing && existing.status !== 'pending') {
+    return res.status(400).send(page('Already Processed', `This payment is already ${existing.status}.`, false));
+  }
+
   const status = action === 'approve' ? 'approved' : 'rejected';
   const { error } = await sb.from('payments').update({ status }).eq('id', id);
   if (error) return res.status(500).send(page('Error', error.message, false));
