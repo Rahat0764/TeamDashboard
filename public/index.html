@@ -13,7 +13,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Cropper.js for Image Cropping -->
+<!-- Cropper.js for Image Cropping & Zooming -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -51,10 +51,8 @@ tailwind.config = {
   ::selection { background: #c8203d; color: #fff; }
 
   /* Cropper CSS Overrides for Circular Avatar */
-  .cropper-view-box,
-  .cropper-face { border-radius: 50%; }
+  .cropper-view-box, .cropper-face { border-radius: 50%; }
   .cropper-modal { background: rgba(0,0,0,0.8); }
-  /* Remove circle crop for banner/proof */
   .rect-crop .cropper-view-box, .rect-crop .cropper-face { border-radius: 0; }
 </style>
 </head>
@@ -70,7 +68,7 @@ tailwind.config = {
       </div>
     </div>
     <div class="flex items-center gap-3 shrink-0">
-      <button onclick="window.toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-400/30 dark:border-slate-800">
+      <button onclick="window.toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-300 dark:border-slate-800">
         <div id="themeSlider" class="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300 flex items-center justify-center">
           <i data-lucide="sun" class="w-2.5 h-2.5 text-amber-500 dark:hidden"></i>
           <i data-lucide="moon" class="w-2.5 h-2.5 text-indigo-500 hidden dark:block"></i>
@@ -114,12 +112,13 @@ tailwind.config = {
 <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900/90 dark:bg-black/95 z-[200] hidden flex flex-col justify-center items-center px-4 backdrop-blur-lg overflow-y-auto transition-all">
   <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-white/10 flex flex-col items-center">
     <h3 class="font-bold disp text-xl mb-4 text-slate-900 dark:text-white" id="ipm-title">Crop Image</h3>
+    <p class="text-[10px] text-slate-500 mb-3 uppercase tracking-widest font-bold"><i data-lucide="move" class="inline w-3 h-3"></i> Drag to move, Pinch/Scroll to zoom</p>
     <div id="ipm-canvas-container" class="w-full bg-slate-100 dark:bg-black/50 rounded-2xl flex items-center justify-center overflow-hidden mb-6 relative border border-slate-200 dark:border-white/5" style="height: 350px;">
-      <img id="ipm-img" class="max-w-full max-h-full" src="" alt="To Crop">
+      <img id="ipm-img" class="max-w-full max-h-full block" src="" alt="To Crop">
     </div>
     <div class="flex gap-3 w-full">
       <button onclick="window.closeImagePreview()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold transition-colors">Cancel</button>
-      <button id="ipm-confirm" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 flex items-center justify-center gap-2"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload</button>
+      <button id="ipm-confirm" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Confirm</button>
     </div>
   </div>
 </div>
@@ -138,9 +137,9 @@ tailwind.config = {
   window.pendingImageUploadCallback = null;
   let cropper = null;
 
-  // Initialize theme toggle slider
   if (document.documentElement.classList.contains('dark')) {
-      document.getElementById('themeSlider').classList.add('translate-x-6');
+      const slider = document.getElementById('themeSlider');
+      if (slider) slider.classList.add('translate-x-6');
   }
 
   window.showToast = (msg, type='success') => {
@@ -213,25 +212,21 @@ tailwind.config = {
       
       const container = document.getElementById('ipm-canvas-container');
       
-      // Destroy previous cropper instance if exists
       if (cropper) { cropper.destroy(); }
 
-      // Setup Cropper Configuration
       let cropOptions = {
         viewMode: 1,
-        dragMode: 'move',
-        autoCropArea: 1,
-        restore: false,
-        guides: false,
-        center: false,
-        highlight: false,
-        cropBoxMovable: false,
+        dragMode: 'move', // Allow moving image
+        autoCropArea: 0.9,
+        cropBoxMovable: false, 
         cropBoxResizable: false,
+        zoomable: true, // Allow zoom
+        scalable: true,
         toggleDragModeOnDblclick: false,
       };
 
       if (type === 'avatar') {
-        document.getElementById('ipm-title').innerText = "Crop Avatar";
+        document.getElementById('ipm-title').innerText = "Crop Avatar / Logo";
         container.classList.remove('rect-crop');
         cropOptions.aspectRatio = 1;
       } else if (type === 'banner') {
@@ -239,14 +234,14 @@ tailwind.config = {
         container.classList.add('rect-crop');
         cropOptions.aspectRatio = 16 / 9;
       } else {
-        // Proofs don't need strict cropping
-        document.getElementById('ipm-title').innerText = "Screenshot Preview";
+        document.getElementById('ipm-title').innerText = "Screenshot Proof Preview";
         container.classList.add('rect-crop');
-        cropOptions.aspectRatio = NaN; // Free crop
+        cropOptions.aspectRatio = NaN; // Free crop for proof
+        cropOptions.cropBoxMovable = true;
         cropOptions.cropBoxResizable = true;
+        cropOptions.autoCropArea = 1;
       }
 
-      // Initialize Cropper after image is loaded into DOM
       imgElem.onload = () => {
          cropper = new Cropper(imgElem, cropOptions);
       };
@@ -257,25 +252,15 @@ tailwind.config = {
         try {
           if (!cropper) throw new Error("Image not ready");
           
-          // Get cropped Canvas
           const canvas = cropper.getCroppedCanvas({
-             maxWidth: 1200,
-             maxHeight: 1200,
-             imageSmoothingEnabled: true,
-             imageSmoothingQuality: 'high',
+             maxWidth: 1200, maxHeight: 1200, imageSmoothingEnabled: true, imageSmoothingQuality: 'high',
           });
 
-          // Upload to Supabase Storage by converting to Blob
           canvas.toBlob(async (blob) => {
               try {
                   const ext = 'jpeg';
                   const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.${ext}`;
                   let bucketName = type === 'avatar' ? 'player-avatars' : (type === 'banner' ? 'team-logos' : 'stat-proofs');
-                  
-                  // Use public API client if user is not admin and trying to upload proof/avatar
-                  // For this implementation, we use window.supabase directly (ensure bucket policies allow anon insert, or use Server API)
-                  // Notice: If RLS prevents this, we should send Base64 to a Vercel Serverless Function.
-                  // Assuming you have set "anon" insert policies on these buckets:
                   
                   const { data, error } = await window.supabase.storage.from(bucketName).upload(path, blob, { contentType: 'image/jpeg' });
                   if (error) throw error;
@@ -482,7 +467,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm"><h3 class="text-xs font-bold text-amber-700 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Approvals</h3><div class="space-y-2.5">`;
         pendingPl.forEach(p=>{
           const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.appPl('${p.id}')" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.rejPl('${p.id}')" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.api('approve_player', {id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.api('delete_player', {id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -534,7 +519,7 @@ tailwind.config = {
         <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
         ${window.isAdmin ? `<button onclick="window.openNumbersModal()" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
       </div>
-      <div class="flex flex-wrap gap-3">
+      <div id="payment-numbers-container" class="flex flex-wrap gap-3">
         ${window.data.numbers?.length ? window.data.numbers.map(n=>`
           <button onclick="window.copyText('${n.number}', 'Number')" class="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto">
             <span class="text-[10px] bg-qeRed/10 text-qeRed px-2 py-1 rounded border border-qeRed/20 font-bold uppercase tracking-wider">${n.type||'Personal'}</span> 
@@ -607,7 +592,7 @@ tailwind.config = {
               <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${p.payer_name}</p>
               <p class="text-[11px] text-slate-500 font-medium mt-0.5">${new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</p>
               ${window.isAdmin ? `<div class="mt-2 space-y-1"><p class="text-[10px] text-slate-600 dark:text-slate-400 font-mono bg-slate-100 dark:bg-black/40 px-2 py-1 rounded border border-slate-200 dark:border-white/5 inline-block font-semibold">Num: ${p.sender_number||'-'} | TrxID: ${p.trx_id||'-'}</p>${p.verification_type==='auto_sms'?'<p class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> Auto Matched</p>':''}</div>` : ''}
-              ${p.screenshot_url ? `<a href="${p.screenshot_url}" target="_blank" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</a>` : ''}
+              ${p.screenshot_url ? `<button onclick="window.viewFullImage('${p.screenshot_url}')" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</button>` : ''}
             </div>
             <div class="text-right shrink-0">
               <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
@@ -831,7 +816,7 @@ tailwind.config = {
       <div class="space-y-4">
         <div class="grid grid-cols-3 gap-3">
           <input id="tm-name" placeholder="Team Name" value="${team?.team_name||''}" class="col-span-2 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
-          <input id="tm-slot" type="number" placeholder="Slot" value="${team?.slot_no||''}" class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors text-center font-bold">
+          <input id="tm-slot" type="number" placeholder="Team Slot No. (1-25)" value="${team?.slot_no||''}" class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors text-center font-bold">
         </div>
         <div>
           <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block tracking-wide">Team Logo (Optional)</label>
@@ -845,7 +830,7 @@ tailwind.config = {
           <div class="space-y-3">
             <input id="tm-mname" placeholder="Manager Name" value="${team?.manager_name||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
             <div class="grid grid-cols-2 gap-3">
-              <input id="tm-mign" placeholder="Manager IGN" value="${team?.manager_ign||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
+              <input id="tm-mign" placeholder="Manager's Game Name (IGN)" value="${team?.manager_ign||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
               <input id="tm-mcontact" placeholder="Contact Number" value="${team?.manager_contact||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-mono font-bold focus:border-qeRed/50 transition-colors">
             </div>
           </div>
