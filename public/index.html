@@ -36,21 +36,21 @@ tailwind.config = {
   .hide-scrollbar::-webkit-scrollbar { display: none; } 
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   .cut-card { clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px); }
-  
+
   .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-color: rgba(226, 232, 240, 0.8); }
   .dark .glass { background: rgba(19,19,25,0.85); border-color: rgba(255,255,255,0.05); }
-  
+
   .mesh-lines { background-image: repeating-linear-gradient(115deg, rgba(200,32,61,.04) 0 1px, transparent 1px 20px); }
   .dark .mesh-lines { background-image: repeating-linear-gradient(115deg, rgba(200,32,61,.08) 0 1px, transparent 1px 20px); }
-  
+
   input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-  
+
   .fade-in { animation: fadeIn .4s cubic-bezier(.16,1,.3,1) forwards; }
   @keyframes fadeIn { from {opacity: 0; transform: translateY(10px)} to {opacity: 1; transform: translateY(0)} }
-  
+
   .toast-in { animation: toastIn .3s ease-out forwards; }
   @keyframes toastIn { from {opacity: 0; transform: translateX(110%)} to {opacity: 1; transform: translateX(0)} }
-  
+
   ::selection { background: #c8203d; color: #fff; }
 
   /* Cropper CSS Overrides for Circular Avatar */
@@ -180,7 +180,7 @@ tailwind.config = {
     lucide.createIcons();
     mc.onclick = (e) => { if(e.target === mc) window.hideModal(); };
   };
-  
+
   window.hideModal = () => document.getElementById('modalContainer').classList.add('hidden');
 
   window.api = async (action, payload, isPublic = false) => {
@@ -202,7 +202,7 @@ tailwind.config = {
   window.triggerImageUpload = (inputId, type) => {
     const input = document.getElementById(inputId);
     if (!input.files || input.files.length === 0) return;
-    
+
     const file = input.files[0];
     if (file.size > 10 * 1024 * 1024) {
       window.showToast("File is too large! Maximum is 10MB.", "error");
@@ -214,9 +214,9 @@ tailwind.config = {
       document.getElementById('imagePreviewModal').classList.remove('hidden');
       const imgElem = document.getElementById('ipm-img');
       imgElem.src = e.target.result;
-      
+
       const container = document.getElementById('ipm-canvas-container');
-      
+
       if (cropper) { cropper.destroy(); }
 
       let cropOptions = {
@@ -256,7 +256,7 @@ tailwind.config = {
         const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Uploading...'; lucide.createIcons();
         try {
           if (!cropper) throw new Error("Image not ready");
-          
+
           const canvas = cropper.getCroppedCanvas({
              maxWidth: 1200, maxHeight: 1200, imageSmoothingEnabled: true, imageSmoothingQuality: 'high',
           });
@@ -266,12 +266,12 @@ tailwind.config = {
                   const ext = 'jpeg';
                   const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.${ext}`;
                   let bucketName = type === 'avatar' ? 'player-avatars' : (type === 'banner' ? 'team-logos' : 'stat-proofs');
-                  
+
                   const { data, error } = await window.supabase.storage.from(bucketName).upload(path, blob, { contentType: 'image/jpeg' });
                   if (error) throw error;
-                  
+
                   const { data: pubData } = window.supabase.storage.from(bucketName).getPublicUrl(path);
-                  
+
                   if (window.pendingImageUploadCallback) window.pendingImageUploadCallback(pubData.publicUrl);
                   window.closeImagePreview();
                   window.showToast("Image Uploaded Successfully");
@@ -356,7 +356,7 @@ tailwind.config = {
     const totalMatches = window.data.matches?.length || 0;
     const totalFund = (window.data.payments||[]).filter(p=>p.status==='approved').reduce((s,p)=>s+Number(p.amount||0),0);
     const pendingCount = (window.data.payments||[]).filter(p=>p.status==='pending').length;
-    
+
     const appTitle = window.data.appSettings?.title || 'QE SCRIM Dashboard';
     const appDesc = window.data.appSettings?.description || 'Manage teams, standings, and automated payments all in one place.';
 
@@ -421,7 +421,7 @@ tailwind.config = {
     window.data.tournaments.forEach(t => {
       const isClosed = new Date(t.deadline).getTime() < new Date().getTime();
       const bannerBg = t.banner_id ? `background-image: linear-gradient(to right, rgba(10,10,15,0.95), rgba(10,10,15,0.7)), url('${t.banner_id}'); background-size: cover; background-position: center;` : '';
-      
+
       html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 relative overflow-hidden group hover:shadow-xl transition-all ${t.banner_id ? 'text-white border-0' : 'bg-white dark:bg-transparent text-slate-900 dark:text-white'}" style="${bannerBg}">
         ${!t.banner_id ? `<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-qeRed/10 dark:from-qeRed/20 to-transparent blur-2xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>` : ''}
         ${window.isAdmin ? `<button class="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg ${t.banner_id?'text-white bg-black/50':'text-slate-500'} hover:text-qeRed transition-colors z-10 border border-slate-200 dark:border-slate-700 backdrop-blur-sm" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
@@ -449,7 +449,7 @@ tailwind.config = {
       </div>`;
     });
     html += `</div>`;
-    
+
     setTimeout(()=>{
       window.data.tournaments.forEach(t => { if(t.deadline) window.startCountdown(`timer-${t.id}`, t.deadline); });
     }, 100);
@@ -480,12 +480,12 @@ tailwind.config = {
 
     html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-5">`;
     if(!window.data.teams?.length) html += `<div class="col-span-full p-10 text-center text-slate-500 cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-white/5 shadow-sm font-medium">No teams added yet.</div>`;
-    
+
     window.data.teams.forEach(t=>{
       const pMain = window.data.players.filter(p=>p.team_id===t.id && p.role==='main' && p.status==='approved');
       const pBench = window.data.players.filter(p=>p.team_id===t.id && p.role==='bench' && p.status==='approved');
       const logo = t.logo_url ? t.logo_url : '/assets/logo-transparent.png';
-      
+
       html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-5 relative shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-transparent">
         ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
         <div class="flex items-center gap-4 mb-5">
@@ -518,7 +518,7 @@ tailwind.config = {
 
   window.buildPayments = () => {
     let html = `<div class="flex justify-between items-center mb-6"><h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="wallet" class="w-6 h-6 text-qeRed"></i> Payments</h2></div>`;
-    
+
     html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
@@ -587,7 +587,7 @@ tailwind.config = {
         </div>
       </div>
     </div>`;
-    
+
     html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm transition-colors bg-white dark:bg-transparent">
       <div class="p-5 border-b border-slate-200 dark:border-white/5 transition-colors bg-slate-50 dark:bg-transparent"><h3 class="font-bold disp text-lg text-slate-900 dark:text-white">Transaction History</h3></div>
       <div class="divide-y divide-slate-100 dark:divide-white/5 max-h-[420px] overflow-y-auto hide-scrollbar transition-colors">
@@ -665,12 +665,12 @@ tailwind.config = {
        window.selectedPlayerCount = 1;
        if(hostCont) hostCont.classList.add('hidden');
     }
-    
+
     const basePerPlayer = Number(opt.dataset.fee) || 0;
     const base = basePerPlayer * window.selectedPlayerCount;
     const fee = Number((base * 0.0185).toFixed(2));
     const total = base + fee;
-    
+
     document.getElementById('lblBase').innerText = `৳${base}`;
     document.getElementById('lblFee').innerText = `৳${fee}`;
     document.getElementById('lblTotal').innerText = `৳${total}`;
@@ -694,17 +694,17 @@ tailwind.config = {
     const tId = e.target.value; 
     const payerCont = document.getElementById('payerContainer');
     const payerSel = document.getElementById('payPayer');
-    
+
     if(!tId) { 
       payerCont.classList.add('hidden'); 
       return; 
     }
-    
+
     const pls = window.data.players.filter(p=>p.team_id===tId && p.status==='approved');
-    
+
     let optionsHTML = `<option value="">-- Choose Payer --</option>`;
     optionsHTML += `<option value="host" class="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10">Host (Pay for multiple members)</option>`;
-    
+
     if(pls.length > 0) {
        optionsHTML += `<optgroup label="Team Members">`;
        pls.forEach(p => {
@@ -726,16 +726,16 @@ tailwind.config = {
     const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
     try {
       const tourSel = document.getElementById('payTour');
-      const tId = tourSel.value; 
+      const tId = tourSel.value;
       const tmId = document.getElementById('payTeam').value;
       const payerVal = document.getElementById('payPayer')?.value;
       const trx = document.getElementById('payTrx').value;
       const sNum = document.getElementById('paySender').value;
-      
+
       if(!tId || !tmId) throw new Error('Tournament and Team are required');
       if(!payerVal) throw new Error('Please select who is paying');
       if(method==='auto' && (!trx || !sNum)) throw new Error('TrxID and Sender Number required for Auto Verify');
-      
+
       let finalName = payerVal;
       if(payerVal === 'host') {
         const tName = window.data.teams.find(t=>t.id===tmId)?.team_name || 'Unknown Team';
@@ -746,15 +746,22 @@ tailwind.config = {
       const base = basePerPlayer * window.selectedPlayerCount;
       const fee = Number((base * 0.0185).toFixed(2));
 
+      const submitPayment = async (fileUrl) => {
+        const res = await fetch('/api/payment-submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url: fileUrl, verify_method: method })
+        });
+        const json = await res.json();
+        if(!res.ok) throw new Error(json.error || 'Server error');
+        window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
+      };
+
       if(document.getElementById('payScreenshot').files.length > 0) {
-        window.pendingImageUploadCallback = async (fileUrl) => {
-          await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url: fileUrl, verify_method: method }, true);
-          window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
-        };
+        window.pendingImageUploadCallback = submitPayment;
         window.triggerImageUpload('payScreenshot', 'proof');
       } else {
-        await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url: null, verify_method: method }, true);
-        window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
+        await submitPayment(null);
       }
     } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
   };
@@ -786,7 +793,7 @@ tailwind.config = {
       </div>
       <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tr-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-qeRedDim transition-colors shadow-lg shadow-qeRed/20"><i data-lucide="save" class="w-4 h-4"></i> Save Event</button></div>
     `);
-    
+
     document.getElementById('tr-save').onclick = async () => {
       const btn = document.getElementById('tr-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
       try {
@@ -943,7 +950,7 @@ tailwind.config = {
       try{
         const opt = document.getElementById('st-player').options[document.getElementById('st-player').selectedIndex];
         if(!opt.value) throw new Error('Select a player');
-        
+
         const p = { match_id: document.getElementById('st-match').value, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), screenshot_url: null };
         if(!p.match_id) throw new Error('Select a match');
 
@@ -971,7 +978,7 @@ tailwind.config = {
       </div>
       <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="al-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 hover:bg-qeRedDim transition-all hover:-translate-y-0.5">Authenticate</button></div>
     `);
-    
+
     document.getElementById('togglePassBtn').onclick = () => {
       const inp = document.getElementById('adminPassInput');
       const icon = document.querySelector('#togglePassBtn i');
@@ -1069,7 +1076,7 @@ tailwind.config = {
     try{ const cfg = await (await fetch('/api/config')).json(); window.supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey); } catch(e){ window.showToast('Config failed','error'); }
     await window.loadAll(); window.render();
   }
-  
+
   // Start the application
   init();
 </script>
