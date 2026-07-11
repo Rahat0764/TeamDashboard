@@ -3,12 +3,8 @@ const { getAdminClient, sendTelegram, refId } = require('../lib/server');
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   
-  // Basic payload size check to prevent abuse
   if (JSON.stringify(req.body).length > 50000) return res.status(400).json({error: 'Payload too large'});
 
-  // We intentionally use the Admin Client (Service Role) here because public users
-  // cannot insert rows into 'players' and 'player_stats' directly due to RLS policies.
-  // This serverless function acts as a secure middleman.
   const sb = getAdminClient();
   const { action, payload } = req.body || {};
 
