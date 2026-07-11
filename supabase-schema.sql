@@ -1,7 +1,12 @@
--- QE SCRIM MANAGEMENT — SUPABASE SCHEMA
--- Run this once inside Supabase SQL Editor.
-
+-- filepath: supabase-schema.sql
 create extension if not exists "pgcrypto";
+
+create table app_settings (
+  id int primary key default 1,
+  title text not null default 'QE SCRIM Dashboard',
+  description text not null default 'Manage teams, standings, and payments all in one place.'
+);
+insert into app_settings (id) values (1) on conflict (id) do nothing;
 
 create table teams (
   id uuid primary key default gen_random_uuid(),
@@ -71,11 +76,7 @@ create table bkash_numbers (
 );
 insert into bkash_numbers (id) values (1) on conflict (id) do nothing;
 
--- ROW LEVEL SECURITY
--- Public (anon) can only READ. All writes happen through serverless functions
--- using the SERVICE ROLE key, which bypasses RLS. This is what keeps the site
--- secure even though the anon key is visible in the browser.
-
+alter table app_settings enable row level security;
 alter table teams enable row level security;
 alter table matches enable row level security;
 alter table match_results enable row level security;
@@ -84,6 +85,7 @@ alter table payments enable row level security;
 alter table activity_logs enable row level security;
 alter table bkash_numbers enable row level security;
 
+create policy "public read app_settings" on app_settings for select using (true);
 create policy "public read teams" on teams for select using (true);
 create policy "public read matches" on matches for select using (true);
 create policy "public read match_results" on match_results for select using (true);
@@ -91,15 +93,3 @@ create policy "public read point_settings" on point_settings for select using (t
 create policy "public read payments" on payments for select using (true);
 create policy "public read activity_logs" on activity_logs for select using (true);
 create policy "public read bkash_numbers" on bkash_numbers for select using (true);
-
--- No insert/update/delete policies are created for anon — meaning normal users
--- can never write to the database directly, even if they open dev tools.
-
--- STORAGE (payment screenshots)
--- Create a public bucket named "payment-proofs" from the Supabase dashboard
--- (Storage -> New bucket -> public). Then add this policy so people can upload
--- their screenshot but can never overwrite or delete someone else's file:
-
--- create policy "anon can upload payment proofs"
--- on storage.objects for insert
--- with check (bucket_id = 'payment-proofs');
