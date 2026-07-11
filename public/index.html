@@ -13,6 +13,10 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Cropper.js for Image Cropping -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <link rel="icon" href="/assets/logo-transparent.png">
 <script>
 tailwind.config = {
@@ -45,6 +49,13 @@ tailwind.config = {
   @keyframes fadeIn { from {opacity: 0; transform: translateY(10px)} to {opacity: 1; transform: translateY(0)} }
   
   ::selection { background: #c8203d; color: #fff; }
+
+  /* Cropper CSS Overrides for Circular Avatar */
+  .cropper-view-box,
+  .cropper-face { border-radius: 50%; }
+  .cropper-modal { background: rgba(0,0,0,0.8); }
+  /* Remove circle crop for banner/proof */
+  .rect-crop .cropper-view-box, .rect-crop .cropper-face { border-radius: 0; }
 </style>
 </head>
 <body class="text-slate-900 dark:text-slate-100 flex flex-col h-full w-full">
@@ -52,20 +63,20 @@ tailwind.config = {
 <header class="glass z-40 shrink-0 border-b border-slate-200 dark:border-white/5 px-4 py-3 relative mesh-lines transition-all duration-300 shadow-sm">
   <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
     <div class="flex items-center gap-3 min-w-0">
-      <img src="/assets/logo-transparent.png" class="w-10 h-10 object-contain drop-shadow-lg" alt="QE">
+      <img src="/assets/logo-transparent.png" class="w-10 h-10 object-contain drop-shadow-lg" alt="QE" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23c8203d\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polygon points=\'12 2 2 7 12 12 22 7 12 2\'></polygon><polyline points=\'2 17 12 22 22 17\'></polyline><polyline points=\'2 12 12 17 22 12\'></polyline></svg>'">
       <div class="min-w-0">
         <h1 class="disp text-xl font-bold text-slate-900 dark:text-white leading-none tracking-wide">QE <span class="text-qeRed">SCRIM</span></h1>
         <p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold tracking-widest uppercase">Dashboard</p>
       </div>
     </div>
     <div class="flex items-center gap-3 shrink-0">
-      <button onclick="window.toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-300 dark:border-slate-800">
-        <div class="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300 dark:translate-x-6 flex items-center justify-center">
+      <button onclick="window.toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-400/30 dark:border-slate-800">
+        <div id="themeSlider" class="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300 flex items-center justify-center">
           <i data-lucide="sun" class="w-2.5 h-2.5 text-amber-500 dark:hidden"></i>
           <i data-lucide="moon" class="w-2.5 h-2.5 text-indigo-500 hidden dark:block"></i>
         </div>
       </button>
-      <button onclick="window.toggleAdmin()" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-xl border border-qeRed/20 active:scale-95 transition-all hover:bg-qeRed hover:text-white shadow-sm">
+      <button id="mainAdminBtn" onclick="window.toggleAdmin()" class="flex items-center gap-1.5 text-xs font-bold text-qeRed bg-qeRed/10 px-3 py-2 rounded-xl border border-qeRed/20 active:scale-95 transition-all hover:bg-qeRed hover:text-white shadow-sm">
         <i data-lucide="shield" class="w-3.5 h-3.5"></i> <span id="adminBtnText">Admin</span>
       </button>
     </div>
@@ -98,11 +109,13 @@ tailwind.config = {
 </nav>
 
 <div id="modalContainer" class="fixed inset-0 bg-slate-900/60 dark:bg-black/80 z-[100] hidden flex justify-center items-center px-4 backdrop-blur-md overflow-y-auto py-8 transition-all"></div>
+
+<!-- Custom Image Cropper Modal -->
 <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900/90 dark:bg-black/95 z-[200] hidden flex flex-col justify-center items-center px-4 backdrop-blur-lg overflow-y-auto transition-all">
   <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-white/10 flex flex-col items-center">
-    <h3 class="font-bold disp text-xl mb-4 text-slate-900 dark:text-white" id="ipm-title">Preview Image</h3>
-    <div id="ipm-canvas-container" class="w-full bg-slate-100 dark:bg-black/50 rounded-2xl flex items-center justify-center overflow-hidden mb-6 min-h-[250px] relative border border-slate-200 dark:border-white/5">
-      <canvas id="ipm-canvas" class="max-w-full max-h-[400px] object-contain"></canvas>
+    <h3 class="font-bold disp text-xl mb-4 text-slate-900 dark:text-white" id="ipm-title">Crop Image</h3>
+    <div id="ipm-canvas-container" class="w-full bg-slate-100 dark:bg-black/50 rounded-2xl flex items-center justify-center overflow-hidden mb-6 relative border border-slate-200 dark:border-white/5" style="height: 350px;">
+      <img id="ipm-img" class="max-w-full max-h-full" src="" alt="To Crop">
     </div>
     <div class="flex gap-3 w-full">
       <button onclick="window.closeImagePreview()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold transition-colors">Cancel</button>
@@ -123,12 +136,18 @@ tailwind.config = {
   window.timers = [];
   window.selectedPlayerCount = 1;
   window.pendingImageUploadCallback = null;
+  let cropper = null;
+
+  // Initialize theme toggle slider
+  if (document.documentElement.classList.contains('dark')) {
+      document.getElementById('themeSlider').classList.add('translate-x-6');
+  }
 
   window.showToast = (msg, type='success') => {
     const c = document.getElementById('toast-container');
     const t = document.createElement('div');
-    const colors = type==='success' ? 'bg-emerald-600' : (type==='error' ? 'bg-qeRed' : 'bg-slate-800');
-    t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl text-white ${colors} text-sm font-bold max-w-xs border border-white/20 backdrop-blur-lg`;
+    const colors = type==='success' ? 'bg-emerald-600 text-white' : (type==='error' ? 'bg-qeRed text-white' : 'bg-slate-800 text-white');
+    t.className = `toast-in flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl ${colors} text-sm font-bold max-w-xs border border-white/20 backdrop-blur-lg`;
     t.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5 shrink-0"></i><span>${msg}</span>`;
     c.appendChild(t); lucide.createIcons();
     setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(20px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3200);
@@ -175,20 +194,7 @@ tailwind.config = {
     return json;
   }
 
-  window.uploadFileToSupabase = async (bucket, fileInputId) => {
-    const fileInput = document.getElementById(fileInputId);
-    if(!fileInput || !fileInput.files || !fileInput.files[0]) return null;
-    const file = fileInput.files[0];
-    const ext = file.name.split('.').pop();
-    const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.${ext}`;
-    
-    const { data, error } = await window.supabase.storage.from(bucket).upload(path, file);
-    if (error) throw error;
-    
-    const { data: pubData } = window.supabase.storage.from(bucket).getPublicUrl(path);
-    return pubData.publicUrl;
-  }
-
+  // Generate unique URL for file object and initiate Cropper
   window.triggerImageUpload = (inputId, type) => {
     const input = document.getElementById(inputId);
     if (!input.files || input.files.length === 0) return;
@@ -201,62 +207,102 @@ tailwind.config = {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        document.getElementById('imagePreviewModal').classList.remove('hidden');
-        const canvas = document.getElementById('ipm-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let targetWidth = img.width;
-        let targetHeight = img.height;
-        
-        if (targetWidth > 1200 || targetHeight > 1200) {
-          const ratio = Math.min(1200 / targetWidth, 1200 / targetHeight);
-          targetWidth *= ratio; targetHeight *= ratio;
-        }
+      document.getElementById('imagePreviewModal').classList.remove('hidden');
+      const imgElem = document.getElementById('ipm-img');
+      imgElem.src = e.target.result;
+      
+      const container = document.getElementById('ipm-canvas-container');
+      
+      // Destroy previous cropper instance if exists
+      if (cropper) { cropper.destroy(); }
 
-        canvas.width = targetWidth; canvas.height = targetHeight;
-        
-        if (type === 'avatar') {
-          document.getElementById('ipm-title').innerText = "Crop Avatar";
-          canvas.style.borderRadius = "50%";
-          canvas.style.objectFit = "cover";
-          canvas.style.width = "200px"; canvas.style.height = "200px";
-        } else if (type === 'banner') {
-          document.getElementById('ipm-title').innerText = "Event Banner Preview";
-          canvas.style.borderRadius = "16px";
-          canvas.style.objectFit = "cover";
-          canvas.style.width = "100%"; canvas.style.height = "180px";
-        } else {
-          document.getElementById('ipm-title').innerText = "Proof Screenshot Preview";
-          canvas.style.borderRadius = "8px";
-          canvas.style.objectFit = "contain";
-          canvas.style.width = "auto"; canvas.style.height = "auto";
-        }
-
-        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-        document.getElementById('ipm-confirm').onclick = async () => {
-          const btn = document.getElementById('ipm-confirm');
-          const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Uploading...'; lucide.createIcons();
-          try {
-            const url = await window.uploadFileToSupabase(type === 'avatar' ? 'player-avatars' : (type === 'banner' ? 'team-logos' : 'stat-proofs'), inputId);
-            if (window.pendingImageUploadCallback) window.pendingImageUploadCallback(url);
-            window.closeImagePreview();
-            window.showToast("Image Uploaded Successfully");
-          } catch(err) {
-            window.showToast(err.message, 'error');
-            btn.innerHTML = og; lucide.createIcons();
-          }
-        };
+      // Setup Cropper Configuration
+      let cropOptions = {
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 1,
+        restore: false,
+        guides: false,
+        center: false,
+        highlight: false,
+        cropBoxMovable: false,
+        cropBoxResizable: false,
+        toggleDragModeOnDblclick: false,
       };
-      img.src = e.target.result;
+
+      if (type === 'avatar') {
+        document.getElementById('ipm-title').innerText = "Crop Avatar";
+        container.classList.remove('rect-crop');
+        cropOptions.aspectRatio = 1;
+      } else if (type === 'banner') {
+        document.getElementById('ipm-title').innerText = "Crop Event Banner";
+        container.classList.add('rect-crop');
+        cropOptions.aspectRatio = 16 / 9;
+      } else {
+        // Proofs don't need strict cropping
+        document.getElementById('ipm-title').innerText = "Screenshot Preview";
+        container.classList.add('rect-crop');
+        cropOptions.aspectRatio = NaN; // Free crop
+        cropOptions.cropBoxResizable = true;
+      }
+
+      // Initialize Cropper after image is loaded into DOM
+      imgElem.onload = () => {
+         cropper = new Cropper(imgElem, cropOptions);
+      };
+
+      document.getElementById('ipm-confirm').onclick = async () => {
+        const btn = document.getElementById('ipm-confirm');
+        const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Uploading...'; lucide.createIcons();
+        try {
+          if (!cropper) throw new Error("Image not ready");
+          
+          // Get cropped Canvas
+          const canvas = cropper.getCroppedCanvas({
+             maxWidth: 1200,
+             maxHeight: 1200,
+             imageSmoothingEnabled: true,
+             imageSmoothingQuality: 'high',
+          });
+
+          // Upload to Supabase Storage by converting to Blob
+          canvas.toBlob(async (blob) => {
+              try {
+                  const ext = 'jpeg';
+                  const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.${ext}`;
+                  let bucketName = type === 'avatar' ? 'player-avatars' : (type === 'banner' ? 'team-logos' : 'stat-proofs');
+                  
+                  // Use public API client if user is not admin and trying to upload proof/avatar
+                  // For this implementation, we use window.supabase directly (ensure bucket policies allow anon insert, or use Server API)
+                  // Notice: If RLS prevents this, we should send Base64 to a Vercel Serverless Function.
+                  // Assuming you have set "anon" insert policies on these buckets:
+                  
+                  const { data, error } = await window.supabase.storage.from(bucketName).upload(path, blob, { contentType: 'image/jpeg' });
+                  if (error) throw error;
+                  
+                  const { data: pubData } = window.supabase.storage.from(bucketName).getPublicUrl(path);
+                  
+                  if (window.pendingImageUploadCallback) window.pendingImageUploadCallback(pubData.publicUrl);
+                  window.closeImagePreview();
+                  window.showToast("Image Uploaded Successfully");
+              } catch (upErr) {
+                  window.showToast(upErr.message, 'error');
+                  btn.innerHTML = og; lucide.createIcons();
+              }
+          }, 'image/jpeg', 0.85);
+
+        } catch(err) {
+          window.showToast(err.message, 'error');
+          btn.innerHTML = og; lucide.createIcons();
+        }
+      };
     };
     reader.readAsDataURL(file);
   };
 
   window.closeImagePreview = () => {
     document.getElementById('imagePreviewModal').classList.add('hidden');
+    if (cropper) { cropper.destroy(); cropper = null; }
     window.pendingImageUploadCallback = null;
   };
 
@@ -266,25 +312,12 @@ tailwind.config = {
 
   window.loadAll = async () => {
     try {
-      const [t, m, r, s, p, l, n, as, tr, pl, ps] = await Promise.all([
-        window.supabase.from('teams').select('*').order('created_at'),
-        window.supabase.from('matches').select('*').order('match_no'),
-        window.supabase.from('match_results').select('*'),
-        window.supabase.from('point_settings').select('*').eq('id',1).single(),
-        window.supabase.from('payments').select('*').order('created_at', { ascending: false }),
-        window.supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(40),
-        window.supabase.from('bkash_numbers').select('*').eq('id',1).single(),
-        window.supabase.from('app_settings').select('*').eq('id',1).single(),
-        window.supabase.from('tournaments').select('*').order('created_at', {ascending: false}),
-        window.supabase.from('players').select('*'),
-        window.supabase.from('player_stats').select('*')
-      ]);
-      window.data = { 
-        teams: t.data||[], matches: m.data||[], results: r.data||[], 
-        settings: s.data||{kill_point_value:1, position_table:{}}, payments: p.data||[], 
-        logs: l.data||[], numbers: n.data?.numbers||[], appSettings: as.data||null,
-        tournaments: tr.data||[], players: pl.data||[], player_stats: ps.data||[]
-      };
+      const res = await fetch('/api/get-data', { headers: { 'x-admin-token': window.adminToken || '' }});
+      if(!res.ok) {
+        if(res.status === 401) { window.doLogout(); return; }
+        throw new Error("Failed to load data");
+      }
+      window.data = await res.json();
     } catch(e) { console.error(e); }
   }
 
@@ -399,7 +432,7 @@ tailwind.config = {
       const isClosed = new Date(t.deadline).getTime() < new Date().getTime();
       const bannerBg = t.banner_id ? `background-image: linear-gradient(to right, rgba(10,10,15,0.95), rgba(10,10,15,0.7)), url('${t.banner_id}'); background-size: cover; background-position: center;` : '';
       
-      html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 relative overflow-hidden group hover:shadow-xl transition-all ${t.banner_id ? 'text-white' : 'bg-white dark:bg-transparent text-slate-900 dark:text-white'}" style="${bannerBg}">
+      html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 relative overflow-hidden group hover:shadow-xl transition-all ${t.banner_id ? 'text-white border-0' : 'bg-white dark:bg-transparent text-slate-900 dark:text-white'}" style="${bannerBg}">
         ${!t.banner_id ? `<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-qeRed/10 dark:from-qeRed/20 to-transparent blur-2xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>` : ''}
         ${window.isAdmin ? `<button class="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg ${t.banner_id?'text-white bg-black/50':'text-slate-500'} hover:text-qeRed transition-colors z-10 border border-slate-200 dark:border-slate-700 backdrop-blur-sm" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
         
@@ -448,8 +481,8 @@ tailwind.config = {
       if(pendingPl.length){
         html += `<div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm"><h3 class="text-xs font-bold text-amber-700 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Approvals</h3><div class="space-y-2.5">`;
         pendingPl.forEach(p=>{
-          const ava = p.avatar_id ? p.avatar_id : '/assets/logo-transparent.png';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" class="w-8 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_id}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.appPl('${p.id}')" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.rejPl('${p.id}')" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.appPl('${p.id}')" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.rejPl('${p.id}')" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -461,13 +494,13 @@ tailwind.config = {
     window.data.teams.forEach(t=>{
       const pMain = window.data.players.filter(p=>p.team_id===t.id && p.role==='main' && p.status==='approved');
       const pBench = window.data.players.filter(p=>p.team_id===t.id && p.role==='bench' && p.status==='approved');
-      const logo = t.logo_id ? t.logo_id : '/assets/logo-transparent.png';
+      const logo = t.logo_url ? t.logo_url : '/assets/logo-transparent.png';
       
       html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-5 relative shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-transparent">
         ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
         <div class="flex items-center gap-4 mb-5">
           <div class="relative">
-            <img src="${logo}" class="w-14 h-14 rounded-2xl object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm p-0.5 cursor-pointer" onclick="${t.logo_id?`window.viewFullImage('${t.logo_id}')`:''}">
+            <img src="${logo}" class="w-14 h-14 rounded-2xl object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm p-0.5 cursor-pointer" onclick="${t.logo_url?`window.viewFullImage('${t.logo_url}')`:''}">
             <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-lg bg-qeRed text-white flex items-center justify-center font-bold text-xs shadow-md border border-white dark:border-[#131319]">${t.slot_no||'?'}</div>
           </div>
           <div><h3 class="font-bold text-xl disp text-slate-900 dark:text-white">${t.team_name}</h3><p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5">MGR: ${t.manager_name||'None'}</p></div>
@@ -476,16 +509,16 @@ tailwind.config = {
         <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 flex items-center gap-1.5 px-1"><i data-lucide="users" class="w-3 h-3"></i> Main Roster</p>
         <div class="space-y-2 mb-4">
           ${pMain.map(p=>{
-            const ava = p.avatar_id ? p.avatar_id : '/assets/logo-transparent.png';
-            return `<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 cursor-pointer" onclick="${p.avatar_id?`window.viewFullImage('${p.avatar_id}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
+            const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
+            return `<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 cursor-pointer" onclick="${p.avatar_url?`window.viewFullImage('${p.avatar_url}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
           }).join('') || `<p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p>`}
         </div>
         
         ${pBench.length ? `<button onclick="document.getElementById('bench-${t.id}').classList.toggle('hidden')" class="text-[10px] w-full py-2.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Toggle Bench (${pBench.length}) <i data-lucide="chevron-down" class="inline w-3 h-3"></i></button>
         <div id="bench-${t.id}" class="hidden space-y-2 mb-4">
           ${pBench.map(p=>{
-            const ava = p.avatar_id ? p.avatar_id : '/assets/logo-transparent.png';
-            return `<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50 cursor-pointer" onclick="${p.avatar_id?`window.viewFullImage('${p.avatar_id}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
+            const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
+            return `<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50 cursor-pointer" onclick="${p.avatar_url?`window.viewFullImage('${p.avatar_url}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
           }).join('')}
         </div>` : ''}
       </div>`;
@@ -532,7 +565,7 @@ tailwind.config = {
           <div id="hostCountContainer" class="hidden fade-in p-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl">
             <label class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-400 mb-2.5 block tracking-wide text-center">How many players are you paying for?</label>
             <div class="grid grid-cols-6 gap-2">
-              ${[1,2,3,4,5,6].map(i=> `<button class="pay-count-btn py-2.5 rounded-xl font-bold text-sm border transition-all bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700" onclick="window.updateCountButtons(${i})" data-count="${i}">${i}</button>`).join('')}
+              ${[1,2,3,4,5,6].map(i=> `<button class="pay-count-btn py-2.5 rounded-xl font-bold text-sm border transition-all ${i===1 ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:bg-indigo-50 dark:hover:bg-slate-700'}" onclick="window.updateCountButtons(${i})" data-count="${i}">${i}</button>`).join('')}
             </div>
           </div>
         </div>
@@ -574,7 +607,7 @@ tailwind.config = {
               <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${p.payer_name}</p>
               <p class="text-[11px] text-slate-500 font-medium mt-0.5">${new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</p>
               ${window.isAdmin ? `<div class="mt-2 space-y-1"><p class="text-[10px] text-slate-600 dark:text-slate-400 font-mono bg-slate-100 dark:bg-black/40 px-2 py-1 rounded border border-slate-200 dark:border-white/5 inline-block font-semibold">Num: ${p.sender_number||'-'} | TrxID: ${p.trx_id||'-'}</p>${p.verification_type==='auto_sms'?'<p class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> Auto Matched</p>':''}</div>` : ''}
-              ${p.proof_id ? `<button onclick="window.viewFullImage('${p.proof_id}')" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</button>` : ''}
+              ${p.screenshot_url ? `<a href="${p.screenshot_url}" target="_blank" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</a>` : ''}
             </div>
             <div class="text-right shrink-0">
               <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
@@ -601,7 +634,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Stats</h3><div class="space-y-2.5">`;
         pStats.forEach(s=>{
           const pName = window.data.players.find(x=>x.id===s.player_id)?.name || 'Unknown';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.proof_id?`<button onclick="window.viewFullImage('${s.proof_id}')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</button>`:''}</div><div><button onclick="window.api('approve_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.api('delete_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<button onclick="window.viewFullImage('${s.screenshot_url}')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</button>`:''}</div><div><button onclick="window.api('approve_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.api('delete_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -723,15 +756,14 @@ tailwind.config = {
       const base = basePerPlayer * window.selectedPlayerCount;
       const fee = Number((base * 0.0185).toFixed(2));
 
-      let proof_id = null;
       if(document.getElementById('payScreenshot').files.length > 0) {
-        window.pendingImageUploadCallback = async (fileId) => {
-          await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, proof_id: fileId, verify_method: method }, true);
+        window.pendingImageUploadCallback = async (fileUrl) => {
+          await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url: fileUrl, verify_method: method }, true);
           window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
         };
         window.triggerImageUpload('payScreenshot', 'proof');
       } else {
-        await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, proof_id: null, verify_method: method }, true);
+        await window.api('payment-submit', { tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url: null, verify_method: method }, true);
         window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
       }
     } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
@@ -776,8 +808,8 @@ tailwind.config = {
         };
         if(!payload.title) throw new Error("Title is required");
 
-        const saveFn = async (fileId) => {
-          if (fileId) payload.banner_id = fileId;
+        const saveFn = async (fileUrl) => {
+          if (fileUrl) payload.banner_id = fileUrl;
           if(t) await window.api('update_tournament', { id: t.id, ...payload }); else await window.api('create_tournament', payload);
           window.hideModal(); await window.loadAll(); window.render(); window.showToast("Event saved successfully");
         };
@@ -829,12 +861,12 @@ tailwind.config = {
         const payload = {
           team_name: document.getElementById('tm-name').value, slot_no: Number(document.getElementById('tm-slot').value)||null,
           manager_name: document.getElementById('tm-mname').value, manager_ign: document.getElementById('tm-mign').value,
-          manager_contact: document.getElementById('tm-mcontact').value, logo_id: team?.logo_id || null
+          manager_contact: document.getElementById('tm-mcontact').value, logo_url: team?.logo_url || null
         };
         if(!payload.team_name) throw new Error('Team name is required');
 
-        const saveFn = async (fileId) => {
-          if (fileId) payload.logo_id = fileId;
+        const saveFn = async (fileUrl) => {
+          if (fileUrl) payload.logo_url = fileUrl;
           if(team) await window.api('update_team', { id: team.id, ...payload }); else await window.api('create_team', payload);
           window.hideModal(); await window.loadAll(); window.render(); window.showToast('Team saved successfully');
         };
@@ -873,11 +905,11 @@ tailwind.config = {
       const btn = document.getElementById('pl-save');
       const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
       try{
-        const p = { team_id: document.getElementById('pl-team').value, name: document.getElementById('pl-name').value, uid: document.getElementById('pl-uid').value, role: document.getElementById('pl-role').value, avatar_id: null };
+        const p = { team_id: document.getElementById('pl-team').value, name: document.getElementById('pl-name').value, uid: document.getElementById('pl-uid').value, role: document.getElementById('pl-role').value, avatar_url: null };
         if(!p.team_id || !p.name || !p.uid) throw new Error('Fill required fields');
 
-        const saveFn = async (fileId) => {
-          if (fileId) p.avatar_id = fileId;
+        const saveFn = async (fileUrl) => {
+          if (fileUrl) p.avatar_url = fileUrl;
           await window.api('submit_player', p, true); window.hideModal(); await window.loadAll(); window.render(); window.showToast(window.isAdmin?'Player added':'Player submitted for approval');
         };
 
@@ -922,12 +954,12 @@ tailwind.config = {
         const opt = document.getElementById('st-player').options[document.getElementById('st-player').selectedIndex];
         if(!opt.value) throw new Error('Select a player');
         
-        const p = { match_id: document.getElementById('st-match').value, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), proof_id: null };
+        const p = { match_id: document.getElementById('st-match').value, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), screenshot_url: null };
         if(!p.match_id) throw new Error('Select a match');
 
-        const saveFn = async (fileId) => {
-          if (!fileId) { window.showToast('Screenshot proof is required','error'); btn.innerHTML=ogHtml; lucide.createIcons(); return; }
-          p.proof_id = fileId;
+        const saveFn = async (fileUrl) => {
+          if (!fileUrl) { window.showToast('Screenshot proof is required','error'); btn.innerHTML=ogHtml; lucide.createIcons(); return; }
+          p.screenshot_url = fileUrl;
           await window.api('submit_stats', p, true); window.hideModal(); window.loadAll().then(window.render); window.showToast(window.isAdmin?'Stats saved':'Stats submitted for review');
         };
 
@@ -958,7 +990,7 @@ tailwind.config = {
       lucide.createIcons();
     };
 
-    document.getElementById('al-ok').addEventListener('click', async ()=>{
+    document.getElementById('al-ok').onclick = async ()=>{
       const password = document.getElementById('adminPassInput').value;
       const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Verifying...'; lucide.createIcons();
       try{
@@ -968,7 +1000,35 @@ tailwind.config = {
         window.adminToken = json.token; window.isAdmin = true; localStorage.setItem('qe_admin_token', window.adminToken);
         window.hideModal(); await window.loadAll(); window.render(); window.showToast('Access Granted');
       } catch(err){ window.showToast(err.message,'error'); btn.innerHTML = og; lucide.createIcons(); }
-    });
+    };
+  };
+
+  window.doLogout = () => {
+    window.isAdmin = false; window.adminToken = null; localStorage.removeItem('qe_admin_token');
+  };
+
+  window.toggleAdmin = () => {
+    if (window.isAdmin) {
+      window.doLogout();
+      window.render();
+      window.showToast('Logged out successfully');
+    } else {
+      window.openAdminLogin();
+    }
+  };
+
+  window.toggleTheme = () => {
+    const html = document.documentElement;
+    const slider = document.getElementById('themeSlider');
+    if(html.classList.contains('dark')) { 
+        html.classList.remove('dark'); 
+        localStorage.setItem('qe_theme', 'light'); 
+        if(slider) slider.classList.remove('translate-x-6');
+    } else { 
+        html.classList.add('dark'); 
+        localStorage.setItem('qe_theme', 'dark'); 
+        if(slider) slider.classList.add('translate-x-6');
+    }
   };
 
   window.openAppSettingsModal = () => {
@@ -996,7 +1056,7 @@ tailwind.config = {
         ${nums.map((n,i)=>`<div class="flex gap-2 num-row fade-in">
           <select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
           <input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50 transition-colors" placeholder="017XXXXXXXX" value="${n.number||''}">
-          <button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+          <button onclick="this.closest('.num-row').remove()" class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>`).join('')}
       </div>
       <button id="num-add" class="w-full mt-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Account</button>
@@ -1005,11 +1065,10 @@ tailwind.config = {
     lucide.createIcons();
     document.getElementById('num-add').onclick = ()=>{
       const div = document.createElement('div'); div.className = 'flex gap-2 num-row mt-3 fade-in';
-      div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+      div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button onclick="this.closest('.num-row').remove()" class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
       document.getElementById('numsList').appendChild(div); lucide.createIcons();
-      div.querySelector('.num-remove').onclick = ()=> div.remove();
     };
-    document.querySelectorAll('.num-remove').forEach(b=> b.onclick = e=> e.currentTarget.closest('.num-row').remove());
+    
     document.getElementById('num-save').onclick = async ()=>{
       const btn = document.getElementById('num-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
       const numbers = Array.from(document.querySelectorAll('.num-row')).map(r=>({ type: r.querySelector('.num-type').value, number: r.querySelector('.num-value').value })).filter(n=>n.number);
@@ -1021,6 +1080,8 @@ tailwind.config = {
     try{ const cfg = await (await fetch('/api/config')).json(); window.supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey); } catch(e){ window.showToast('Config failed','error'); }
     await window.loadAll(); window.render();
   }
+  
+  // Start the application
   init();
 </script>
 </body>
