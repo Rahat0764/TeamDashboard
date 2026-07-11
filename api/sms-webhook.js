@@ -1,3 +1,4 @@
+// filepath: api/sms-webhook.js
 const { getAdminClient, sendTelegram, refId } = require('../lib/server');
 
 function parseBkashSms(text) {
@@ -13,11 +14,11 @@ function parseBkashSms(text) {
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const { secret, message } = req.body || {};
-  if (secret !== process.env.SMS_WEBHOOK_SECRET) return res.status(401).json({ error: 'ভুল সিক্রেট' });
-  if (!message) return res.status(400).json({ error: 'ম্যাসেজ পাওয়া যায়নি' });
+  if (secret !== process.env.SMS_WEBHOOK_SECRET) return res.status(401).json({ error: 'Invalid secret' });
+  if (!message) return res.status(400).json({ error: 'Message not found' });
 
   const parsed = parseBkashSms(message);
-  if (!parsed) return res.status(200).json({ matched: false, reason: 'এই ফরম্যাটের ম্যাসেজ চেনা যায়নি' });
+  if (!parsed) return res.status(200).json({ matched: false, reason: 'Unrecognized format' });
 
   const sb = getAdminClient();
   const { data: pending } = await sb
@@ -37,16 +38,16 @@ module.exports = async (req, res) => {
     status: 'approved',
     verification_type: 'auto_sms',
     trx_id: parsed.trxId,
-    admin_note: `bKash SMS মিলে যাওয়ায় স্বয়ংক্রিয়ভাবে অ্যাপ্রুভ হয়েছে।`
+    admin_note: `Automatically verified via bKash SMS matching.`
   }).eq('id', match.id);
 
   const id = refId();
   await sb.from('activity_logs').insert([{
     ref_id: id,
-    action: 'স্বয়ংক্রিয় পেমেন্ট ভেরিফাই',
-    details: `${match.payer_name} এর ৳${parsed.amount} (TrxID ${parsed.trxId}) SMS মিলিয়ে স্বয়ংক্রিয়ভাবে অ্যাপ্রুভ হয়েছে।`
+    action: 'Auto Payment Verify',
+    details: `Payment of ৳${parsed.amount} by ${match.payer_name} (TrxID ${parsed.trxId}) auto-approved.`
   }]);
-  await sendTelegram(`✅ <b>স্বয়ংক্রিয় ভেরিফাই সম্পন্ন</b>\n👤 ${match.payer_name}\n💵 ৳${parsed.amount}\n🧾 TrxID: ${parsed.trxId}\n🔑 Ref: #${id}`);
+  await sendTelegram(`✅ <b>Auto Verify Successful</b>\n👤 ${match.payer_name}\n💵 ৳${parsed.amount}\n🧾 TrxID: ${parsed.trxId}\n🔑 Ref: #${id}`);
 
   return res.status(200).json({ matched: true, paymentId: match.id });
 };
