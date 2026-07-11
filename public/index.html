@@ -13,7 +13,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Cropper.js for Image Cropping & Zooming -->
+<!-- Cropper.js for Image Cropping -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -48,11 +48,16 @@ tailwind.config = {
   .fade-in { animation: fadeIn .4s cubic-bezier(.16,1,.3,1) forwards; }
   @keyframes fadeIn { from {opacity: 0; transform: translateY(10px)} to {opacity: 1; transform: translateY(0)} }
   
+  .toast-in { animation: toastIn .3s ease-out forwards; }
+  @keyframes toastIn { from {opacity: 0; transform: translateX(110%)} to {opacity: 1; transform: translateX(0)} }
+  
   ::selection { background: #c8203d; color: #fff; }
 
   /* Cropper CSS Overrides for Circular Avatar */
-  .cropper-view-box, .cropper-face { border-radius: 50%; }
+  .cropper-view-box,
+  .cropper-face { border-radius: 50%; }
   .cropper-modal { background: rgba(0,0,0,0.8); }
+  /* Remove circle crop for banner/proof */
   .rect-crop .cropper-view-box, .rect-crop .cropper-face { border-radius: 0; }
 </style>
 </head>
@@ -218,7 +223,7 @@ tailwind.config = {
         viewMode: 1,
         dragMode: 'move', // Allow moving image
         autoCropArea: 0.9,
-        cropBoxMovable: false, 
+        cropBoxMovable: false,   
         cropBoxResizable: false,
         zoomable: true, // Allow zoom
         scalable: true,
@@ -519,7 +524,7 @@ tailwind.config = {
         <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
         ${window.isAdmin ? `<button onclick="window.openNumbersModal()" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
       </div>
-      <div id="payment-numbers-container" class="flex flex-wrap gap-3">
+      <div class="flex flex-wrap gap-3">
         ${window.data.numbers?.length ? window.data.numbers.map(n=>`
           <button onclick="window.copyText('${n.number}', 'Number')" class="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto">
             <span class="text-[10px] bg-qeRed/10 text-qeRed px-2 py-1 rounded border border-qeRed/20 font-bold uppercase tracking-wider">${n.type||'Personal'}</span> 
@@ -1053,7 +1058,6 @@ tailwind.config = {
       div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button onclick="this.closest('.num-row').remove()" class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
       document.getElementById('numsList').appendChild(div); lucide.createIcons();
     };
-    
     document.getElementById('num-save').onclick = async ()=>{
       const btn = document.getElementById('num-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
       const numbers = Array.from(document.querySelectorAll('.num-row')).map(r=>({ type: r.querySelector('.num-type').value, number: r.querySelector('.num-value').value })).filter(n=>n.number);
