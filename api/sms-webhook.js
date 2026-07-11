@@ -1,4 +1,3 @@
-// filepath: api/sms-webhook.js
 const { getAdminClient, sendTelegram, refId } = require('../lib/server');
 
 function parseBkashSms(text) {
@@ -26,7 +25,7 @@ module.exports = async (req, res) => {
     .select('*')
     .eq('status', 'pending')
     .eq('sender_number', parsed.number)
-    .eq('amount', parsed.amount);
+    .eq('total_paid', parsed.amount);
 
   if (!pending || pending.length === 0) {
     return res.status(200).json({ matched: false, parsed });
