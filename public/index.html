@@ -71,7 +71,7 @@ tailwind.config = {
         <p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold tracking-widest uppercase">Dashboard</p>
       </div>
     </div>
-    <div class="flex items-center gap-3 shrink-0 relative z-50">
+    <div class="flex items-center gap-3 shrink-0 relative z-50 pointer-events-auto">
       <button type="button" onclick="window.toggleTheme()" class="relative w-12 h-6 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors shadow-inner flex items-center p-1 border border-slate-300 dark:border-slate-800 cursor-pointer">
         <div id="themeSlider" class="w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-300 flex items-center justify-center pointer-events-none">
           <i data-lucide="sun" class="w-2.5 h-2.5 text-amber-500 dark:hidden"></i>
@@ -104,7 +104,7 @@ tailwind.config = {
   <div class="flex justify-around items-center h-16 px-2">
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('tournaments')" data-tab="tournaments"><i data-lucide="crosshair" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Events</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('teams')" data-tab="teams"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Teams</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('dashboard')" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all text-qeRed" onclick="window.changeTab('dashboard')" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('standings')" data-tab="standings"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Rank</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('payments')" data-tab="payments"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Pay</span></button>
   </div>
@@ -120,8 +120,8 @@ tailwind.config = {
       <img id="ipm-img" class="max-w-full max-h-full block" src="" alt="To Crop">
     </div>
     <div class="flex gap-3 w-full">
-      <button onclick="window.closeImagePreview()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold transition-colors">Cancel</button>
-      <button id="ipm-confirm" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Confirm</button>
+      <button type="button" onclick="window.closeImagePreview()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold transition-colors">Cancel</button>
+      <button type="button" id="ipm-confirm" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Confirm</button>
     </div>
   </div>
 </div>
@@ -316,7 +316,7 @@ tailwind.config = {
       window.showModal(`
         <div class="text-center mb-6"><div class="w-14 h-14 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-3 border border-qeRed/20"><i data-lucide="shield-alert" class="w-7 h-7"></i></div><h3 class="font-bold disp text-2xl text-slate-900 dark:text-white">Confirm Action</h3><p class="text-xs text-slate-600 dark:text-slate-400 mt-2">Enter admin password to continue</p></div>
         <input type="password" id="confirmPassInput" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/10 text-lg text-center tracking-widest font-mono outline-none text-slate-900 dark:text-white" placeholder="••••••••">
-        <div class="flex gap-3 mt-6"><button id="cap-cancel" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="cap-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold">Confirm</button></div>
+        <div class="flex gap-3 mt-6"><button type="button" id="cap-cancel" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button type="button" id="cap-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold">Confirm</button></div>
       `);
       document.getElementById('cap-cancel').onclick = () => { window.hideModal(); resolve(false); };
       document.getElementById('cap-ok').onclick = async () => {
@@ -375,11 +375,11 @@ tailwind.config = {
                 <div><p class="text-[9px] text-slate-500 uppercase font-bold">Damage</p><p class="font-bold text-amber-500 text-lg disp">${s.damage}</p></div>
                 <div><p class="text-[9px] text-slate-500 uppercase font-bold">Survival</p><p class="font-bold text-indigo-500 text-lg disp">${s.survived_minutes}m</p></div>
             </div>
-            ${s.screenshot_url ? `<button onclick="window.viewFullImage('${s.screenshot_url}')" class="w-full py-2 bg-slate-200 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition flex justify-center items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5"></i> View Proof</button>` : ''}
+            ${s.screenshot_url ? `<button type="button" onclick="window.viewFullImage('${s.screenshot_url}')" class="w-full py-2 bg-slate-200 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition flex justify-center items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5"></i> View Proof</button>` : ''}
         </div>`;
     });
     html += `</div>`;
-    html += `<div class="mt-5"><button onclick="window.hideModal()" class="w-full py-3 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition">Close Details</button></div>`;
+    html += `<div class="mt-5"><button type="button" onclick="window.hideModal()" class="w-full py-3 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition">Close Details</button></div>`;
     
     window.showModal(html);
   };
@@ -402,7 +402,7 @@ tailwind.config = {
     } else {
         html += `<p class="text-xs text-slate-500 mb-6">Not registered in any tournaments yet.</p>`;
     }
-    html += `<button onclick="window.hideModal()" class="w-full py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Close</button>`;
+    html += `<button type="button" onclick="window.hideModal()" class="w-full py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Close</button>`;
     window.showModal(html);
   };
 
@@ -413,10 +413,9 @@ tailwind.config = {
     if(Array.isArray(pp)) pp = {};
     
     let html = `<h3 class="disp text-2xl font-bold mb-4">${t.title}</h3>`;
-    html += `<p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap mb-6">${t.description || 'No description provided.'}</p>`;
     
     if(pp.total > 0) {
-        html += `<div class="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-4 mb-6">
+        html += `<div class="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-4 mb-4">
             <h4 class="font-bold text-amber-500 uppercase tracking-widest text-xs mb-3 text-center"><i data-lucide="trophy" class="w-4 h-4 inline mb-0.5"></i> Prize Pool Breakdown</h4>
             <div class="grid grid-cols-3 gap-2 text-center">
                 <div><p class="text-[10px] text-amber-600/70 font-bold uppercase">1st Prize</p><p class="font-bold text-lg disp text-amber-500">৳${pp.first||0}</p></div>
@@ -427,7 +426,7 @@ tailwind.config = {
     }
 
     if(pp.winners && Object.keys(pp.winners).length > 0) {
-         html += `<div class="mb-6"><h4 class="font-bold text-emerald-500 uppercase tracking-widest text-xs mb-3 border-b border-white/5 pb-2">Tournament Winners</h4><div class="space-y-2">`;
+         html += `<div class="mb-4"><h4 class="font-bold text-emerald-500 uppercase tracking-widest text-xs mb-3 border-b border-white/5 pb-2">Tournament Winners</h4><div class="space-y-2">`;
          ['first', 'second', 'third'].forEach(pos => {
              if(pp.winners[pos]) {
                  const wTeam = window.data.teams.find(x=>x.id===pp.winners[pos])?.team_name || 'Unknown Team';
@@ -439,7 +438,9 @@ tailwind.config = {
          html += `</div></div>`;
     }
     
-    html += `<button onclick="window.hideModal()" class="w-full py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Close</button>`;
+    html += `<p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap mb-6 bg-slate-50 dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 mt-4 leading-relaxed">${t.description || 'No description provided.'}</p>`;
+    
+    html += `<button type="button" onclick="window.hideModal()" class="w-full py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Close</button>`;
     window.showModal(html);
   };
 
@@ -456,7 +457,7 @@ tailwind.config = {
             <option value="second">2nd Prize</option>
             <option value="third">3rd Prize</option>
        </select>
-       <div class="flex gap-3"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button onclick="window.doGivePrize(this, '${teamId}')" class="flex-1 py-4 text-sm bg-amber-500 text-white rounded-xl font-bold">Award Prize</button></div>
+       <div class="flex gap-3"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button type="button" onclick="window.doGivePrize(this, '${teamId}')" class="flex-1 py-4 text-sm bg-amber-500 text-white rounded-xl font-bold">Award Prize</button></div>
    `);
   };
 
@@ -479,7 +480,7 @@ tailwind.config = {
             <option value="">-- Choose Team --</option>
             ${window.data.teams.filter(t=>t.status==='approved').map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}
         </select>
-        <div class="flex gap-3"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button onclick="window.doFreeReg(this, '${tourId}')" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold">Confirm Register</button></div>
+        <div class="flex gap-3"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button type="button" onclick="window.doFreeReg(this, '${tourId}')" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold">Confirm Register</button></div>
     `);
   };
 
@@ -495,14 +496,12 @@ tailwind.config = {
   };
 
   window.loadAll = async () => {
-    try {
-      const res = await fetch('/api/get-data', { headers: { 'x-admin-token': window.adminToken || '' }});
-      if(!res.ok) {
-        if(res.status === 401) { window.doLogout(); return; }
-        throw new Error("Failed to load data");
-      }
-      window.data = await res.json();
-    } catch(e) { console.error(e); throw e; }
+    const res = await fetch('/api/get-data', { headers: { 'x-admin-token': window.adminToken || '' }});
+    if(!res.ok) {
+      if(res.status === 401) { window.doLogout(); throw new Error("Unauthorized"); }
+      throw new Error("Failed to load data");
+    }
+    window.data = await res.json();
   }
 
   window.updateNav = () => {
@@ -575,7 +574,22 @@ tailwind.config = {
   window.buildDashboard = () => {
     const totalTeams = window.data.teams?.length || 0;
     const totalMatches = window.data.matches?.length || 0;
-    const totalFund = (window.data.payments||[]).filter(p=>p.status==='approved').reduce((s,p)=>s+Number(p.amount||0),0);
+    
+    let awardedPrizes = 0;
+    (window.data.tournaments||[]).forEach(t => {
+      let pp = t.prize_pool || {};
+      if (typeof pp === 'string') { try { pp = JSON.parse(pp); } catch(e) { pp = {}; } }
+      if (Array.isArray(pp)) pp = {};
+      if (pp.winners) {
+        if (pp.winners.first && pp.first) awardedPrizes += Number(pp.first);
+        if (pp.winners.second && pp.second) awardedPrizes += Number(pp.second);
+        if (pp.winners.third && pp.third) awardedPrizes += Number(pp.third);
+      }
+    });
+    
+    const totalPayments = (window.data.payments||[]).filter(p=>p.status==='approved').reduce((s,p)=>s+Number(p.amount||0),0);
+    const totalFund = totalPayments - awardedPrizes;
+    
     const pendingCount = (window.data.payments||[]).filter(p=>p.status==='pending').length;
 
     const appTitle = window.data.appSettings?.title || 'QE SCRIM Dashboard';
@@ -591,7 +605,7 @@ tailwind.config = {
           <p class="text-sm text-slate-700 dark:text-slate-400 max-w-md transition-colors leading-relaxed font-semibold">${appDesc}</p>
           ${window.isAdmin ? `<p class="mt-3 text-[11px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1 bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 w-max rounded-lg border border-emerald-200 dark:border-emerald-500/20"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin Mode Active</p>` : ''}
         </div>
-        ${window.isAdmin ? `<button onclick="window.openAppSettingsModal()" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 p-2 rounded-xl border border-slate-200 dark:border-slate-700 active:scale-95 shadow-sm hover:text-qeRed transition-colors"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
+        ${window.isAdmin ? `<button type="button" onclick="window.openAppSettingsModal()" class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 p-2 rounded-xl border border-slate-200 dark:border-slate-700 active:scale-95 shadow-sm hover:text-qeRed transition-colors"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
       </div>
     </div>
     
@@ -644,7 +658,7 @@ tailwind.config = {
   window.buildTournaments = () => {
     let html = `<div class="flex justify-between items-center mb-6">
       <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="crosshair" class="w-6 h-6 text-qeRed"></i> Tournaments</h2>
-      ${window.isAdmin ? `<button onclick="window.openTourModal()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Event</button>` : ''}
+      ${window.isAdmin ? `<button type="button" onclick="window.openTourModal()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Event</button>` : ''}
     </div><div class="space-y-6">`;
 
     if(!window.data.tournaments.length) html += `<div class="glass p-10 text-center text-slate-500 rounded-3xl border border-slate-200 dark:border-white/5 font-medium">No active tournaments available.</div>`;
@@ -657,6 +671,7 @@ tailwind.config = {
       if (typeof pp === 'string') { try { pp = JSON.parse(pp); } catch(e) { pp = {}; } }
       if (Array.isArray(pp)) pp = {};
       const totalPrize = pp.total || 0;
+      const displayLimit = pp.slots ? Number(pp.slots) : 18;
 
       const activeBadge = !isClosed
         ? `<span class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md"><span class="relative flex w-2 h-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> Active</span>`
@@ -673,7 +688,7 @@ tailwind.config = {
           
           <div class="absolute top-3 right-3 z-50 flex flex-col items-end gap-2 pointer-events-auto">
             ${activeBadge}
-            ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.adminDelete(this, 'delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
+            ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button type="button" class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button type="button" class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.adminDelete(this, 'delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
           </div>
           
           <div class="absolute bottom-0 left-0 right-0 p-4 z-20 flex justify-between items-end pointer-events-none">
@@ -708,7 +723,7 @@ tailwind.config = {
             </div>
             <div class="flex flex-col items-end gap-2 relative z-50 pointer-events-auto">
                 ${activeBadge}
-                ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.adminDelete(this, 'delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
+                ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button type="button" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button type="button" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.adminDelete(this, 'delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
             </div>
           </div>`}
 
@@ -716,40 +731,48 @@ tailwind.config = {
           <div class="flex items-start gap-3 mb-4">
             <div class="w-12 h-12 rounded-2xl bg-qeRed/10 border border-qeRed/20 flex items-center justify-center text-qeRed shadow-inner shrink-0 mt-1"><i data-lucide="award" class="w-6 h-6"></i></div>
             <div class="min-w-0 flex-1">
-              <h3 class="disp text-2xl font-bold leading-tight break-words flex items-center gap-2">${t.title} <button onclick="window.showEventInfo('${t.id}')" class="text-slate-400 hover:text-qeRed shrink-0"><i data-lucide="info" class="w-5 h-5"></i></button></h3>
+              <h3 class="disp text-2xl font-bold leading-tight break-words flex items-center gap-2">${t.title} <button type="button" onclick="window.showEventInfo('${t.id}')" class="text-slate-400 hover:text-qeRed shrink-0"><i data-lucide="info" class="w-5 h-5"></i></button></h3>
               <p class="text-xs font-bold mt-1.5 tracking-wide text-slate-600 dark:text-slate-400 flex items-center gap-1.5" id="timer-${t.id}">${isClosed ? '<i data-lucide="clock" class="w-3.5 h-3.5 inline"></i> Registration Closed' : 'Loading...'}</p>
             </div>
           </div>
           `;
 
-      const eventPayments = window.data.payments.filter(p => p.tournament_id === t.id && p.status === 'approved');
-      const uniqueTeamIds = [...new Set(eventPayments.map(p => p.team_id).filter(Boolean))];
+      const eventPayments = window.data.payments.filter(p => p.tournament_id === t.id && p.status === 'approved').sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+      const uniqueTeamIds = [];
+      eventPayments.forEach(p => { if(p.team_id && !uniqueTeamIds.includes(p.team_id)) uniqueTeamIds.push(p.team_id); });
       
+      let teamsHTML = '';
       if (uniqueTeamIds.length > 0) {
-          html += `<div class="mb-5 border-t border-slate-200 dark:border-white/10 pt-4">
-              <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-3 flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> Participating Teams (${uniqueTeamIds.length})</p>
+          teamsHTML += `<div class="mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
+              <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-3 flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> Participating Teams (${uniqueTeamIds.length}${pp.slots ? ` / ${pp.slots}` : ''})</p>
               <div class="flex flex-wrap gap-2">`;
           
-          uniqueTeamIds.forEach(teamId => {
+          uniqueTeamIds.forEach((teamId, idx) => {
               const team = window.data.teams.find(tm => tm.id === teamId);
               if (team) {
                   const approvedPlayers = window.data.players.filter(p => p.team_id === team.id && p.status === 'approved').length;
-                  html += `<span class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1.5 text-slate-700 dark:text-slate-300"><img src="${team.logo_url || '/assets/logo-transparent.png'}" class="w-3.5 h-3.5 rounded-full object-cover"> ${team.team_name} <span class="bg-white dark:bg-black/50 text-slate-500 px-1.5 rounded text-[9px]">${approvedPlayers}</span></span>`;
+                  const hiddenClass = idx >= displayLimit ? 'hidden extra-team-' + t.id : '';
+                  teamsHTML += `<span class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1.5 text-slate-700 dark:text-slate-300 ${hiddenClass}"><img src="${team.logo_url || '/assets/logo-transparent.png'}" class="w-3.5 h-3.5 rounded-full object-cover"> ${team.team_name} <span class="bg-white dark:bg-black/50 text-slate-500 px-1.5 rounded text-[9px]">${approvedPlayers}</span></span>`;
               }
           });
           
-          html += `</div></div>`;
+          teamsHTML += `</div>`;
+          if (uniqueTeamIds.length > displayLimit) {
+              teamsHTML += `<button type="button" onclick="document.querySelectorAll('.extra-team-${t.id}').forEach(el=>el.classList.toggle('hidden')); this.innerText = this.innerText === 'WAIT FOR NEXT ROUND' ? 'HIDE WAITING TEAMS' : 'WAIT FOR NEXT ROUND';" class="w-full text-center text-[10px] font-bold text-qeRed uppercase tracking-widest mt-4 hover:underline bg-qeRed/5 py-2 rounded-xl border border-qeRed/10 transition-colors">WAIT FOR NEXT ROUND</button>`;
+          }
+          teamsHTML += `</div>`;
       }
 
+      html += `<div class="mt-auto">`;
       if(!isClosed) {
          if(isFree) {
-            html += `<button onclick="window.registerFree('${t.id}')" class="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/30 active:scale-95 transition-all disp tracking-wide text-lg border border-white/10 mt-auto">Register for Free</button>`;
+            html += `<button type="button" onclick="window.registerFree('${t.id}')" class="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/30 active:scale-95 transition-all disp tracking-wide text-lg border border-white/10 mt-auto">Register for Free</button>`;
          } else {
-            html += `<button onclick="window.goToPayment('${t.id}')" class="w-full py-4 rounded-xl bg-qeRed hover:bg-qeRedDim text-white font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-all disp tracking-wide text-lg border border-white/10 mt-auto">Register & Pay ৳${t.entry_fee}</button>`;
+            html += `<button type="button" onclick="window.goToPayment('${t.id}')" class="w-full py-4 rounded-xl bg-qeRed hover:bg-qeRedDim text-white font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-all disp tracking-wide text-lg border border-white/10 mt-auto">Register & Pay ৳${t.entry_fee}</button>`;
          }
       }
-      
-      html += `</div></div>`;
+      html += teamsHTML;
+      html += `</div></div></div>`;
     });
     html += `</div>`;
 
@@ -765,8 +788,8 @@ tailwind.config = {
     let html = `<div class="flex justify-between items-center mb-6">
       <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="users" class="w-6 h-6 text-qeRed"></i> Teams</h2>
       <div class="flex gap-2">
-        <button onclick="window.openPlayerModal()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 hover:border-qeRed/50 transition-colors"><i data-lucide="user-plus" class="inline w-3.5 h-3.5"></i> Player</button>
-        <button onclick="window.openTeamModal(null)" class="bg-qeRed text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="${window.isAdmin ? 'plus' : 'git-pull-request'}" class="inline w-3.5 h-3.5"></i> ${window.isAdmin ? 'Team' : 'Request Team'}</button>
+        <button type="button" onclick="window.openPlayerModal()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 hover:border-qeRed/50 transition-colors"><i data-lucide="user-plus" class="inline w-3.5 h-3.5"></i> Player</button>
+        <button type="button" onclick="window.openTeamModal(null)" class="bg-qeRed text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="${window.isAdmin ? 'plus' : 'git-pull-request'}" class="inline w-3.5 h-3.5"></i> ${window.isAdmin ? 'Team' : 'Request Team'}</button>
       </div>
     </div>`;
 
@@ -776,7 +799,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 shadow-sm"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Team Requests</h3><div class="space-y-2.5">`;
         pendingTeams.forEach(t=>{
           const logo = t.logo_url ? t.logo_url : '/assets/logo-transparent.png';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="flex items-center gap-2"><img src="${logo}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${t.logo_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${t.team_name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">MGR: ${t.manager_name}</span></span></div><div><button onclick="window.handleAction(this, 'approve_team', {id:'${t.id}'})" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.adminDelete(this, 'delete_team', {id:'${t.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="flex items-center gap-2"><img src="${logo}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${t.logo_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${t.team_name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">MGR: ${t.manager_name}</span></span></div><div><button type="button" onclick="window.handleAction(this, 'approve_team', {id:'${t.id}'})" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button type="button" onclick="window.adminDelete(this, 'delete_team', {id:'${t.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -786,7 +809,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm"><h3 class="text-xs font-bold text-amber-700 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Player Approvals</h3><div class="space-y-2.5">`;
         pendingPl.forEach(p=>{
           const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.handleAction(this, 'approve_player', {id:'${p.id}'})" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.adminDelete(this, 'delete_player', {id:'${p.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button type="button" onclick="window.handleAction(this, 'approve_player', {id:'${p.id}'})" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button type="button" onclick="window.adminDelete(this, 'delete_player', {id:'${p.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -805,9 +828,9 @@ tailwind.config = {
 
       html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-5 relative shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-transparent">
         ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1 z-10">
-            <button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-amber-500 transition text-slate-400" onclick="window.openGivePrizeModal('${t.id}')" title="Give Prize"><i data-lucide="gift" class="w-3.5 h-3.5"></i></button>
-            <button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition text-slate-400" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-            <button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition text-slate-400" onclick="window.adminDelete(this, 'delete_team',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <button type="button" class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-amber-500 transition text-slate-400" onclick="window.openGivePrizeModal('${t.id}')" title="Give Prize"><i data-lucide="gift" class="w-3.5 h-3.5"></i></button>
+            <button type="button" class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition text-slate-400" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+            <button type="button" class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition text-slate-400" onclick="window.adminDelete(this, 'delete_team',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
         </div>` : ''}
         
         <div class="flex items-center gap-4 mb-5 pr-20">
@@ -816,7 +839,7 @@ tailwind.config = {
             <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-lg bg-qeRed text-white flex items-center justify-center font-bold text-xs shadow-md border border-white dark:border-[#131319]">${t.slot_no||'?'}</div>
           </div>
           <div class="min-w-0 flex-1">
-            <h3 class="font-bold text-xl disp text-slate-900 dark:text-white truncate flex items-center gap-2">${t.team_name} <button onclick="window.showTeamInfo('${t.id}')" class="text-slate-400 hover:text-qeRed shrink-0"><i data-lucide="info" class="w-4 h-4"></i></button></h3>
+            <h3 class="font-bold text-xl disp text-slate-900 dark:text-white truncate flex items-center gap-2">${t.team_name} <button type="button" onclick="window.showTeamInfo('${t.id}')" class="text-slate-400 hover:text-qeRed shrink-0"><i data-lucide="info" class="w-4 h-4"></i></button></h3>
             <p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5 truncate">MGR: ${t.manager_name||'None'}</p>
             <p class="text-[9px] text-slate-500 font-bold mt-1 bg-slate-100 dark:bg-slate-800/50 inline-block px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">Total: ${totalPl} (M: ${pMain.length}, B: ${pBench.length})</p>
           </div>
@@ -834,14 +857,14 @@ tailwind.config = {
                     <p class="text-[8px] text-slate-500 font-mono font-semibold">UID: ${p.uid}</p>
                 </div>
                 ${window.isAdmin ? `<div class="flex flex-col gap-0.5 shrink-0 pr-1">
-                    <button onclick="window.openPlayerModal('${p.id}')" class="text-slate-400 hover:text-emerald-500"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
-                    <button onclick="window.adminDelete(this, 'delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    <button type="button" onclick="window.openPlayerModal('${p.id}')" class="text-slate-400 hover:text-emerald-500"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
+                    <button type="button" onclick="window.adminDelete(this, 'delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                 </div>`:''}
             </div>`
           }).join('') || `<div class="col-span-2"><p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p></div>`}
         </div>
         
-        ${pBench.length ? `<button onclick="document.getElementById('bench-${t.id}').classList.toggle('hidden')" class="text-[10px] w-full py-2.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Toggle Bench (${pBench.length}) <i data-lucide="chevron-down" class="inline w-3 h-3"></i></button>
+        ${pBench.length ? `<button type="button" onclick="document.getElementById('bench-${t.id}').classList.toggle('hidden')" class="text-[10px] w-full py-2.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Toggle Bench (${pBench.length}) <i data-lucide="chevron-down" class="inline w-3 h-3"></i></button>
         <div id="bench-${t.id}" class="hidden grid grid-cols-2 gap-2 mb-4">
           ${pBench.map(p=>{
             const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
@@ -852,8 +875,8 @@ tailwind.config = {
                     <p class="text-[8px] text-slate-500 font-mono font-semibold">UID: ${p.uid}</p>
                 </div>
                 ${window.isAdmin ? `<div class="flex flex-col gap-0.5 shrink-0 pr-1">
-                    <button onclick="window.openPlayerModal('${p.id}')" class="text-slate-400 hover:text-emerald-500"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
-                    <button onclick="window.adminDelete(this, 'delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    <button type="button" onclick="window.openPlayerModal('${p.id}')" class="text-slate-400 hover:text-emerald-500"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
+                    <button type="button" onclick="window.adminDelete(this, 'delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                 </div>`:''}
             </div>`
           }).join('')}
@@ -869,11 +892,11 @@ tailwind.config = {
     html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-bold disp text-sm uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-qeRed"></i> Payment Numbers</h3>
-        ${window.isAdmin ? `<button onclick="window.openNumbersModal()" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
+        ${window.isAdmin ? `<button type="button" onclick="window.openNumbersModal()" class="text-xs text-qeRed font-bold flex items-center gap-1 bg-qeRed/10 px-2.5 py-1.5 rounded-lg hover:bg-qeRed hover:text-white transition-all border border-qeRed/20"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit</button>` : ''}
       </div>
       <div class="flex flex-wrap gap-3">
         ${window.data.numbers?.length ? window.data.numbers.map(n=>`
-          <button onclick="window.copyText('${n.number}', 'Number')" class="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto">
+          <button type="button" onclick="window.copyText('${n.number}', 'Number')" class="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm font-mono shadow-sm hover:border-qeRed/50 hover:shadow-md transition-all group w-full sm:w-auto">
             <span class="text-[10px] bg-qeRed/10 text-qeRed px-2 py-1 rounded border border-qeRed/20 font-bold uppercase tracking-wider">${n.type||'Personal'}</span> 
             <span class="text-slate-800 dark:text-slate-200 font-bold group-hover:text-qeRed transition-colors">${n.number}</span> 
             <i data-lucide="copy" class="w-4 h-4 text-slate-400 group-hover:text-qeRed transition-colors ml-auto sm:ml-2"></i>
@@ -909,7 +932,7 @@ tailwind.config = {
             <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">Screenshot Proof</label>
             <div class="relative w-full">
               <input id="payScreenshot" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('payScreenshot', 'proof')">
-              <button class="w-full text-xs text-slate-500 dark:text-slate-400 py-3.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i> Choose Image...</button>
+              <button type="button" class="w-full text-xs text-slate-500 dark:text-slate-400 py-3.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2"><i data-lucide="image-plus" class="w-4 h-4"></i> Choose Image...</button>
             </div>
           </div>
         </div>
@@ -931,15 +954,15 @@ tailwind.config = {
                   <p class="font-bold text-sm text-slate-800 dark:text-slate-200 truncate">${p.payer_name}</p>
                   <p class="text-[11px] text-slate-500 font-medium mt-0.5">${new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</p>
                   <div class="mt-2 space-y-1"><p class="text-[10px] text-slate-600 dark:text-slate-400 font-mono bg-slate-100 dark:bg-black/40 px-2 py-1 rounded border border-slate-200 dark:border-white/5 inline-block font-semibold">Num: ${p.sender_number||'-'} | TrxID: ${p.trx_id||'-'}</p>${p.verification_type==='auto_sms'?'<p class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> Auto Matched</p>':''}</div>
-                  ${p.screenshot_url ? `<button onclick="window.viewFullImage('${p.screenshot_url}')" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</button>` : ''}
+                  ${p.screenshot_url ? `<button type="button" onclick="window.viewFullImage('${p.screenshot_url}')" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</button>` : ''}
                 </div>
                 <div class="text-right shrink-0">
                   <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
                   <span class="inline-block mt-1 text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${p.status==='approved'?'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400':p.status==='rejected'?'bg-slate-100 border-slate-300 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400':'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}">${p.status}</span>
                   <div class="flex gap-1.5 mt-3 justify-end">
-                    ${p.status==='pending' ? `<button onclick="window.handleAction(this, 'approve_payment',{id:'${p.id}'})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
-                    <button onclick="window.handleAction(this, 'reject_payment',{id:'${p.id}'})" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
-                    <button onclick="window.adminDelete(this, 'delete_payment',{id:'${p.id}'})" class="bg-qeRed/10 hover:bg-qeRed text-qeRed hover:text-white border border-qeRed/20 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    ${p.status==='pending' ? `<button type="button" onclick="window.handleAction(this, 'approve_payment',{id:'${p.id}'})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                    <button type="button" onclick="window.handleAction(this, 'reject_payment',{id:'${p.id}'})" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
+                    <button type="button" onclick="window.adminDelete(this, 'delete_payment',{id:'${p.id}'})" class="bg-qeRed/10 hover:bg-qeRed text-qeRed hover:text-white border border-qeRed/20 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                   </div>
                 </div>
               </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No transactions found</div>'}
@@ -960,7 +983,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Stats</h3><div class="space-y-2.5">`;
         pStats.forEach(s=>{
           const pName = window.data.players.find(x=>x.id===s.player_id)?.name || 'Unknown';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<button onclick="window.viewFullImage('${s.screenshot_url}')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</button>`:''}</div><div><button onclick="window.handleAction(this, 'approve_stat',{id:'${s.id}'})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.adminDelete(this, 'delete_stat',{id:'${s.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<button type="button" onclick="window.viewFullImage('${s.screenshot_url}')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</button>`:''}</div><div><button type="button" onclick="window.handleAction(this, 'approve_stat',{id:'${s.id}'})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button type="button" onclick="window.adminDelete(this, 'delete_stat',{id:'${s.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -1136,6 +1159,10 @@ tailwind.config = {
           <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Status</label>
           <select id="tr-status" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold appearance-none"><option value="active" ${t?.status==='active'?'selected':''}>Active</option><option value="closed" ${t?.status==='closed'?'selected':''}>Closed</option></select></div>
         </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Total Slots (Optional)</label>
+          <input id="tr-slots" type="number" placeholder="e.g. 20" value="${ppObj.slots||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50">
+        </div>
         <div class="grid grid-cols-3 gap-3 pt-2">
           <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">1st Prize (৳)</label><input id="tr-p1" type="number" value="${ppObj.first||0}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
           <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">2nd Prize (৳)</label><input id="tr-p2" type="number" value="${ppObj.second||0}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
@@ -1151,7 +1178,7 @@ tailwind.config = {
           </div>
         </div>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tr-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-qeRedDim transition-colors shadow-lg shadow-qeRed/20"><i data-lucide="save" class="w-4 h-4"></i> Save Event</button></div>
+      <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button type="button" id="tr-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-qeRedDim transition-colors shadow-lg shadow-qeRed/20"><i data-lucide="save" class="w-4 h-4"></i> Save Event</button></div>
     `);
 
     document.getElementById('tr-save').onclick = async () => {
@@ -1161,6 +1188,7 @@ tailwind.config = {
         const p2 = Number(document.getElementById('tr-p2').value) || 0;
         const p3 = Number(document.getElementById('tr-p3').value) || 0;
         ppObj.first = p1; ppObj.second = p2; ppObj.third = p3; ppObj.total = p1+p2+p3;
+        ppObj.slots = Number(document.getElementById('tr-slots').value) || null;
 
         const payload = {
           title: document.getElementById('tr-title').value, description: document.getElementById('tr-desc').value,
@@ -1207,7 +1235,7 @@ tailwind.config = {
           </div>
         </div>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="tm-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors flex items-center justify-center gap-2"><i data-lucide="${team ? 'save' : 'send'}" class="w-4 h-4"></i> ${team ? 'Save Team' : (window.isAdmin ? 'Add Team' : 'Submit Team')}</button></div>
+      <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button type="button" id="tm-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors flex items-center justify-center gap-2"><i data-lucide="${team ? 'save' : 'send'}" class="w-4 h-4"></i> ${team ? 'Save Team' : (window.isAdmin ? 'Add Team' : 'Submit Team')}</button></div>
     `);
 
     document.getElementById('tm-save').onclick = async () => {
@@ -1259,7 +1287,7 @@ tailwind.config = {
           </div>
         </div>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="pl-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="${pl ? 'save' : 'send'}" class="w-4 h-4"></i> ${pl ? 'Save Player' : 'Submit Request'}</button></div>
+      <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button type="button" id="pl-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="${pl ? 'save' : 'send'}" class="w-4 h-4"></i> ${pl ? 'Save Player' : 'Submit Request'}</button></div>
     `);
     document.getElementById('pl-save').onclick = async () => {
       const btn = document.getElementById('pl-save');
@@ -1325,7 +1353,7 @@ tailwind.config = {
           </div>
         </div>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
+      <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button type="button" id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
     `);
     document.getElementById('st-save').onclick = async () => {
       const btn = document.getElementById('st-save');
@@ -1360,9 +1388,9 @@ tailwind.config = {
       <div class="text-center mb-8"><div class="w-16 h-16 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-4 border border-qeRed/20 shadow-inner"><i data-lucide="shield-check" class="w-8 h-8"></i></div><h3 class="font-bold disp text-3xl text-slate-900 dark:text-white">Admin Access</h3><p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-medium">Verify your identity to enter control room</p></div>
       <div class="relative">
         <input type="password" id="adminPassInput" class="w-full p-4 pr-12 rounded-2xl bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/10 text-lg text-center tracking-widest font-mono outline-none text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors shadow-inner" placeholder="••••••••">
-        <button id="togglePassBtn" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white p-2 transition-colors"><i data-lucide="eye" class="w-5 h-5"></i></button>
+        <button type="button" id="togglePassBtn" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white p-2 transition-colors"><i data-lucide="eye" class="w-5 h-5"></i></button>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button id="al-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 hover:bg-qeRedDim transition-all hover:-translate-y-0.5">Authenticate</button></div>
+      <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button type="button" id="al-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/30 hover:bg-qeRedDim transition-all hover:-translate-y-0.5">Authenticate</button></div>
     `);
 
     document.getElementById('togglePassBtn').onclick = () => {
@@ -1375,14 +1403,14 @@ tailwind.config = {
 
     document.getElementById('al-ok').onclick = async ()=>{
       const password = document.getElementById('adminPassInput').value;
-      const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; lucide.createIcons();
+      const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; btn.disabled=true; lucide.createIcons();
       try{
         const res = await fetch('/api/admin-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password }) });
         const json = await res.json();
         if(!res.ok) throw new Error(json.error||'Invalid Password');
         window.adminToken = json.token; window.isAdmin = true; localStorage.setItem('qe_admin_token', window.adminToken);
         window.hideModal(); await window.loadAll(); window.render(); window.showToast('Access Granted');
-      } catch(err){ window.showToast(err.message,'error'); btn.innerHTML = og; lucide.createIcons(); }
+      } catch(err){ window.showToast(err.message,'error'); btn.innerHTML = og; btn.disabled=false; lucide.createIcons(); }
     };
   };
 
@@ -1421,10 +1449,10 @@ tailwind.config = {
         <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Dashboard Title</label><input id="as-title" placeholder="Title" value="${window.data.appSettings?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors"></div>
         <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Welcome Description</label><textarea id="as-desc" placeholder="Description" rows="3" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50 transition-colors leading-relaxed">${window.data.appSettings?.description||''}</textarea></div>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="save" class="w-4 h-4"></i> Save</button></div>
+      <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button type="button" id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="save" class="w-4 h-4"></i> Save</button></div>
       <div class="mt-6 pt-6 border-t border-red-200 dark:border-red-900/40">
         <p class="text-[10px] font-bold uppercase text-qeRed mb-2 tracking-wide">Danger Zone</p>
-        <button id="reset-all-btn" class="w-full py-4 text-sm bg-qeRed/10 text-qeRed border border-qeRed/30 rounded-xl font-bold hover:bg-qeRed hover:text-white transition-all">Reset All Data</button>
+        <button type="button" id="reset-all-btn" class="w-full py-4 text-sm bg-qeRed/10 text-qeRed border border-qeRed/30 rounded-xl font-bold hover:bg-qeRed hover:text-white transition-all">Reset All Data</button>
       </div>
     `);
     document.getElementById('as-save').onclick = async () => {
@@ -1451,16 +1479,16 @@ tailwind.config = {
         ${nums.map((n,i)=>`<div class="flex gap-2 num-row fade-in">
           <select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option ${n.type==='Personal'?'selected':''}>Personal</option><option ${n.type==='Agent'?'selected':''}>Agent</option><option ${n.type==='Merchant'?'selected':''}>Merchant</option></select>
           <input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50 transition-colors" placeholder="017XXXXXXXX" value="${n.number||''}">
-          <button onclick="this.closest('.num-row').remove()" class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+          <button type="button" onclick="this.closest('.num-row').remove()" class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>`).join('')}
       </div>
-      <button id="num-add" class="w-full mt-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Account</button>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="num-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save</button></div>
+      <button type="button" id="num-add" class="w-full mt-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Account</button>
+      <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button type="button" id="num-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Save</button></div>
     `);
     lucide.createIcons();
     document.getElementById('num-add').onclick = ()=>{
       const div = document.createElement('div'); div.className = 'flex gap-2 num-row mt-3 fade-in';
-      div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button onclick="this.closest('.num-row').remove()" class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+      div.innerHTML = `<select class="num-type bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs px-3 py-3 outline-none font-bold appearance-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select><input class="num-value flex-1 p-3 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm outline-none font-mono font-bold focus:border-qeRed/50" placeholder="017XXXXXXXX"><button type="button" onclick="this.closest('.num-row').remove()" class="num-remove text-slate-400 hover:text-qeRed bg-slate-100 dark:bg-slate-800/50 hover:bg-qeRed/10 rounded-xl px-4 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>`;
       document.getElementById('numsList').appendChild(div); lucide.createIcons();
     };
     document.getElementById('num-save').onclick = async ()=>{
