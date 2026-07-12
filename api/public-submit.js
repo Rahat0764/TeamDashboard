@@ -20,7 +20,23 @@ module.exports = async (req, res) => {
       const id = refId();
       await sb.from('activity_logs').insert([{ ref_id: id, action: 'Team Request', details: `${payload.team_name} requested to register.` }]);
       await sendTelegram(`🛡️ <b>New Team Request</b>\nName: ${payload.team_name}\nManager: ${payload.manager_name}\nRef: #${id}`);
-      return res.status(200).json({ ok: true });
+      return res.status(200).json({ ok: true, data });
+    }
+
+    if (action === 'submit_team_with_players') {
+      const { data: newTeam, error: tErr } = await sb.from('teams').insert([{ ...payload.team, status: 'pending' }]).select().single();
+      if (tErr) throw tErr;
+
+      if (payload.players && payload.players.length > 0) {
+        const pData = payload.players.map(p => ({ ...p, team_id: newTeam.id, status: 'pending' }));
+        const { error: pErr } = await sb.from('players').insert(pData);
+        if (pErr) throw pErr;
+      }
+      
+      const id = refId();
+      await sb.from('activity_logs').insert([{ ref_id: id, action: 'Team Request', details: `${payload.team.team_name} requested to register with players.` }]);
+      await sendTelegram(`🛡️ <b>New Team & Players Request</b>\nName: ${payload.team.team_name}\nPlayers: ${payload.players?.length || 0}\nRef: #${id}`);
+      return res.status(200).json({ ok: true, data: newTeam });
     }
 
     if (action === 'submit_player') {
