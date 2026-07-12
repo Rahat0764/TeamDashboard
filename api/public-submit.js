@@ -1,4 +1,4 @@
-const { getAdminClient, sendTelegram, refId } = require('../lib/server');
+const { getAdminClient, sendTelegram, refId, verify } = require('../lib/server');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -7,6 +7,10 @@ module.exports = async (req, res) => {
 
   const sb = getAdminClient();
   const { action, payload } = req.body || {};
+  
+  const token = req.headers['x-admin-token'];
+  const tokenPayload = verify(token);
+  const isAdmin = !!(tokenPayload && tokenPayload.role === 'admin');
 
   try {
     if (action === 'submit_team') {
@@ -30,12 +34,39 @@ module.exports = async (req, res) => {
     }
     
     if (action === 'submit_stats') {
-      const { data, error } = await sb.from('player_stats').insert([{ ...payload, status: 'pending' }]).select().single();
+      let match_id = payload.match_id;
+      
+      if (payload.match_label) {
+        const { data: m } = await sb.from('matches').select('id').eq('match_label', payload.match_label).single();
+        if (m) {
+            match_id = m.id;
+        } else {
+            const { data: nm } = await sb.from('matches').insert([{ match_no: Date.now()%10000, match_label: payload.match_label }]).select('id').single();
+            if(nm) match_id = nm.id;
+        }
+      }
+      
+      const statStatus = isAdmin ? 'approved' : 'pending';
+
+      const { data, error } = await sb.from('player_stats').insert([{ 
+          match_id, 
+          player_id: payload.player_id, 
+          team_id: payload.team_id,
+          kills: payload.kills,
+          assists: payload.assists,
+          damage: payload.damage,
+          survived_minutes: payload.survived_minutes,
+          screenshot_url: payload.screenshot_url,
+          status: statStatus 
+      }]).select().single();
+      
       if (error) throw error;
       
-      const id = refId();
-      await sb.from('activity_logs').insert([{ ref_id: id, action: 'Stats Submission', details: `Match stats submitted for review.` }]);
-      await sendTelegram(`📊 <b>New Stats Submission</b>\nKills: ${payload.kills} | Dmg: ${payload.damage}\nRef: #${id}`);
+      if (!isAdmin) {
+          const id = refId();
+          await sb.from('activity_logs').insert([{ ref_id: id, action: 'Stats Submission', details: `Match stats submitted for review.` }]);
+          await sendTelegram(`📊 <b>New Stats Submission</b>\nKills: ${payload.kills} | Dmg: ${payload.damage}\nRef: #${id}`);
+      }
       return res.status(200).json({ ok: true });
     }
 
