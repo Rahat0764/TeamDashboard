@@ -294,6 +294,24 @@ tailwind.config = {
     return pubData.publicUrl;
   };
 
+  window.handleAction = async (btn, action, payload, isPublic = false) => {
+    const ogHtml = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>';
+    btn.disabled = true;
+    lucide.createIcons();
+    try {
+      await window.api(action, payload, isPublic);
+      window.showToast('Action successful');
+      await window.loadAll();
+      window.render();
+    } catch (err) {
+      window.showToast(err.message, 'error');
+      btn.innerHTML = ogHtml;
+      btn.disabled = false;
+      lucide.createIcons();
+    }
+  };
+
   window.confirmAdminPassword = () => {
     return new Promise((resolve) => {
       window.showModal(`
@@ -314,19 +332,57 @@ tailwind.config = {
     });
   };
 
-  window.adminDelete = async (action, payload) => {
+  window.adminDelete = async (btn, action, payload) => {
     const confirmed = await window.confirmAdminPassword();
     if (!confirmed) return;
+    const ogHtml = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>';
+    btn.disabled = true;
+    lucide.createIcons();
     try {
       await window.api(action, payload);
       window.showToast('Deleted successfully');
       await window.loadAll();
       window.render();
-    } catch(e) { window.showToast(e.message, 'error'); }
+    } catch(e) { 
+      window.showToast(e.message, 'error');
+      btn.innerHTML = ogHtml;
+      btn.disabled = false;
+      lucide.createIcons();
+    }
   };
 
   window.viewFullImage = (url) => {
     window.showModal(`<img src="${url}" class="w-full rounded-2xl object-contain">`);
+  };
+
+  window.showPlayerDetails = (playerId) => {
+    const pl = window.data.players.find(p => p.id === playerId);
+    const team = window.data.teams.find(t => t.id === pl.team_id);
+    const stats = window.data.player_stats.filter(s => s.player_id === playerId && s.status === 'approved');
+    
+    let html = `<h3 class="font-bold disp text-2xl mb-4 flex items-center gap-3"><img src="${pl.avatar_url || '/assets/logo-transparent.png'}" class="w-10 h-10 rounded-full border border-slate-700 object-cover"> <div>${pl.name} <p class="text-[10px] text-slate-500 font-mono mt-0.5">UID: ${pl.uid} | Team: ${team?.team_name || 'Unknown'}</p></div></h3>`;
+    
+    html += `<div class="space-y-3 max-h-96 overflow-y-auto pr-2 hide-scrollbar">`;
+    if(stats.length === 0) html += `<p class="text-slate-500 text-center text-sm py-4">No match data found</p>`;
+    
+    stats.forEach(s => {
+        const m = window.data.matches.find(mx => mx.id === s.match_id);
+        html += `<div class="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl p-4 relative">
+            <p class="font-bold text-sm text-slate-800 dark:text-slate-200 mb-3 border-b border-slate-200 dark:border-white/5 pb-2"><i data-lucide="crosshair" class="w-3.5 h-3.5 inline text-qeRed mb-0.5 mr-1"></i> ${m ? m.match_label : 'Unknown Match'}</p>
+            <div class="grid grid-cols-4 gap-2 text-center mb-3">
+                <div><p class="text-[9px] text-slate-500 uppercase font-bold">Kills</p><p class="font-bold text-qeRed text-lg disp">${s.kills}</p></div>
+                <div><p class="text-[9px] text-slate-500 uppercase font-bold">Assists</p><p class="font-bold text-emerald-500 text-lg disp">${s.assists}</p></div>
+                <div><p class="text-[9px] text-slate-500 uppercase font-bold">Damage</p><p class="font-bold text-amber-500 text-lg disp">${s.damage}</p></div>
+                <div><p class="text-[9px] text-slate-500 uppercase font-bold">Survival</p><p class="font-bold text-indigo-500 text-lg disp">${s.survived_minutes}m</p></div>
+            </div>
+            ${s.screenshot_url ? `<button onclick="window.viewFullImage('${s.screenshot_url}')" class="w-full py-2 bg-slate-200 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition flex justify-center items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5"></i> View Proof</button>` : ''}
+        </div>`;
+    });
+    html += `</div>`;
+    html += `<div class="mt-5"><button onclick="window.hideModal()" class="w-full py-3 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition">Close Details</button></div>`;
+    
+    window.showModal(html);
   };
 
   window.loadAll = async () => {
@@ -482,7 +538,7 @@ tailwind.config = {
           
           <div class="absolute top-3 right-3 z-50 flex flex-col items-end gap-2 pointer-events-auto">
             ${activeBadge}
-            ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.adminDelete('delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
+            ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-qeRed transition-colors border border-white/20 shadow-lg" onclick="window.adminDelete(this, 'delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
           </div>
           
           <div class="absolute bottom-0 left-0 right-0 p-4 z-20 flex justify-between items-end pointer-events-none">
@@ -499,7 +555,7 @@ tailwind.config = {
             </div>
             <div class="flex flex-col items-end gap-2 relative z-50 pointer-events-auto">
                 ${activeBadge}
-                ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.adminDelete('delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
+                ${window.isAdmin ? `<div class="flex gap-1.5 mt-1"><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700" onclick="window.adminDelete(this, 'delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
             </div>
           </div>`}
 
@@ -563,7 +619,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 shadow-sm"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Team Requests</h3><div class="space-y-2.5">`;
         pendingTeams.forEach(t=>{
           const logo = t.logo_url ? t.logo_url : '/assets/logo-transparent.png';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="flex items-center gap-2"><img src="${logo}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${t.logo_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${t.team_name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">MGR: ${t.manager_name}</span></span></div><div><button onclick="window.api('approve_team', {id:'${t.id}'}).then(()=>window.loadAll().then(window.render))" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.api('delete_team', {id:'${t.id}'}).then(()=>window.loadAll().then(window.render))" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="flex items-center gap-2"><img src="${logo}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${t.logo_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${t.team_name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">MGR: ${t.manager_name}</span></span></div><div><button onclick="window.handleAction(this, 'approve_team', {id:'${t.id}'})" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.adminDelete(this, 'delete_team', {id:'${t.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -573,7 +629,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm"><h3 class="text-xs font-bold text-amber-700 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Player Approvals</h3><div class="space-y-2.5">`;
         pendingPl.forEach(p=>{
           const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.api('approve_player', {id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.api('delete_player', {id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-2.5 rounded-xl text-sm border border-amber-100 dark:border-amber-500/10"><div class="flex items-center gap-2"><img src="${ava}" loading="lazy" class="w-7 h-7 rounded object-cover bg-slate-100 border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80" onclick="window.viewFullImage('${p.avatar_url}')"><span class="font-bold text-slate-800 dark:text-slate-200">${p.name} <br><span class="text-[9px] text-slate-500 font-mono font-bold">UID: ${p.uid} | Role: ${p.role}</span></span></div><div><button onclick="window.handleAction(this, 'approve_player', {id:'${p.id}'})" class="text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg mr-1 hover:bg-emerald-100 transition-colors"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.adminDelete(this, 'delete_player', {id:'${p.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -591,7 +647,7 @@ tailwind.config = {
       const totalPl = pMain.length + pBench.length;
 
       html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-5 relative shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-transparent">
-        ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1 z-10"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.adminDelete('delete_team',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
+        ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1 z-10"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.adminDelete(this, 'delete_team',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
         
         <div class="flex items-center gap-4 mb-5 pr-20">
           <div class="relative shrink-0">
@@ -618,7 +674,7 @@ tailwind.config = {
                 </div>
                 ${window.isAdmin ? `<div class="flex flex-col gap-0.5 shrink-0 pr-1">
                     <button onclick="window.openPlayerModal('${p.id}')" class="text-slate-400 hover:text-emerald-500"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
-                    <button onclick="window.adminDelete('delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    <button onclick="window.adminDelete(this, 'delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                 </div>`:''}
             </div>`
           }).join('') || `<div class="col-span-2"><p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p></div>`}
@@ -636,7 +692,7 @@ tailwind.config = {
                 </div>
                 ${window.isAdmin ? `<div class="flex flex-col gap-0.5 shrink-0 pr-1">
                     <button onclick="window.openPlayerModal('${p.id}')" class="text-slate-400 hover:text-emerald-500"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
-                    <button onclick="window.adminDelete('delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    <button onclick="window.adminDelete(this, 'delete_player',{id:'${p.id}'})" class="text-slate-400 hover:text-qeRed"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                 </div>`:''}
             </div>`
           }).join('')}
@@ -733,9 +789,9 @@ tailwind.config = {
               <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
               <span class="inline-block mt-1 text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${p.status==='approved'?'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400':p.status==='rejected'?'bg-slate-100 border-slate-300 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400':'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}">${p.status}</span>
               ${window.isAdmin ? `<div class="flex gap-1.5 mt-3 justify-end">
-                ${p.status==='pending' ? `<button onclick="window.api('approve_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
-                <button onclick="window.api('reject_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
-                <button onclick="window.adminDelete('delete_payment',{id:'${p.id}'})" class="bg-qeRed/10 hover:bg-qeRed text-qeRed hover:text-white border border-qeRed/20 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                ${p.status==='pending' ? `<button onclick="window.handleAction(this, 'approve_payment',{id:'${p.id}'})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                <button onclick="window.handleAction(this, 'reject_payment',{id:'${p.id}'})" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
+                <button onclick="window.adminDelete(this, 'delete_payment',{id:'${p.id}'})" class="bg-qeRed/10 hover:bg-qeRed text-qeRed hover:text-white border border-qeRed/20 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
               </div>` : ''}
             </div>
           </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No transactions found</div>'}
@@ -746,7 +802,7 @@ tailwind.config = {
 
   window.buildStandings = () => {
     let html = `<div class="flex justify-between items-center mb-6"><h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="bar-chart-2" class="w-6 h-6 text-qeRed"></i> Leaderboards</h2>
-    ${window.isAdmin ? `<button onclick="window.openStatForm()" class="bg-qeRed text-white px-4 py-2 rounded-xl text-xs font-bold active:scale-95 shadow-lg shadow-qeRed/30 transition-transform"><i data-lucide="plus" class="inline w-3 h-3"></i> Add Stats</button>` : `<button onclick="window.openStatForm()" class="bg-slate-800 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-xl text-xs font-bold active:scale-95 shadow-md">Submit Stats</button>`}
+    <button onclick="window.openStatForm()" class="${window.isAdmin ? 'bg-qeRed text-white shadow-qeRed/30' : 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-md'} px-4 py-2 rounded-xl text-xs font-bold active:scale-95 shadow-lg transition-transform"><i data-lucide="${window.isAdmin ? 'plus' : 'bar-chart'}" class="inline w-3 h-3"></i> ${window.isAdmin ? 'Add Stats' : 'Submit Stats'}</button>
     </div>`;
 
     if(window.isAdmin) {
@@ -755,7 +811,7 @@ tailwind.config = {
         html += `<div class="mb-6 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20"><h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-3 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i> Pending Stats</h3><div class="space-y-2.5">`;
         pStats.forEach(s=>{
           const pName = window.data.players.find(x=>x.id===s.player_id)?.name || 'Unknown';
-          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<button onclick="window.viewFullImage('${s.screenshot_url}')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</button>`:''}</div><div><button onclick="window.api('approve_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.api('delete_stat',{id:'${s.id}'}).then(()=>{window.loadAll().then(window.render)})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
+          html += `<div class="flex justify-between items-center bg-white dark:bg-black/30 p-3 rounded-xl text-sm border border-indigo-100 dark:border-indigo-500/10"><div class="min-w-0"><span class="font-bold text-xs text-slate-800 dark:text-slate-200">${pName}</span><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-bold">K:${s.kills} | D:${s.damage} | S:${s.survived_minutes}m</p>${s.screenshot_url?`<button onclick="window.viewFullImage('${s.screenshot_url}')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-1 inline-flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> Proof</button>`:''}</div><div><button onclick="window.handleAction(this, 'approve_stat',{id:'${s.id}'})" class="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 p-2 rounded-lg hover:bg-emerald-100 transition-colors mr-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></button><button onclick="window.adminDelete(this, 'delete_stat',{id:'${s.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-2 rounded-lg hover:bg-qeRed/20 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div></div>`;
         });
         html += `</div></div>`;
       }
@@ -811,9 +867,12 @@ tailwind.config = {
                 <p class="font-bold text-lg text-slate-800 dark:text-slate-100 leading-tight truncate">${m.pl.name}</p>
                 <p class="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1 mt-0.5"><i data-lucide="shield" class="w-3 h-3"></i> ${teamName}</p>
             </div>
-            <div class="text-right shrink-0 bg-black/5 dark:bg-black/20 p-2 rounded-xl border border-black/5 dark:border-white/5">
-                <p class="text-[10px] font-bold uppercase text-slate-500 mb-0.5 tracking-wider">Matches</p>
-                <p class="font-bold text-xl disp text-slate-800 dark:text-slate-200 leading-none">${m.matches}</p>
+            <div class="flex items-center gap-2 shrink-0">
+                <div class="text-right bg-black/5 dark:bg-black/20 p-2 rounded-xl border border-black/5 dark:border-white/5">
+                    <p class="text-[10px] font-bold uppercase text-slate-500 mb-0.5 tracking-wider">Matches</p>
+                    <p class="font-bold text-xl disp text-slate-800 dark:text-slate-200 leading-none">${m.matches}</p>
+                </div>
+                <button onclick="window.showPlayerDetails('${m.id}')" class="p-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 hover:text-qeRed transition-colors border border-slate-300 dark:border-slate-700 shadow-sm"><i data-lucide="info" class="w-5 h-5"></i></button>
             </div>
         </div>
 
@@ -932,7 +991,7 @@ tailwind.config = {
 
   window.doPaymentSubmit = async (method) => {
     const btn = method==='auto' ? document.getElementById('autoVerifyBtn') : document.getElementById('manualVerifyBtn');
-    const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
+    const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; lucide.createIcons();
     try {
       const tourSel = document.getElementById('payTour');
       const tId = tourSel.value;
@@ -997,7 +1056,7 @@ tailwind.config = {
     `);
 
     document.getElementById('tr-save').onclick = async () => {
-      const btn = document.getElementById('tr-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+      const btn = document.getElementById('tr-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; btn.disabled=true; lucide.createIcons();
       try {
         const payload = {
           title: document.getElementById('tr-title').value, description: document.getElementById('tr-desc').value,
@@ -1012,7 +1071,7 @@ tailwind.config = {
 
         if(t) await window.api('update_tournament', { id: t.id, ...payload }); else await window.api('create_tournament', payload);
         window.hideModal(); await window.loadAll(); window.render(); window.showToast("Event saved successfully");
-      } catch(e){ window.showToast(e.message, 'error'); btn.innerHTML=og; lucide.createIcons(); }
+      } catch(e){ window.showToast(e.message, 'error'); btn.innerHTML=og; btn.disabled=false; lucide.createIcons(); }
     }
   };
 
@@ -1048,7 +1107,7 @@ tailwind.config = {
 
     document.getElementById('tm-save').onclick = async () => {
       const btn = document.getElementById('tm-save');
-      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
+      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; btn.disabled=true; lucide.createIcons();
       try{
         const payload = {
           team_name: document.getElementById('tm-name').value, slot_no: Number(document.getElementById('tm-slot').value)||null,
@@ -1071,7 +1130,7 @@ tailwind.config = {
         }
         
         window.hideModal(); await window.loadAll(); window.render(); 
-      } catch(err){ window.showToast(err.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+      } catch(err){ window.showToast(err.message,'error'); btn.innerHTML=ogHtml; btn.disabled=false; lucide.createIcons(); }
     };
   }
 
@@ -1099,7 +1158,7 @@ tailwind.config = {
     `);
     document.getElementById('pl-save').onclick = async () => {
       const btn = document.getElementById('pl-save');
-      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
+      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; btn.disabled=true; lucide.createIcons();
       try{
         const p = { team_id: document.getElementById('pl-team').value, name: document.getElementById('pl-name').value, uid: document.getElementById('pl-uid').value, role: document.getElementById('pl-role').value, avatar_url: pl?.avatar_url || null };
         if(!p.team_id || !p.name || !p.uid) throw new Error('Fill required fields');
@@ -1112,12 +1171,12 @@ tailwind.config = {
             window.showToast('Player updated');
         } else {
             const isPublic = !window.isAdmin;
-            await window.api('submit_player', p, isPublic); 
+            await window.api(isPublic ? 'submit_player' : 'create_player', p, isPublic); 
             window.showToast(isPublic ? 'Player submitted for approval' : 'Player added');
         }
         
         window.hideModal(); await window.loadAll(); window.render(); 
-      } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+      } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; btn.disabled=false; lucide.createIcons(); }
     };
   };
 
@@ -1137,7 +1196,12 @@ tailwind.config = {
       <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="bar-chart" class="inline w-5 h-5 text-qeRed mb-1"></i> Submit Stats</h3>
       <div class="space-y-4">
         <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Event</label><select id="st-event" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Event --</option>${window.data.tournaments.filter(t=>t.status==='active').map(t=>`<option value="${t.id}">${t.title}</option>`).join('')}</select></div>
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Match ID / Label</label><input id="st-match-label" placeholder="e.g. Erangel, Match 1" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"></div>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Match Date</label><input id="st-match-date" type="date" value="${new Date().toISOString().split('T')[0]}" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"></div>
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Match ID / Label</label><input id="st-match-label" placeholder="e.g. Erangel, Match 1" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"></div>
+        </div>
+
         <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Team</label><select id="st-team" onchange="window.updateStatPlayers()" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- Choose Team --</option>${(window.data.teams||[]).filter(t=>t.status==='approved').map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select></div>
         <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Select Player</label><select id="st-player" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none appearance-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50"><option value="">-- First Choose Team --</option></select></div>
         
@@ -1156,28 +1220,33 @@ tailwind.config = {
           </div>
         </div>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold text-slate-800 dark:text-white">Cancel</button><button id="st-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2"><i data-lucide="send" class="w-4 h-4"></i> Submit</button></div>
     `);
     document.getElementById('st-save').onclick = async () => {
       const btn = document.getElementById('st-save');
-      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Wait...'; lucide.createIcons();
+      const ogHtml = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; btn.disabled=true; lucide.createIcons();
       try{
-        const matchLabel = document.getElementById('st-match-label').value;
-        if(!matchLabel) throw new Error('Enter a Match ID / Label');
+        const dateVal = document.getElementById('st-match-date').value;
+        const rawLabel = document.getElementById('st-match-label').value;
+        if(!rawLabel) throw new Error('Enter a Match ID / Label');
+        
+        const finalLabel = dateVal ? `${rawLabel} [${dateVal}]` : rawLabel;
           
         const pSel = document.getElementById('st-player');
-        if(pSel.selectedIndex < 0) throw new Error('Select a player');
+        if(pSel.selectedIndex <= 0) throw new Error('Select a player');
         const opt = pSel.options[pSel.selectedIndex];
         if(!opt.value) throw new Error('Select a player');
 
-        const p = { match_label: matchLabel, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), screenshot_url: null };
+        const p = { match_label: finalLabel, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), screenshot_url: null };
 
         const uploadedUrl = await window.uploadPendingBlob('st-pic');
         if (!uploadedUrl) throw new Error('Screenshot proof is required');
         p.screenshot_url = uploadedUrl;
 
-        await window.api('submit_stats', p, true); window.hideModal(); window.loadAll().then(window.render); window.showToast(window.isAdmin?'Stats saved':'Stats submitted for review');
-      } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
+        const isPublic = !window.isAdmin;
+        await window.api(isPublic ? 'submit_stats' : 'create_stat', p, isPublic); 
+        window.hideModal(); window.loadAll().then(window.render); window.showToast(window.isAdmin?'Stats saved':'Stats submitted for review');
+      } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; btn.disabled=false; lucide.createIcons(); }
     };
   };
 
@@ -1201,7 +1270,7 @@ tailwind.config = {
 
     document.getElementById('al-ok').onclick = async ()=>{
       const password = document.getElementById('adminPassInput').value;
-      const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Verifying...'; lucide.createIcons();
+      const btn = document.getElementById('al-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; lucide.createIcons();
       try{
         const res = await fetch('/api/admin-login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password }) });
         const json = await res.json();
@@ -1254,10 +1323,10 @@ tailwind.config = {
       </div>
     `);
     document.getElementById('as-save').onclick = async () => {
-      const btn = document.getElementById('as-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+      const btn = document.getElementById('as-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; btn.disabled=true; lucide.createIcons();
       const title = document.getElementById('as-title').value; const description = document.getElementById('as-desc').value;
-      if(!title) { window.showToast('Title is required','error'); btn.innerHTML=og; lucide.createIcons(); return; }
-      try{ await window.api('update_app_settings', { title, description }); await window.loadAll(); window.hideModal(); window.render(); window.showToast('Settings updated'); }catch(e){window.showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
+      if(!title) { window.showToast('Title is required','error'); btn.innerHTML=og; btn.disabled=false; lucide.createIcons(); return; }
+      try{ await window.api('update_app_settings', { title, description }); await window.loadAll(); window.hideModal(); window.render(); window.showToast('Settings updated'); }catch(e){window.showToast(e.message,'error'); btn.innerHTML=og; btn.disabled=false; lucide.createIcons();}
     };
     document.getElementById('reset-all-btn').onclick = async () => {
       const c1 = await window.confirmAdminPassword();
@@ -1290,9 +1359,9 @@ tailwind.config = {
       document.getElementById('numsList').appendChild(div); lucide.createIcons();
     };
     document.getElementById('num-save').onclick = async ()=>{
-      const btn = document.getElementById('num-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+      const btn = document.getElementById('num-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; btn.disabled=true; lucide.createIcons();
       const numbers = Array.from(document.querySelectorAll('.num-row')).map(r=>({ type: r.querySelector('.num-type').value, number: r.querySelector('.num-value').value })).filter(n=>n.number);
-      try{ await window.api('update_bkash_numbers', { numbers }); await window.loadAll(); window.hideModal(); window.render(); window.showToast('Numbers updated'); }catch(e){window.showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
+      try{ await window.api('update_bkash_numbers', { numbers }); await window.loadAll(); window.hideModal(); window.render(); window.showToast('Numbers updated'); }catch(e){window.showToast(e.message,'error'); btn.innerHTML=og; btn.disabled=false; lucide.createIcons();}
     };
   };
 
