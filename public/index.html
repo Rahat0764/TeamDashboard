@@ -1,3 +1,4 @@
+<!-- filepath: public/index.html -->
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -53,18 +54,16 @@ tailwind.config = {
 
   ::selection { background: #c8203d; color: #fff; }
 
-  /* Cropper CSS Overrides for Circular Avatar */
   .cropper-view-box,
   .cropper-face { border-radius: 50%; }
   .cropper-modal { background: rgba(0,0,0,0.8); }
-  /* Remove circle crop for banner/proof */
   .rect-crop .cropper-view-box, .rect-crop .cropper-face { border-radius: 0; }
 </style>
 </head>
 <body class="text-slate-900 dark:text-slate-100 flex flex-col h-full w-full">
 
 <header class="glass z-40 shrink-0 border-b border-slate-200 dark:border-white/5 px-4 py-3 relative mesh-lines transition-all duration-300 shadow-sm">
-  <div class="max-w-6xl mx-auto flex justify-between items-center gap-2">
+  <div class="max-w-6xl mx-auto flex justify-between items-center gap-2 flex-wrap">
     <div class="flex items-center gap-3 min-w-0">
       <img src="/assets/logo-transparent.png" class="w-10 h-10 object-contain drop-shadow-lg" alt="QE" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23c8203d\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polygon points=\'12 2 2 7 12 12 22 7 12 2\'></polygon><polyline points=\'2 17 12 22 22 17\'></polyline><polyline points=\'2 12 12 17 22 12\'></polyline></svg>'">
       <div class="min-w-0">
@@ -113,7 +112,6 @@ tailwind.config = {
 
 <div id="modalContainer" class="fixed inset-0 bg-slate-900/60 dark:bg-black/80 z-[100] hidden flex justify-center items-center px-4 backdrop-blur-md overflow-y-auto py-8 transition-all"></div>
 
-<!-- Custom Image Cropper Modal -->
 <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900/90 dark:bg-black/95 z-[200] hidden flex flex-col justify-center items-center px-4 backdrop-blur-lg overflow-y-auto transition-all">
   <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-white/10 flex flex-col items-center">
     <h3 class="font-bold disp text-xl mb-4 text-slate-900 dark:text-white" id="ipm-title">Crop Image</h3>
@@ -139,8 +137,11 @@ tailwind.config = {
   window.data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [], appSettings: null, tournaments: [], players: [], player_stats: [] };
   window.timers = [];
   window.selectedPlayerCount = 1;
-  window.pendingImageUploadCallback = null;
   let cropper = null;
+  
+  // Storage for pending blobs before final save
+  window.pendingBlobs = {};
+  window.pendingBucket = {};
 
   if (document.documentElement.classList.contains('dark')) {
       const slider = document.getElementById('themeSlider');
@@ -198,7 +199,6 @@ tailwind.config = {
     return json;
   }
 
-  // Generate unique URL for file object and initiate Cropper
   window.triggerImageUpload = (inputId, type) => {
     const input = document.getElementById(inputId);
     if (!input.files || input.files.length === 0) return;
@@ -216,18 +216,12 @@ tailwind.config = {
       imgElem.src = e.target.result;
 
       const container = document.getElementById('ipm-canvas-container');
-
       if (cropper) { cropper.destroy(); }
 
       let cropOptions = {
-        viewMode: 1,
-        dragMode: 'move', // Allow moving image
-        autoCropArea: 0.9,
-        cropBoxMovable: false,   
-        cropBoxResizable: false,
-        zoomable: true, // Allow zoom
-        scalable: true,
-        toggleDragModeOnDblclick: false,
+        viewMode: 1, dragMode: 'move', autoCropArea: 0.9,
+        cropBoxMovable: false, cropBoxResizable: false,
+        zoomable: true, scalable: true, toggleDragModeOnDblclick: false,
       };
 
       if (type === 'avatar') {
@@ -241,49 +235,41 @@ tailwind.config = {
       } else {
         document.getElementById('ipm-title').innerText = "Screenshot Proof Preview";
         container.classList.add('rect-crop');
-        cropOptions.aspectRatio = NaN; // Free crop for proof
+        cropOptions.aspectRatio = NaN;
         cropOptions.cropBoxMovable = true;
         cropOptions.cropBoxResizable = true;
         cropOptions.autoCropArea = 1;
       }
 
-      imgElem.onload = () => {
-         cropper = new Cropper(imgElem, cropOptions);
-      };
+      imgElem.onload = () => { cropper = new Cropper(imgElem, cropOptions); };
 
-      document.getElementById('ipm-confirm').onclick = async () => {
-        const btn = document.getElementById('ipm-confirm');
-        const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Uploading...'; lucide.createIcons();
+      const confirmBtn = document.getElementById('ipm-confirm');
+      confirmBtn.innerHTML = '<i data-lucide="upload-cloud" class="w-4 h-4"></i> Confirm';
+      lucide.createIcons();
+
+      confirmBtn.onclick = async () => {
+        const og = confirmBtn.innerHTML; confirmBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...'; lucide.createIcons();
         try {
           if (!cropper) throw new Error("Image not ready");
+          const canvas = cropper.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200, imageSmoothingEnabled: true, imageSmoothingQuality: 'high' });
 
-          const canvas = cropper.getCroppedCanvas({
-             maxWidth: 1200, maxHeight: 1200, imageSmoothingEnabled: true, imageSmoothingQuality: 'high',
-          });
+          canvas.toBlob((blob) => {
+            const bucketName = type === 'avatar' ? 'player-avatars' : (type === 'banner' ? 'team-logos' : 'stat-proofs');
+            window.pendingBlobs[inputId] = blob;
+            window.pendingBucket[inputId] = bucketName;
 
-          canvas.toBlob(async (blob) => {
-              try {
-                  const ext = 'jpeg';
-                  const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.${ext}`;
-                  let bucketName = type === 'avatar' ? 'player-avatars' : (type === 'banner' ? 'team-logos' : 'stat-proofs');
+            const previewUrl = URL.createObjectURL(blob);
+            const btn = input.parentElement.querySelector('button');
+            if (btn) {
+              btn.innerHTML = `<img src="${previewUrl}" class="w-8 h-8 rounded-lg object-cover inline-block mr-2 align-middle border border-white/10"> <span class="align-middle">Selected — will upload on Save</span>`;
+            }
 
-                  const { data, error } = await window.supabase.storage.from(bucketName).upload(path, blob, { contentType: 'image/jpeg' });
-                  if (error) throw error;
-
-                  const { data: pubData } = window.supabase.storage.from(bucketName).getPublicUrl(path);
-
-                  if (window.pendingImageUploadCallback) window.pendingImageUploadCallback(pubData.publicUrl);
-                  window.closeImagePreview();
-                  window.showToast("Image Uploaded Successfully");
-              } catch (upErr) {
-                  window.showToast(upErr.message, 'error');
-                  btn.innerHTML = og; lucide.createIcons();
-              }
+            window.closeImagePreview();
+            window.showToast("Image ready");
           }, 'image/jpeg', 0.85);
-
         } catch(err) {
           window.showToast(err.message, 'error');
-          btn.innerHTML = og; lucide.createIcons();
+          confirmBtn.innerHTML = og; lucide.createIcons();
         }
       };
     };
@@ -293,7 +279,50 @@ tailwind.config = {
   window.closeImagePreview = () => {
     document.getElementById('imagePreviewModal').classList.add('hidden');
     if (cropper) { cropper.destroy(); cropper = null; }
-    window.pendingImageUploadCallback = null;
+  };
+
+  window.uploadPendingBlob = async (inputId) => {
+    const blob = window.pendingBlobs[inputId];
+    if (!blob) return null;
+    const bucketName = window.pendingBucket[inputId];
+    const path = `${Date.now()}_${Math.random().toString(36).substring(2,9)}.jpeg`;
+    const { error } = await window.supabase.storage.from(bucketName).upload(path, blob, { contentType: 'image/jpeg' });
+    if (error) throw error;
+    const { data: pubData } = window.supabase.storage.from(bucketName).getPublicUrl(path);
+    delete window.pendingBlobs[inputId];
+    delete window.pendingBucket[inputId];
+    return pubData.publicUrl;
+  };
+
+  window.confirmAdminPassword = () => {
+    return new Promise((resolve) => {
+      window.showModal(`
+        <div class="text-center mb-6"><div class="w-14 h-14 bg-qeRed/10 text-qeRed rounded-full flex items-center justify-center mx-auto mb-3 border border-qeRed/20"><i data-lucide="shield-alert" class="w-7 h-7"></i></div><h3 class="font-bold disp text-2xl text-slate-900 dark:text-white">Confirm Action</h3><p class="text-xs text-slate-600 dark:text-slate-400 mt-2">Enter admin password to continue</p></div>
+        <input type="password" id="confirmPassInput" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/10 text-lg text-center tracking-widest font-mono outline-none text-slate-900 dark:text-white" placeholder="••••••••">
+        <div class="flex gap-3 mt-6"><button id="cap-cancel" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="cap-ok" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold">Confirm</button></div>
+      `);
+      document.getElementById('cap-cancel').onclick = () => { window.hideModal(); resolve(false); };
+      document.getElementById('cap-ok').onclick = async () => {
+        const pw = document.getElementById('confirmPassInput').value;
+        const btn = document.getElementById('cap-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>'; lucide.createIcons();
+        try {
+          const res = await fetch('/api/admin-verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw }) });
+          if(!res.ok) throw new Error('Incorrect password');
+          window.hideModal(); resolve(true);
+        } catch(e) { window.showToast(e.message,'error'); btn.innerHTML = og; lucide.createIcons(); }
+      };
+    });
+  };
+
+  window.adminDelete = async (action, payload) => {
+    const confirmed = await window.confirmAdminPassword();
+    if (!confirmed) return;
+    try {
+      await window.api(action, payload);
+      window.showToast('Deleted successfully');
+      await window.loadAll();
+      window.render();
+    } catch(e) { window.showToast(e.message, 'error'); }
   };
 
   window.viewFullImage = (url) => {
@@ -382,7 +411,10 @@ tailwind.config = {
     </div>
     
     <div class="cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-white/5 overflow-hidden shadow-sm transition-colors">
-      <div class="p-4 border-b border-slate-200 dark:border-white/5 flex items-center gap-2 transition-colors bg-slate-50 dark:bg-transparent"><i data-lucide="activity" class="w-4 h-4 text-qeRed"></i><h3 class="font-bold disp tracking-wide text-lg text-slate-900 dark:text-white">Recent Activity</h3></div>
+      <div class="p-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between transition-colors bg-slate-50 dark:bg-transparent">
+        <div class="flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-qeRed"></i><h3 class="font-bold disp tracking-wide text-lg text-slate-900 dark:text-white">Recent Activity</h3></div>
+        <button onclick="window.changeTab('activity')" class="text-[10px] font-bold text-qeRed">View All</button>
+      </div>
       <div class="divide-y divide-slate-100 dark:divide-white/5 max-h-80 overflow-y-auto hide-scrollbar transition-colors">
         ${(window.data.logs||[]).slice(0,8).map(l=>`
           <div class="p-4 flex gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
@@ -424,12 +456,13 @@ tailwind.config = {
 
       html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 relative overflow-hidden group hover:shadow-xl transition-all ${t.banner_id ? 'text-white border-0' : 'bg-white dark:bg-transparent text-slate-900 dark:text-white'}" style="${bannerBg}">
         ${!t.banner_id ? `<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-qeRed/10 dark:from-qeRed/20 to-transparent blur-2xl rounded-full -mr-10 -mt-10 pointer-events-none"></div>` : ''}
-        ${window.isAdmin ? `<button class="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-800 rounded-lg ${t.banner_id?'text-white bg-black/50':'text-slate-500'} hover:text-qeRed transition-colors z-10 border border-slate-200 dark:border-slate-700 backdrop-blur-sm" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
+        
+        ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1 z-10"><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg ${t.banner_id?'text-white bg-black/50':'text-slate-500'} hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700 backdrop-blur-sm" onclick="window.openTourModal('${t.id}')"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg ${t.banner_id?'text-white bg-black/50':'text-slate-500'} hover:text-qeRed transition-colors border border-slate-200 dark:border-slate-700 backdrop-blur-sm" onclick="window.adminDelete('delete_tournament',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>` : ''}
         
         <div class="flex items-center gap-3 mb-4 relative z-10">
           <div class="w-12 h-12 rounded-2xl bg-qeRed/20 border border-qeRed/30 flex items-center justify-center text-qeRed shadow-lg backdrop-blur-sm"><i data-lucide="award" class="w-6 h-6"></i></div>
           <div>
-            <h3 class="disp text-2xl font-bold leading-tight drop-shadow-md">${t.title}</h3>
+            <h3 class="disp text-2xl font-bold leading-tight drop-shadow-md pr-16">${t.title}</h3>
             <p class="text-xs font-bold mt-1 tracking-wide ${t.banner_id?'text-slate-300':'text-slate-600 dark:text-slate-400'}" id="timer-${t.id}">${isClosed ? 'Registration Closed' : 'Loading...'}</p>
           </div>
         </div>
@@ -487,20 +520,20 @@ tailwind.config = {
       const logo = t.logo_url ? t.logo_url : '/assets/logo-transparent.png';
 
       html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-5 relative shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-transparent">
-        ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
-        <div class="flex items-center gap-4 mb-5">
-          <div class="relative">
+        ${window.isAdmin ? `<div class="absolute top-4 right-4 flex gap-1"><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.openTeamModal('${t.id}')"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button><button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:text-qeRed transition" onclick="window.adminDelete('delete_team',{id:'${t.id}'})"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>` : ''}
+        <div class="flex items-center gap-4 mb-5 pr-20">
+          <div class="relative shrink-0">
             <img src="${logo}" class="w-14 h-14 rounded-2xl object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm p-0.5 cursor-pointer" onclick="${t.logo_url?`window.viewFullImage('${t.logo_url}')`:''}">
             <div class="absolute -bottom-2 -right-2 w-6 h-6 rounded-lg bg-qeRed text-white flex items-center justify-center font-bold text-xs shadow-md border border-white dark:border-[#131319]">${t.slot_no||'?'}</div>
           </div>
-          <div><h3 class="font-bold text-xl disp text-slate-900 dark:text-white">${t.team_name}</h3><p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5">MGR: ${t.manager_name||'None'}</p></div>
+          <div class="min-w-0 flex-1"><h3 class="font-bold text-xl disp text-slate-900 dark:text-white truncate">${t.team_name}</h3><p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5 truncate">MGR: ${t.manager_name||'None'}</p></div>
         </div>
         
         <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 flex items-center gap-1.5 px-1"><i data-lucide="users" class="w-3 h-3"></i> Main Roster</p>
         <div class="space-y-2 mb-4">
           ${pMain.map(p=>{
             const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
-            return `<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 cursor-pointer" onclick="${p.avatar_url?`window.viewFullImage('${p.avatar_url}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
+            return `<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 cursor-pointer shrink-0" onclick="${p.avatar_url?`window.viewFullImage('${p.avatar_url}')`:''}"><div class="min-w-0 flex-1"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div>${window.isAdmin?`<button onclick="window.adminDelete('delete_player',{id:'${p.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-1.5 rounded-lg shrink-0 hover:bg-qeRed hover:text-white transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`:''}</div>`
           }).join('') || `<p class="text-xs text-slate-500 font-medium p-2 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">No players added</p>`}
         </div>
         
@@ -508,7 +541,7 @@ tailwind.config = {
         <div id="bench-${t.id}" class="hidden space-y-2 mb-4">
           ${pBench.map(p=>{
             const ava = p.avatar_url ? p.avatar_url : '/assets/logo-transparent.png';
-            return `<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50 cursor-pointer" onclick="${p.avatar_url?`window.viewFullImage('${p.avatar_url}')`:''}"><div class="min-w-0"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div></div>`
+            return `<div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-500/5 p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/10"><img src="${ava}" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 opacity-90 border border-amber-300 dark:border-amber-700/50 cursor-pointer shrink-0" onclick="${p.avatar_url?`window.viewFullImage('${p.avatar_url}')`:''}"><div class="min-w-0 flex-1"><p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name}</p><p class="text-[9px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${p.uid}</p></div>${window.isAdmin?`<button onclick="window.adminDelete('delete_player',{id:'${p.id}'})" class="text-qeRed bg-qeRed/10 border border-qeRed/20 p-1.5 rounded-lg shrink-0 hover:bg-qeRed hover:text-white transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`:''}</div>`
           }).join('')}
         </div>` : ''}
       </div>`;
@@ -592,9 +625,9 @@ tailwind.config = {
       <div class="p-5 border-b border-slate-200 dark:border-white/5 transition-colors bg-slate-50 dark:bg-transparent"><h3 class="font-bold disp text-lg text-slate-900 dark:text-white">Transaction History</h3></div>
       <div class="divide-y divide-slate-100 dark:divide-white/5 max-h-[420px] overflow-y-auto hide-scrollbar transition-colors">
         ${(window.data.payments||[]).map(p=>`
-          <div class="p-5 flex justify-between items-start gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-            <div class="min-w-0">
-              <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${p.payer_name}</p>
+          <div class="p-5 flex justify-between items-start gap-3 flex-wrap hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-sm text-slate-800 dark:text-slate-200 truncate">${p.payer_name}</p>
               <p class="text-[11px] text-slate-500 font-medium mt-0.5">${new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</p>
               ${window.isAdmin ? `<div class="mt-2 space-y-1"><p class="text-[10px] text-slate-600 dark:text-slate-400 font-mono bg-slate-100 dark:bg-black/40 px-2 py-1 rounded border border-slate-200 dark:border-white/5 inline-block font-semibold">Num: ${p.sender_number||'-'} | TrxID: ${p.trx_id||'-'}</p>${p.verification_type==='auto_sms'?'<p class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold flex items-center gap-1"><i data-lucide="zap" class="w-3 h-3"></i> Auto Matched</p>':''}</div>` : ''}
               ${p.screenshot_url ? `<button onclick="window.viewFullImage('${p.screenshot_url}')" class="text-[11px] text-qeRed font-bold hover:underline mt-2 inline-flex items-center gap-1 bg-qeRed/5 px-2 py-1 rounded-md border border-qeRed/10"><i data-lucide="image" class="w-3 h-3"></i> View Proof</button>` : ''}
@@ -602,9 +635,10 @@ tailwind.config = {
             <div class="text-right shrink-0">
               <p class="font-bold disp text-xl ${p.status==='approved'?'text-emerald-600 dark:text-emerald-400':p.status==='rejected'?'text-slate-500':'text-amber-600 dark:text-amber-500'}">৳${p.amount}</p>
               <span class="inline-block mt-1 text-[9px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${p.status==='approved'?'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400':p.status==='rejected'?'bg-slate-100 border-slate-300 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400':'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}">${p.status}</span>
-              ${window.isAdmin && p.status==='pending' ? `<div class="flex gap-1.5 mt-3">
-                <button onclick="window.api('approve_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
-                <button onclick="window.api('reject_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+              ${window.isAdmin ? `<div class="flex gap-1.5 mt-3 justify-end">
+                ${p.status==='pending' ? `<button onclick="window.api('approve_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                <button onclick="window.api('reject_payment',{id:'${p.id}'}).then(()=>window.loadAll().then(window.render))" class="bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
+                <button onclick="window.adminDelete('delete_payment',{id:'${p.id}'})" class="bg-qeRed/10 hover:bg-qeRed text-qeRed hover:text-white border border-qeRed/20 text-[10px] px-3 py-1.5 rounded-lg font-bold transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
               </div>` : ''}
             </div>
           </div>`).join('') || '<div class="p-10 text-center text-slate-500 text-sm font-medium">No transactions found</div>'}
@@ -640,7 +674,7 @@ tailwind.config = {
     html += `<div class="glass border border-slate-200 dark:border-white/5 rounded-3xl p-6 mb-6 shadow-sm bg-white dark:bg-transparent"><h3 class="font-bold disp text-xl mb-5 text-emerald-600 dark:text-emerald-500 flex items-center gap-2"><i data-lucide="crosshair" class="w-5 h-5"></i> Top Fraggers (MVP)</h3>
     <div class="space-y-3">`;
     mvps.slice(0,10).forEach((m, i)=>{
-      html += `<div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-3.5 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-emerald-500/30 transition-colors"><div class="flex items-center gap-3.5"><span class="w-8 h-8 flex items-center justify-center rounded-xl font-bold disp text-lg ${i===0?'bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30':i===1?'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800 shadow-md':i===2?'bg-gradient-to-br from-orange-600 to-orange-800 text-white shadow-md':'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}">${i+1}</span><div><p class="font-bold text-sm text-slate-800 dark:text-slate-200 leading-tight">${m.pl.name}</p><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${m.pl.uid}</p></div></div><div class="text-right"><p class="font-bold text-qeRed text-2xl disp leading-none">${m.k} <span class="text-xs text-slate-400 font-bold uppercase tracking-widest ml-0.5">Kills</span></p><p class="text-[10px] text-slate-500 font-bold mt-1 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md inline-block">${m.d} DMG</p></div></div>`;
+      html += `<div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-3.5 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-emerald-500/30 transition-colors"><div class="flex items-center gap-3.5 min-w-0"><span class="w-8 h-8 flex items-center justify-center rounded-xl font-bold disp text-lg shrink-0 ${i===0?'bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30':i===1?'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800 shadow-md':i===2?'bg-gradient-to-br from-orange-600 to-orange-800 text-white shadow-md':'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}">${i+1}</span><div class="min-w-0"><p class="font-bold text-sm text-slate-800 dark:text-slate-200 leading-tight truncate">${m.pl.name}</p><p class="text-[10px] text-slate-500 font-mono mt-0.5 font-semibold">UID: ${m.pl.uid}</p></div></div><div class="text-right shrink-0"><p class="font-bold text-qeRed text-2xl disp leading-none">${m.k} <span class="text-xs text-slate-400 font-bold uppercase tracking-widest ml-0.5">Kills</span></p><p class="text-[10px] text-slate-500 font-bold mt-1 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md inline-block">${m.d} DMG</p></div></div>`;
     });
     if(!mvps.length) html += `<div class="p-8 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-slate-500 font-medium"><i data-lucide="shield-question" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>No verified stats yet.</div>`;
     html += `</div></div>`;
@@ -648,7 +682,16 @@ tailwind.config = {
     return html;
   }
 
-  window.buildActivity = () => { return `<div class="p-8 text-center text-slate-500 font-medium">Activity Logs (Restricted view)</div>`; }
+  window.buildActivity = () => {
+    let html = `<h2 class="disp text-2xl font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="history" class="w-6 h-6 text-qeRed"></i> Full History</h2>
+    <div class="glass border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm bg-white dark:bg-transparent"><div class="divide-y divide-slate-100 dark:divide-white/5">`;
+    (window.data.logs||[]).forEach(l=>{
+      html += `<div class="p-4 flex gap-3 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"><div class="w-8 h-8 rounded-xl bg-qeRed/10 border border-qeRed/20 text-qeRed flex items-center justify-center shrink-0"><i data-lucide="bell" class="w-4 h-4"></i></div><div class="min-w-0"><p class="text-sm font-bold text-slate-800 dark:text-slate-200">${l.action}</p><p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed font-medium">${l.details}</p><p class="text-[10px] text-slate-500 mt-1 font-bold">${new Date(l.created_at).toLocaleString('en-US')}</p></div></div>`;
+    });
+    if(!(window.data.logs||[]).length) html += `<div class="p-10 text-center text-slate-500 font-medium">No activity recorded yet.</div>`;
+    html += `</div></div>`;
+    return html;
+  }
 
   window.updateCalc = () => {
     const tourSel = document.getElementById('payTour');
@@ -746,23 +789,16 @@ tailwind.config = {
       const base = basePerPlayer * window.selectedPlayerCount;
       const fee = Number((base * 0.0185).toFixed(2));
 
-      const submitPayment = async (fileUrl) => {
-        const res = await fetch('/api/payment-submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url: fileUrl, verify_method: method })
-        });
-        const json = await res.json();
-        if(!res.ok) throw new Error(json.error || 'Server error');
-        window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
-      };
+      const uploadedUrl = await window.uploadPendingBlob('payScreenshot');
 
-      if(document.getElementById('payScreenshot').files.length > 0) {
-        window.pendingImageUploadCallback = submitPayment;
-        window.triggerImageUpload('payScreenshot', 'proof');
-      } else {
-        await submitPayment(null);
-      }
+      const res = await fetch('/api/payment-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tournament_id: tId, team_id: tmId, payer_name: finalName, base_amount: base, calculated_fee: fee, total_paid: base+fee, trx_id: trx, sender_number: sNum, screenshot_url: uploadedUrl, verify_method: method })
+      });
+      const json = await res.json();
+      if(!res.ok) throw new Error(json.error || 'Server error');
+      window.showToast('Payment submitted successfully'); window.loadAll().then(window.render);
     } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
   };
 
@@ -805,18 +841,11 @@ tailwind.config = {
         };
         if(!payload.title) throw new Error("Title is required");
 
-        const saveFn = async (fileUrl) => {
-          if (fileUrl) payload.banner_id = fileUrl;
-          if(t) await window.api('update_tournament', { id: t.id, ...payload }); else await window.api('create_tournament', payload);
-          window.hideModal(); await window.loadAll(); window.render(); window.showToast("Event saved successfully");
-        };
+        const uploadedUrl = await window.uploadPendingBlob('tr-banner');
+        if (uploadedUrl) payload.banner_id = uploadedUrl;
 
-        if (document.getElementById('tr-banner').files.length > 0) {
-          window.pendingImageUploadCallback = saveFn;
-          window.triggerImageUpload('tr-banner', 'banner');
-        } else {
-          await saveFn(null);
-        }
+        if(t) await window.api('update_tournament', { id: t.id, ...payload }); else await window.api('create_tournament', payload);
+        window.hideModal(); await window.loadAll(); window.render(); window.showToast("Event saved successfully");
       } catch(e){ window.showToast(e.message, 'error'); btn.innerHTML=og; lucide.createIcons(); }
     }
   };
@@ -862,18 +891,11 @@ tailwind.config = {
         };
         if(!payload.team_name) throw new Error('Team name is required');
 
-        const saveFn = async (fileUrl) => {
-          if (fileUrl) payload.logo_url = fileUrl;
-          if(team) await window.api('update_team', { id: team.id, ...payload }); else await window.api('create_team', payload);
-          window.hideModal(); await window.loadAll(); window.render(); window.showToast('Team saved successfully');
-        };
+        const uploadedUrl = await window.uploadPendingBlob('tm-logo');
+        if (uploadedUrl) payload.logo_url = uploadedUrl;
 
-        if(document.getElementById('tm-logo').files.length > 0){
-           window.pendingImageUploadCallback = saveFn;
-           window.triggerImageUpload('tm-logo', 'avatar');
-        } else {
-           await saveFn(null);
-        }
+        if(team) await window.api('update_team', { id: team.id, ...payload }); else await window.api('create_team', payload);
+        window.hideModal(); await window.loadAll(); window.render(); window.showToast('Team saved successfully');
       } catch(err){ window.showToast(err.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
     };
   }
@@ -905,17 +927,10 @@ tailwind.config = {
         const p = { team_id: document.getElementById('pl-team').value, name: document.getElementById('pl-name').value, uid: document.getElementById('pl-uid').value, role: document.getElementById('pl-role').value, avatar_url: null };
         if(!p.team_id || !p.name || !p.uid) throw new Error('Fill required fields');
 
-        const saveFn = async (fileUrl) => {
-          if (fileUrl) p.avatar_url = fileUrl;
-          await window.api('submit_player', p, true); window.hideModal(); await window.loadAll(); window.render(); window.showToast(window.isAdmin?'Player added':'Player submitted for approval');
-        };
+        const uploadedUrl = await window.uploadPendingBlob('pl-pic');
+        if (uploadedUrl) p.avatar_url = uploadedUrl;
 
-        if(document.getElementById('pl-pic').files.length > 0){
-          window.pendingImageUploadCallback = saveFn;
-          window.triggerImageUpload('pl-pic', 'avatar');
-        } else {
-          await saveFn(null);
-        }
+        await window.api('submit_player', p, true); window.hideModal(); await window.loadAll(); window.render(); window.showToast(window.isAdmin?'Player added':'Player submitted for approval');
       } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
     };
   };
@@ -954,17 +969,11 @@ tailwind.config = {
         const p = { match_id: document.getElementById('st-match').value, player_id: opt.value, team_id: opt.dataset.team, kills: Number(document.getElementById('st-k').value), assists: Number(document.getElementById('st-a').value), damage: Number(document.getElementById('st-d').value), survived_minutes: Number(document.getElementById('st-s').value), screenshot_url: null };
         if(!p.match_id) throw new Error('Select a match');
 
-        const saveFn = async (fileUrl) => {
-          if (!fileUrl) { window.showToast('Screenshot proof is required','error'); btn.innerHTML=ogHtml; lucide.createIcons(); return; }
-          p.screenshot_url = fileUrl;
-          await window.api('submit_stats', p, true); window.hideModal(); window.loadAll().then(window.render); window.showToast(window.isAdmin?'Stats saved':'Stats submitted for review');
-        };
+        const uploadedUrl = await window.uploadPendingBlob('st-pic');
+        if (!uploadedUrl) throw new Error('Screenshot proof is required');
+        p.screenshot_url = uploadedUrl;
 
-        if(document.getElementById('st-pic').files.length > 0){
-          window.pendingImageUploadCallback = saveFn;
-          window.triggerImageUpload('st-pic', 'proof');
-        } else { throw new Error('Screenshot proof is required'); }
-
+        await window.api('submit_stats', p, true); window.hideModal(); window.loadAll().then(window.render); window.showToast(window.isAdmin?'Stats saved':'Stats submitted for review');
       } catch(e) { window.showToast(e.message,'error'); btn.innerHTML=ogHtml; lucide.createIcons(); }
     };
   };
@@ -1035,13 +1044,25 @@ tailwind.config = {
         <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Dashboard Title</label><input id="as-title" placeholder="Title" value="${window.data.appSettings?.title||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors"></div>
         <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Welcome Description</label><textarea id="as-desc" placeholder="Description" rows="3" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-medium focus:border-qeRed/50 transition-colors leading-relaxed">${window.data.appSettings?.description||''}</textarea></div>
       </div>
-      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="save" class="w-4 h-4"></i> Save Settings</button></div>
+      <div class="flex gap-3 mt-8"><button onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold">Cancel</button><button id="as-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 flex items-center justify-center gap-2 hover:bg-qeRedDim transition-all"><i data-lucide="save" class="w-4 h-4"></i> Save</button></div>
+      <div class="mt-6 pt-6 border-t border-red-200 dark:border-red-900/40">
+        <p class="text-[10px] font-bold uppercase text-qeRed mb-2 tracking-wide">Danger Zone</p>
+        <button id="reset-all-btn" class="w-full py-4 text-sm bg-qeRed/10 text-qeRed border border-qeRed/30 rounded-xl font-bold hover:bg-qeRed hover:text-white transition-all">Reset All Data</button>
+      </div>
     `);
     document.getElementById('as-save').onclick = async () => {
       const btn = document.getElementById('as-save'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
       const title = document.getElementById('as-title').value; const description = document.getElementById('as-desc').value;
       if(!title) { window.showToast('Title is required','error'); btn.innerHTML=og; lucide.createIcons(); return; }
       try{ await window.api('update_app_settings', { title, description }); await window.loadAll(); window.hideModal(); window.render(); window.showToast('Settings updated'); }catch(e){window.showToast(e.message,'error'); btn.innerHTML=og; lucide.createIcons();}
+    };
+    document.getElementById('reset-all-btn').onclick = async () => {
+      const c1 = await window.confirmAdminPassword();
+      if(!c1) return;
+      const c2 = await window.confirmAdminPassword();
+      if(!c2) return;
+      try { await window.api('reset_all', {}); window.showToast('All data has been reset'); await window.loadAll(); window.hideModal(); window.render(); }
+      catch(e){ window.showToast(e.message,'error'); }
     };
   };
 
