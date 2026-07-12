@@ -13,7 +13,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Cropper.js for Image Cropping -->
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -51,7 +51,6 @@ tailwind.config = {
   .toast-in { animation: toastIn .3s ease-out forwards; }
   @keyframes toastIn { from {opacity: 0; transform: translateX(110%)} to {opacity: 1; transform: translateX(0)} }
 
-  /* Loading Splash Screen CSS */
   #initial-loader { transition: opacity 0.4s ease, visibility 0.4s ease; }
   .hidden-loader { opacity: 0; visibility: hidden; }
 
@@ -65,7 +64,6 @@ tailwind.config = {
 </head>
 <body class="text-slate-900 dark:text-slate-100 flex flex-col h-full w-full">
 
-<!-- Initial Loading Splash Screen -->
 <div id="initial-loader" class="fixed inset-0 bg-[#050508] z-[500] flex flex-col items-center justify-center gap-4">
   <img src="/assets/logo-transparent.png" class="w-20 h-20 animate-pulse drop-shadow-2xl" onerror="this.style.display='none'">
   <div class="flex items-center gap-2 text-qeRed mt-2">
@@ -149,10 +147,9 @@ tailwind.config = {
   window.data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [], appSettings: null, tournaments: [], players: [], player_stats: [] };
   window.timers = [];
   window.selectedPlayerCount = 1;
-  window.pendingPayTournamentId = null; // for auto payment tab select
+  window.pendingPayTournamentId = null;
   let cropper = null;
   
-  // Storage for pending blobs before final save
   window.pendingBlobs = {};
   window.pendingBucket = {};
 
@@ -390,7 +387,6 @@ tailwind.config = {
     window.updateNav();
     document.getElementById('adminBtnText').innerText = window.isAdmin ? 'Logout' : 'Admin';
 
-    // Auto-select payment tournament if requested
     if(window.activeTab==='payments' && window.pendingPayTournamentId){
       const sel = document.getElementById('payTour');
       if(sel){ 
@@ -1152,15 +1148,13 @@ tailwind.config = {
     await window.loadAll(); 
     window.render();
     
-    // Hide initial loader after data is fetched
     const loader = document.getElementById('initial-loader');
     if (loader) {
       loader.classList.add('hidden-loader');
-      setTimeout(() => loader.remove(), 400); // give time for transition
+      setTimeout(() => loader.remove(), 400);
     }
   }
 
-  // Start the application
   init();
 </script>
 </body>
