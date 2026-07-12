@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
         return res.status(200).json({ ok: true });
       case 'create_team':
         const { data: tData } = await sb.from('teams').insert([{ ...payload, status: 'approved' }]).select().throwOnError();
-        await logAndNotify(sb, 'New Team Added', `Team ${payload.team_name} added.`);
+        await logAndNotify(sb, 'Team Added', `Admin added team ${payload.team_name}.`);
         return res.status(200).json({ data: tData });
       case 'update_team':
         const { id: uId, ...tFields } = payload;
@@ -31,9 +31,6 @@ module.exports = async (req, res) => {
         return res.status(200).json({ data: mData });
       case 'delete_match':
         await sb.from('matches').delete().eq('id', payload.id).throwOnError();
-        return res.status(200).json({ ok: true });
-      case 'upsert_result':
-        await sb.from('match_results').upsert([payload], { onConflict: 'match_id,team_id' }).throwOnError();
         return res.status(200).json({ ok: true });
       case 'update_point_settings':
         await sb.from('point_settings').upsert({ id: 1, ...payload }).throwOnError();
@@ -65,6 +62,9 @@ module.exports = async (req, res) => {
         await sb.from('payments').delete().eq('id', payload.id).throwOnError();
         return res.status(200).json({ ok: true });
       
+      case 'create_player':
+        const { data: pData } = await sb.from('players').insert([{ ...payload, status: 'approved' }]).select().throwOnError();
+        return res.status(200).json({ data: pData });
       case 'approve_player':
         await sb.from('players').update({ status: 'approved' }).eq('id', payload.id).throwOnError();
         return res.status(200).json({ ok: true });
@@ -76,6 +76,29 @@ module.exports = async (req, res) => {
         await sb.from('players').delete().eq('id', payload.id).throwOnError();
         return res.status(200).json({ ok: true });
       
+      case 'create_stat':
+        let match_id = payload.match_id;
+        if (!match_id && payload.match_label) {
+          const { data: m } = await sb.from('matches').select('id').eq('match_label', payload.match_label).single();
+          if (m) {
+            match_id = m.id;
+          } else {
+            const { data: nm } = await sb.from('matches').insert([{ match_no: Date.now()%10000, match_label: payload.match_label }]).select('id').single();
+            if (nm) match_id = nm.id;
+          }
+        }
+        await sb.from('player_stats').insert([{ 
+            match_id, 
+            player_id: payload.player_id, 
+            team_id: payload.team_id,
+            kills: payload.kills,
+            assists: payload.assists,
+            damage: payload.damage,
+            survived_minutes: payload.survived_minutes,
+            screenshot_url: payload.screenshot_url,
+            status: 'approved' 
+        }]).throwOnError();
+        return res.status(200).json({ ok: true });
       case 'approve_stat':
         await sb.from('player_stats').update({ status: 'approved' }).eq('id', payload.id).throwOnError();
         return res.status(200).json({ ok: true });
