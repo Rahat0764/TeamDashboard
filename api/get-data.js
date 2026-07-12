@@ -22,7 +22,9 @@ module.exports = async (req, res) => {
       playersRes,
       statsRes
     ] = await Promise.all([
-      sb.from('teams').select('*').order('created_at', { ascending: true }),
+      isAdmin 
+        ? sb.from('teams').select('*').order('created_at', { ascending: true })
+        : sb.from('teams').select('*').eq('status', 'approved').order('created_at', { ascending: true }),
       sb.from('matches').select('*').order('match_no', { ascending: true }),
       sb.from('match_results').select('*'),
       sb.from('payments').select('*').order('created_at', { ascending: false }),
