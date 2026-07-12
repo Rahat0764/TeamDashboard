@@ -16,6 +16,14 @@ module.exports = async (req, res) => {
         const { data: tData } = await sb.from('teams').insert([{ ...payload, status: 'approved' }]).select().throwOnError();
         await logAndNotify(sb, 'Team Added', `Admin added team ${payload.team_name}.`);
         return res.status(200).json({ data: tData });
+      case 'create_team_with_players':
+        const { data: newTeam } = await sb.from('teams').insert([{ ...payload.team, status: 'approved' }]).select().single().throwOnError();
+        if (payload.players && payload.players.length > 0) {
+          const pData = payload.players.map(p => ({ ...p, team_id: newTeam.id, status: 'approved' }));
+          await sb.from('players').insert(pData).throwOnError();
+        }
+        await logAndNotify(sb, 'Team Added', `Admin added team ${payload.team.team_name} with ${payload.players?.length || 0} players.`);
+        return res.status(200).json({ data: newTeam });
       case 'update_team':
         const { id: uId, ...tFields } = payload;
         await sb.from('teams').update(tFields).eq('id', uId).throwOnError();
@@ -60,6 +68,9 @@ module.exports = async (req, res) => {
         return res.status(200).json({ ok: true });
       case 'delete_payment':
         await sb.from('payments').delete().eq('id', payload.id).throwOnError();
+        return res.status(200).json({ ok: true });
+      case 'remove_team_from_tour':
+        await sb.from('payments').delete().eq('tournament_id', payload.tournament_id).eq('team_id', payload.team_id).throwOnError();
         return res.status(200).json({ ok: true });
       
       case 'create_player':
