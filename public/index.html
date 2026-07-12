@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>QE Scrim | Dashboard</title>
+<title>QE Scrim | Pro Dashboard</title>
 <meta name="theme-color" content="#0a0a0f">
 <script>
   if (localStorage.getItem('qe_theme') === 'light') document.documentElement.classList.remove('dark');
@@ -104,7 +104,7 @@ tailwind.config = {
   <div class="flex justify-around items-center h-16 px-2">
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('tournaments')" data-tab="tournaments"><i data-lucide="crosshair" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Events</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('teams')" data-tab="teams"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Teams</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all text-qeRed" onclick="window.changeTab('dashboard')" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('dashboard')" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('standings')" data-tab="standings"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Rank</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('payments')" data-tab="payments"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Pay</span></button>
   </div>
@@ -137,6 +137,7 @@ tailwind.config = {
   window.data = { teams: [], matches: [], results: [], settings: null, payments: [], logs: [], numbers: [], appSettings: null, tournaments: [], players: [], player_stats: [] };
   window.timers = [];
   window.pendingPayTournamentId = null;
+  window.playerSlotCount = 0;
   let cropper = null;
   
   window.pendingBlobs = {};
@@ -200,7 +201,7 @@ tailwind.config = {
 
   window.triggerImageUpload = (inputId, type) => {
     const input = document.getElementById(inputId);
-    if (!input.files || input.files.length === 0) return;
+    if (!input || !input.files || input.files.length === 0) return;
 
     const file = input.files[0];
     if (file.size > 10 * 1024 * 1024) {
@@ -355,6 +356,20 @@ tailwind.config = {
     window.showModal(`<img src="${url}" class="w-full rounded-2xl object-contain">`);
   };
 
+  window.showManagerInfo = (teamId) => {
+    const team = window.data.teams.find(t=>t.id===teamId);
+    if (!team) return;
+    window.showModal(`
+      <h3 class="disp text-2xl font-bold mb-4 flex items-center gap-3"><i data-lucide="shield" class="text-qeRed"></i> Manager Info</h3>
+      <div class="space-y-3 bg-slate-50 dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5">
+        <p class="text-sm"><span class="text-slate-500 font-bold uppercase text-[10px] block tracking-widest mb-1">Name</span> <strong class="text-slate-800 dark:text-slate-200">${team.manager_name || 'N/A'}</strong></p>
+        <p class="text-sm"><span class="text-slate-500 font-bold uppercase text-[10px] block tracking-widest mb-1">In-Game Name</span> <strong class="text-slate-800 dark:text-slate-200">${team.manager_ign || 'N/A'}</strong></p>
+        <p class="text-sm"><span class="text-slate-500 font-bold uppercase text-[10px] block tracking-widest mb-1">Contact</span> <strong class="text-slate-800 dark:text-slate-200">${team.manager_contact || 'N/A'}</strong></p>
+      </div>
+      <button type="button" onclick="window.hideModal()" class="w-full py-4 mt-6 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Close</button>
+    `);
+  };
+
   window.showPlayerDetails = (playerId) => {
     const pl = window.data.players.find(p => p.id === playerId);
     const team = window.data.teams.find(t => t.id === pl.team_id);
@@ -384,25 +399,33 @@ tailwind.config = {
     window.showModal(html);
   };
 
-  window.showTeamInfo = (tId) => {
-    const t = window.data.teams.find(x=>x.id===tId);
-    const regs = window.data.payments.filter(p=>p.team_id===tId && p.status==='approved').map(p=>p.tournament_id);
-    const regTours = window.data.tournaments.filter(tr => regs.includes(tr.id));
+  window.showEventTeamDetails = (tourId, teamId) => {
+    const tour = window.data.tournaments.find(t=>t.id===tourId);
+    const team = window.data.teams.find(t=>t.id===teamId);
+    const pls = window.data.players.filter(p=>p.team_id===teamId && p.status==='approved');
     
-    let html = `<h3 class="disp text-2xl font-bold mb-4 flex items-center gap-3"><img src="${t.logo_url||'/assets/logo-transparent.png'}" class="w-10 h-10 rounded-xl object-cover"> ${t.team_name}</h3>`;
-    html += `<div class="bg-black/20 p-4 rounded-2xl border border-white/5 mb-4"><p class="text-xs text-slate-400 mb-1">Manager: <strong class="text-white">${t.manager_name}</strong></p><p class="text-xs text-slate-400 mb-1">IGN: <strong class="text-white">${t.manager_ign}</strong></p><p class="text-xs text-slate-400">Contact: <strong class="text-white">${t.manager_contact}</strong></p></div>`;
+    let html = `<h3 class="disp text-2xl font-bold mb-4 flex items-center gap-3"><img src="${team.logo_url||'/assets/logo-transparent.png'}" class="w-10 h-10 rounded-xl object-cover"> ${team.team_name}</h3>`;
     
-    html += `<h4 class="font-bold text-emerald-500 uppercase tracking-widest text-xs mb-3">Registered Tournaments</h4>`;
-    if(regTours.length > 0) {
-        html += `<div class="space-y-2 mb-6 max-h-40 overflow-y-auto pr-2 hide-scrollbar">`;
-        regTours.forEach(rt => {
-            html += `<div class="bg-slate-800 p-3 rounded-xl border border-white/10 text-sm font-bold">${rt.title}</div>`;
-        });
-        html += `</div>`;
-    } else {
-        html += `<p class="text-xs text-slate-500 mb-6">Not registered in any tournaments yet.</p>`;
+    html += `<div class="space-y-2 mb-6 max-h-60 overflow-y-auto pr-2 hide-scrollbar">`;
+    if(pls.length === 0) html += `<p class="text-xs text-slate-500">No approved players found.</p>`;
+    
+    pls.forEach(p => {
+        html += `<div class="flex items-center gap-3 bg-slate-50 dark:bg-black/20 p-2.5 rounded-xl border border-slate-200 dark:border-white/5">
+            <img src="${p.avatar_url || '/assets/logo-transparent.png'}" loading="lazy" class="w-8 h-8 rounded-full object-cover bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 shrink-0">
+            <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${p.name} <span class="text-[9px] ml-1 bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500">${p.role}</span></p>
+                <p class="text-[9px] text-slate-500 font-mono font-semibold">UID: ${p.uid}</p>
+            </div>
+        </div>`;
+    });
+    html += `</div>`;
+
+    html += `<div class="flex flex-col gap-3">`;
+    if (window.isAdmin) {
+        html += `<button type="button" onclick="window.adminDelete(this, 'remove_team_from_tour', { tournament_id: '${tourId}', team_id: '${teamId}' })" class="w-full py-4 text-sm bg-qeRed/10 text-qeRed border border-qeRed/20 rounded-xl font-bold hover:bg-qeRed hover:text-white transition-all flex items-center justify-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Remove from Tournament</button>`;
     }
-    html += `<button type="button" onclick="window.hideModal()" class="w-full py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Close</button>`;
+    html += `<button type="button" onclick="window.hideModal()" class="w-full py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Close</button></div>`;
+    
     window.showModal(html);
   };
 
@@ -476,12 +499,14 @@ tailwind.config = {
     window.showModal(`
         <h3 class="disp text-xl font-bold mb-4">Free Registration</h3>
         <label class="text-[10px] font-bold uppercase text-slate-500 mb-1 block">Select your team</label>
-        <select id="free-team-sel" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold mb-6">
+        <select id="free-team-sel" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-bold mb-4">
             <option value="">-- Choose Team --</option>
             ${window.data.teams.filter(t=>t.status==='approved').map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}
         </select>
-        <div class="flex gap-3"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button type="button" onclick="window.doFreeReg(this, '${tourId}')" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold">Confirm Register</button></div>
+        <button type="button" onclick="window.openTeamModal(null, 'free_reg_${tourId}')" class="w-full py-3 mb-6 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Create New Team</button>
+        <div class="flex gap-3"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 rounded-xl font-bold">Cancel</button><button type="button" onclick="window.doFreeReg(this, '${tourId}')" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold">Confirm</button></div>
     `);
+    lucide.createIcons();
   };
 
   window.doFreeReg = async (btn, tourId) => {
@@ -495,13 +520,40 @@ tailwind.config = {
     } catch(e) { window.showToast(e.message, 'error'); btn.innerHTML=ogHtml; btn.disabled=false; lucide.createIcons(); }
   };
 
+  window.addPlayerSlot = () => {
+      window.playerSlotCount++;
+      const id = window.playerSlotCount;
+      const html = `
+      <div class="player-slot border border-slate-200 dark:border-slate-700 rounded-xl p-4 mt-3 bg-white dark:bg-[#0a0a0f] relative fade-in">
+          <button type="button" onclick="this.parentElement.remove()" class="absolute top-3 right-3 text-slate-400 hover:text-qeRed"><i data-lucide="x" class="w-4 h-4"></i></button>
+          <div class="space-y-3">
+              <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">In-Game Name</label><input placeholder="IGN" class="p-name w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white"></div>
+              <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">Game UID</label><input placeholder="Numeric ID" type="number" class="p-uid w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold font-mono text-slate-900 dark:text-white"></div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">Role</label><select class="p-role w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white appearance-none"><option value="main">Main Roster</option><option value="bench">Bench/Reserve</option></select></div>
+                  <div>
+                      <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">Avatar Image</label>
+                      <div class="relative w-full">
+                          <input id="pl-pic-${id}" type="file" accept="image/*" class="p-pic absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('pl-pic-${id}', 'avatar')">
+                          <button type="button" class="w-full text-xs text-slate-500 dark:text-slate-400 py-3 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-1.5"><i data-lucide="image-plus" class="w-3.5 h-3.5"></i> Upload</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>`;
+      document.getElementById('players-list').insertAdjacentHTML('beforeend', html);
+      lucide.createIcons();
+  };
+
   window.loadAll = async () => {
-    const res = await fetch('/api/get-data', { headers: { 'x-admin-token': window.adminToken || '' }});
-    if(!res.ok) {
-      if(res.status === 401) { window.doLogout(); throw new Error("Unauthorized"); }
-      throw new Error("Failed to load data");
-    }
-    window.data = await res.json();
+    try {
+      const res = await fetch('/api/get-data', { headers: { 'x-admin-token': window.adminToken || '' }});
+      if(!res.ok) {
+        if(res.status === 401) { window.doLogout(); return; }
+        throw new Error("Failed to load data");
+      }
+      window.data = await res.json();
+    } catch(e) { console.error(e); throw e; }
   }
 
   window.updateNav = () => {
@@ -638,19 +690,35 @@ tailwind.config = {
     return html;
   }
 
-  window.startCountdown = (elementId, deadlineStr) => {
+  window.startCountdown = (elementId, startStr, deadlineStr) => {
     const el = document.getElementById(elementId);
     if(!el) return;
-    const target = new Date(deadlineStr).getTime();
+    const startTime = startStr ? new Date(startStr).getTime() : 0;
+    const deadlineTime = deadlineStr ? new Date(deadlineStr).getTime() : 0;
+
     const timer = setInterval(()=>{
       const now = new Date().getTime();
-      const diff = target - now;
-      if(diff <= 0) { clearInterval(timer); el.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5 inline"></i> Registration Closed`; lucide.createIcons(); return; }
+      let diff = 0;
+      let label = "";
+      
+      if (startTime && now < startTime) {
+          diff = startTime - now;
+          label = "Starts in: ";
+      } else if (deadlineTime && now < deadlineTime) {
+          diff = deadlineTime - now;
+          label = "Ends in: ";
+      } else {
+          clearInterval(timer); 
+          el.innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5 inline"></i> Registration Closed`; 
+          lucide.createIcons(); 
+          return;
+      }
+      
       const d = Math.floor(diff / (1000 * 60 * 60 * 24));
       const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const s = Math.floor((diff % (1000 * 60)) / 1000);
-      el.innerHTML = `Ends in: <span class="text-white font-bold bg-qeRed/80 px-2 py-0.5 rounded-lg shadow-sm ml-1">${d}d ${h}h ${m}m ${s}s</span>`;
+      el.innerHTML = `${label}<span class="text-white font-bold bg-qeRed/80 px-2 py-0.5 rounded-lg shadow-sm ml-1">${d}d ${h}h ${m}m ${s}s</span>`;
     }, 1000);
     window.timers.push(timer);
   }
@@ -664,7 +732,7 @@ tailwind.config = {
     if(!window.data.tournaments.length) html += `<div class="glass p-10 text-center text-slate-500 rounded-3xl border border-slate-200 dark:border-white/5 font-medium">No active tournaments available.</div>`;
 
     window.data.tournaments.forEach(t => {
-      const isClosed = new Date(t.deadline).getTime() < new Date().getTime();
+      const isClosed = t.deadline ? new Date(t.deadline).getTime() < new Date().getTime() : false;
       const isFree = Number(t.entry_fee) === 0;
       
       let pp = t.prize_pool || {};
@@ -732,7 +800,7 @@ tailwind.config = {
             <div class="w-12 h-12 rounded-2xl bg-qeRed/10 border border-qeRed/20 flex items-center justify-center text-qeRed shadow-inner shrink-0 mt-1"><i data-lucide="award" class="w-6 h-6"></i></div>
             <div class="min-w-0 flex-1">
               <h3 class="disp text-2xl font-bold leading-tight break-words flex items-center gap-2">${t.title} <button type="button" onclick="window.showEventInfo('${t.id}')" class="text-slate-400 hover:text-qeRed shrink-0"><i data-lucide="info" class="w-5 h-5"></i></button></h3>
-              <p class="text-xs font-bold mt-1.5 tracking-wide text-slate-600 dark:text-slate-400 flex items-center gap-1.5" id="timer-${t.id}">${isClosed ? '<i data-lucide="clock" class="w-3.5 h-3.5 inline"></i> Registration Closed' : 'Loading...'}</p>
+              <p class="text-xs font-bold mt-1.5 tracking-wide text-slate-600 dark:text-slate-400 flex items-center gap-1.5" id="timer-${t.id}">Loading...</p>
             </div>
           </div>
           `;
@@ -756,14 +824,14 @@ tailwind.config = {
                   const totalCount = mCount + bCount;
                   const hiddenClass = idx >= displayLimit ? 'hidden extra-team-' + t.id : '';
                   
-                  teamsHTML += `<div class="flex-shrink-0 w-64 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/5 rounded-2xl p-3.5 flex items-center gap-3.5 snap-start relative overflow-hidden shadow-sm ${hiddenClass}">
+                  teamsHTML += `<button type="button" onclick="window.showEventTeamDetails('${t.id}', '${team.id}')" class="flex-shrink-0 w-64 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/5 rounded-2xl p-3.5 flex items-center gap-3.5 snap-start relative overflow-hidden shadow-sm hover:border-qeRed/50 transition-colors text-left ${hiddenClass}">
                       <span class="absolute top-0 left-0 bg-qeRed text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg shadow-sm z-10">#${idx + 1}</span>
                       <img src="${team.logo_url || '/assets/logo-transparent.png'}" loading="lazy" class="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm shrink-0 mt-1">
                       <div class="min-w-0 flex-1 py-0.5">
                           <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">${team.team_name}</h4>
                           <p class="text-[9px] font-bold text-slate-500 mt-1.5 bg-white dark:bg-slate-800 px-2 py-1 rounded-md inline-block border border-slate-200 dark:border-slate-700 shadow-sm">Players: ${totalCount} (M: ${mCount}, B: ${bCount})</p>
                       </div>
-                  </div>`;
+                  </button>`;
               }
           });
           
@@ -774,7 +842,7 @@ tailwind.config = {
           teamsHTML += `</div>`;
       }
 
-      html += `<div class="mt-auto">`;
+      html += `<div class="mt-auto pt-4">`;
       if(!isClosed) {
          if(isFree) {
             html += `<button type="button" onclick="window.registerFree('${t.id}')" class="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-600/30 active:scale-95 transition-all disp tracking-wide text-lg border border-white/10 mt-auto">Register for Free</button>`;
@@ -788,7 +856,9 @@ tailwind.config = {
     html += `</div>`;
 
     setTimeout(()=>{
-      window.data.tournaments.forEach(t => { if(t.deadline) window.startCountdown(`timer-${t.id}`, t.deadline); });
+      window.data.tournaments.forEach(t => { 
+          if(t.deadline || t.start_date) window.startCountdown(`timer-${t.id}`, t.start_date, t.deadline); 
+      });
       lucide.createIcons();
     }, 100);
 
@@ -799,7 +869,6 @@ tailwind.config = {
     let html = `<div class="flex justify-between items-center mb-6">
       <h2 class="disp text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><i data-lucide="users" class="w-6 h-6 text-qeRed"></i> Teams</h2>
       <div class="flex gap-2">
-        <button type="button" onclick="window.openPlayerModal()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-3 py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 hover:border-qeRed/50 transition-colors"><i data-lucide="user-plus" class="inline w-3.5 h-3.5"></i> Player</button>
         <button type="button" onclick="window.openTeamModal(null)" class="bg-qeRed text-white px-3 py-2 rounded-xl text-xs font-bold shadow-lg shadow-qeRed/30 active:scale-95 transition-transform"><i data-lucide="${window.isAdmin ? 'plus' : 'git-pull-request'}" class="inline w-3.5 h-3.5"></i> ${window.isAdmin ? 'Team' : 'Request Team'}</button>
       </div>
     </div>`;
@@ -851,12 +920,15 @@ tailwind.config = {
           </div>
           <div class="min-w-0 flex-1">
             <h3 class="font-bold text-xl disp text-slate-900 dark:text-white truncate flex items-center gap-2">${t.team_name} <button type="button" onclick="window.showTeamInfo('${t.id}')" class="text-slate-400 hover:text-qeRed shrink-0"><i data-lucide="info" class="w-4 h-4"></i></button></h3>
-            <p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5 truncate">MGR: ${t.manager_name||'None'}</p>
+            <p class="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide mt-0.5 truncate flex items-center gap-1">MGR: ${t.manager_name||'None'} <button type="button" onclick="window.showManagerInfo('${t.id}')"><i data-lucide="info" class="w-3 h-3 text-slate-400 hover:text-qeRed"></i></button></p>
             <p class="text-[9px] text-slate-500 font-bold mt-1 bg-slate-100 dark:bg-slate-800/50 inline-block px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">Total: ${totalPl} (M: ${pMain.length}, B: ${pBench.length})</p>
           </div>
         </div>
         
-        <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase mb-2 flex items-center gap-1.5 px-1"><i data-lucide="users" class="w-3 h-3"></i> Main Roster</p>
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase flex items-center gap-1.5 px-1"><i data-lucide="users" class="w-3 h-3"></i> Main Roster</p>
+            ${window.isAdmin ? `<button type="button" onclick="window.openPlayerModal(null, '${t.id}')" class="text-[9px] font-bold text-qeRed hover:underline uppercase flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Add Player</button>` : ''}
+        </div>
         
         <div class="grid grid-cols-2 gap-2 mb-4">
           ${pMain.map(p=>{
@@ -924,7 +996,10 @@ tailwind.config = {
         </div>
         <div>
           <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1.5 block tracking-wide">2. Select Team</label>
-          <select id="payTeam" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Team --</option>${(window.data.teams||[]).filter(t=>t.status==='approved').map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
+          <div class="flex gap-2">
+             <select id="payTeam" class="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white focus:border-qeRed/50 transition-colors appearance-none"><option value="">-- Choose Team --</option>${(window.data.teams||[]).filter(t=>t.status==='approved').map(t=>`<option value="${t.id}">${t.team_name}</option>`).join('')}</select>
+             <button type="button" onclick="window.openTeamModal(null, 'pay_tab')" class="px-4 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-300 rounded-xl font-bold flex items-center justify-center shrink-0 border border-slate-300 dark:border-slate-700 hover:text-qeRed transition-colors" title="Create New Team"><i data-lucide="plus" class="w-5 h-5"></i></button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 mt-4">
@@ -1170,6 +1245,12 @@ tailwind.config = {
           <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Status</label>
           <select id="tr-status" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold appearance-none"><option value="active" ${t?.status==='active'?'selected':''}>Active</option><option value="closed" ${t?.status==='closed'?'selected':''}>Closed</option></select></div>
         </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Start Date</label>
+          <input id="tr-start" type="datetime-local" value="${t?.start_date ? new Date(new Date(t.start_date).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,16) : ''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+          <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Registration Deadline</label>
+          <input id="tr-deadline" type="datetime-local" value="${t?.deadline ? new Date(new Date(t.deadline).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,16) : ''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
+        </div>
         <div>
           <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Total Slots (Optional)</label>
           <input id="tr-slots" type="number" placeholder="e.g. 20" value="${ppObj.slots||''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50">
@@ -1179,8 +1260,6 @@ tailwind.config = {
           <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">2nd Prize (৳)</label><input id="tr-p2" type="number" value="${ppObj.second||0}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
           <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">3rd Prize (৳)</label><input id="tr-p3" type="number" value="${ppObj.third||0}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
         </div>
-        <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Registration Deadline</label>
-        <input id="tr-deadline" type="datetime-local" value="${t?.deadline ? new Date(new Date(t.deadline).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0,16) : ''}" class="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50"></div>
         <div>
           <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1.5 block">Event Banner (Landscape)</label>
           <div class="relative w-full">
@@ -1204,6 +1283,7 @@ tailwind.config = {
         const payload = {
           title: document.getElementById('tr-title').value, description: document.getElementById('tr-desc').value,
           entry_fee: Number(document.getElementById('tr-fee').value) || 0, status: document.getElementById('tr-status').value,
+          start_date: document.getElementById('tr-start').value ? new Date(document.getElementById('tr-start').value).toISOString() : null,
           deadline: document.getElementById('tr-deadline').value ? new Date(document.getElementById('tr-deadline').value).toISOString() : null,
           banner_id: t?.banner_id || null,
           prize_pool: ppObj
@@ -1219,10 +1299,24 @@ tailwind.config = {
     }
   };
 
-  window.openTeamModal = (id) => {
+  window.openTeamModal = (id, callbackContext = null) => {
     const team = id ? window.data.teams.find(t=>t.id===id) : null;
+    
+    let dynamicPlayersHtml = '';
+    if (!team) {
+        window.playerSlotCount = 0;
+        dynamicPlayersHtml = `
+        <div id="dynamic-players-container">
+            <div class="pt-2 border-t border-slate-200 dark:border-white/5 mt-4">
+                <p class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2">Team Players</p>
+                <div id="players-list"></div>
+                <button type="button" onclick="window.addPlayerSlot()" class="w-full py-3 mt-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-qeRed/50 dark:hover:border-qeRed/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Player</button>
+            </div>
+        </div>`;
+    }
+
     window.showModal(`
-      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3">${team ? 'Edit Team' : 'Add New Team'}</h3>
+      <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3">${team ? 'Edit Team' : 'Create New Team'}</h3>
       <div class="space-y-4">
         <div class="grid grid-cols-3 gap-3">
           <input id="tm-name" placeholder="Team Name" value="${team?.team_name||''}" class="col-span-2 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none text-slate-900 dark:text-white font-bold focus:border-qeRed/50 transition-colors">
@@ -1245,9 +1339,11 @@ tailwind.config = {
             </div>
           </div>
         </div>
+        ${dynamicPlayersHtml}
       </div>
       <div class="flex gap-3 mt-8"><button type="button" onclick="window.hideModal()" class="flex-1 py-4 text-sm bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">Cancel</button><button type="button" id="tm-save" class="flex-1 py-4 text-sm bg-qeRed text-white rounded-xl font-bold shadow-lg shadow-qeRed/20 hover:bg-qeRedDim transition-colors flex items-center justify-center gap-2"><i data-lucide="${team ? 'save' : 'send'}" class="w-4 h-4"></i> ${team ? 'Save Team' : (window.isAdmin ? 'Add Team' : 'Submit Team')}</button></div>
     `);
+    if(!team) { window.addPlayerSlot(); }
 
     document.getElementById('tm-save').onclick = async () => {
       const btn = document.getElementById('tm-save');
@@ -1263,20 +1359,75 @@ tailwind.config = {
         const uploadedUrl = await window.uploadPendingBlob('tm-logo');
         if (uploadedUrl) payload.logo_url = uploadedUrl;
 
-        const isPublic = !window.isAdmin && !team;
+        const isPublic = !window.isAdmin;
 
         if(team) {
             await window.api('update_team', { id: team.id, ...payload }); 
             window.showToast('Team updated successfully');
         } else {
-            await window.api(isPublic ? 'submit_team' : 'create_team', payload, isPublic);
+            let players = [];
+            const playerSlots = document.querySelectorAll('.player-slot');
+            for(let slot of playerSlots) {
+                const pName = slot.querySelector('.p-name').value;
+                const pUid = slot.querySelector('.p-uid').value;
+                const pRole = slot.querySelector('.p-role').value;
+                const picInput = slot.querySelector('.p-pic');
+                
+                if(pName && pUid) {
+                     let avatarUrl = null;
+                     if(picInput.id && window.pendingBlobs[picInput.id]) {
+                         avatarUrl = await window.uploadPendingBlob(picInput.id);
+                     }
+                     players.push({ name: pName, uid: pUid, role: pRole, avatar_url: avatarUrl });
+                }
+            }
+            
+            const apiAction = isPublic ? 'submit_team_with_players' : 'create_team_with_players';
+            const res = await window.api(apiAction, { team: payload, players: players }, isPublic);
             window.showToast(isPublic ? 'Team submitted for approval' : 'Team added successfully');
+            
+            if(res && res.data && res.data.id) {
+                if (callbackContext === 'pay_tab') {
+                    window.changeTab('payments'); 
+                    setTimeout(() => { document.getElementById('payTeam').value = res.data.id; window.updateCalc(); }, 600);
+                } else if (callbackContext && callbackContext.startsWith('free_reg_')) {
+                    const tourId = callbackContext.split('free_reg_')[1];
+                    setTimeout(() => { window.registerFree(tourId); setTimeout(()=>{document.getElementById('free-team-sel').value = res.data.id;}, 100); }, 600);
+                }
+            }
         }
         
-        window.hideModal(); await window.loadAll(); window.render(); 
+        if(!callbackContext || !callbackContext.startsWith('free_reg_')) window.hideModal(); 
+        await window.loadAll(); 
+        if(!callbackContext) window.render(); 
       } catch(err){ window.showToast(err.message,'error'); btn.innerHTML=ogHtml; btn.disabled=false; lucide.createIcons(); }
     };
   }
+
+  window.addPlayerSlot = () => {
+      window.playerSlotCount++;
+      const id = window.playerSlotCount;
+      const html = `
+      <div class="player-slot border border-slate-200 dark:border-slate-700 rounded-xl p-4 mt-3 bg-white dark:bg-[#0a0a0f] relative fade-in">
+          <button type="button" onclick="this.parentElement.remove()" class="absolute top-3 right-3 text-slate-400 hover:text-qeRed"><i data-lucide="x" class="w-4 h-4"></i></button>
+          <div class="space-y-3">
+              <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">In-Game Name</label><input placeholder="IGN" class="p-name w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white"></div>
+              <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">Game UID</label><input placeholder="Numeric ID" type="number" class="p-uid w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold font-mono text-slate-900 dark:text-white"></div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div><label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">Role</label><select class="p-role w-full p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm outline-none font-bold text-slate-900 dark:text-white appearance-none"><option value="main">Main Roster</option><option value="bench">Bench/Reserve</option></select></div>
+                  <div>
+                      <label class="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-500 mb-1 block">Avatar Image</label>
+                      <div class="relative w-full">
+                          <input id="pl-pic-${id}" type="file" accept="image/*" class="p-pic absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="window.triggerImageUpload('pl-pic-${id}', 'avatar')">
+                          <button type="button" class="w-full text-xs text-slate-500 dark:text-slate-400 py-3 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-1.5"><i data-lucide="image-plus" class="w-3.5 h-3.5"></i> Upload</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>`;
+      document.getElementById('players-list').insertAdjacentHTML('beforeend', html);
+      lucide.createIcons();
+  };
 
   window.openPlayerModal = (id = null) => {
     const pl = id ? window.data.players.find(x => x.id === id) : null;
@@ -1517,15 +1668,17 @@ tailwind.config = {
        console.error('Config failed', e); 
     }
     
-    try { await window.loadAll(); } catch(e) { console.error('Load failed', e); }
-    try { window.render(); } catch(e) { console.error('Render failed', e); }
-    
-    const loader = document.getElementById('initial-loader');
-    if (loader) {
-      loader.classList.add('hidden-loader');
-      setTimeout(() => {
-        if(loader.parentNode) loader.remove();
-      }, 400); 
+    try { 
+        await window.loadAll(); 
+        window.render();
+    } catch(e) { 
+        console.error('Init rendering failed', e); 
+    } finally {
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.classList.add('hidden-loader');
+          setTimeout(() => { if(loader.parentNode) loader.remove(); }, 400); 
+        }
     }
   }
 
