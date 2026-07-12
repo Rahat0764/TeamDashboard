@@ -1,4 +1,3 @@
-// filepath: api/admin-write.js
 const { getAdminClient, requireAdmin, sendTelegram, refId } = require('../lib/server');
 
 module.exports = async (req, res) => {
@@ -14,12 +13,15 @@ module.exports = async (req, res) => {
         await sb.from('app_settings').upsert({ id: 1, ...payload }).throwOnError();
         return res.status(200).json({ ok: true });
       case 'create_team':
-        const { data: tData } = await sb.from('teams').insert([payload]).select().throwOnError();
+        const { data: tData } = await sb.from('teams').insert([{ ...payload, status: 'approved' }]).select().throwOnError();
         await logAndNotify(sb, 'New Team Added', `Team ${payload.team_name} added.`);
         return res.status(200).json({ data: tData });
       case 'update_team':
         const { id: uId, ...tFields } = payload;
         await sb.from('teams').update(tFields).eq('id', uId).throwOnError();
+        return res.status(200).json({ ok: true });
+      case 'approve_team':
+        await sb.from('teams').update({ status: 'approved' }).eq('id', payload.id).throwOnError();
         return res.status(200).json({ ok: true });
       case 'delete_team':
         await sb.from('teams').delete().eq('id', payload.id).throwOnError();
@@ -65,6 +67,10 @@ module.exports = async (req, res) => {
       
       case 'approve_player':
         await sb.from('players').update({ status: 'approved' }).eq('id', payload.id).throwOnError();
+        return res.status(200).json({ ok: true });
+      case 'update_player':
+        const { id: pId, ...pFields } = payload;
+        await sb.from('players').update(pFields).eq('id', pId).throwOnError();
         return res.status(200).json({ ok: true });
       case 'delete_player':
         await sb.from('players').delete().eq('id', payload.id).throwOnError();
