@@ -106,6 +106,16 @@ module.exports = async (req, res) => {
         await sb.from('player_stats').delete().eq('id', payload.id).throwOnError();
         return res.status(200).json({ ok: true });
 
+      case 'award_prize':
+        const { data: tp } = await sb.from('tournaments').select('prize_pool').eq('id', payload.tournament_id).single();
+        let currPP = tp.prize_pool || {};
+        if(typeof currPP === 'string') { try{ currPP = JSON.parse(currPP); }catch(e){ currPP={}; } }
+        if(Array.isArray(currPP)) currPP = {};
+        if(!currPP.winners) currPP.winners = {};
+        currPP.winners[payload.position] = payload.team_id;
+        await sb.from('tournaments').update({ prize_pool: currPP }).eq('id', payload.tournament_id).throwOnError();
+        return res.status(200).json({ ok: true });
+
       case 'reset_all':
         await sb.from('player_stats').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
         await sb.from('payments').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
