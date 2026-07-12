@@ -70,6 +70,28 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
+    if (action === 'free_registration') {
+      const { data: tour, error: tErr } = await sb.from('tournaments').select('entry_fee, title').eq('id', payload.tournament_id).single();
+      if (tErr || !tour) throw new Error('Tournament not found');
+      if (Number(tour.entry_fee) !== 0) throw new Error('Not a free tournament');
+      
+      const { data: exist } = await sb.from('payments').select('id').eq('tournament_id', payload.tournament_id).eq('team_id', payload.team_id).eq('status', 'approved');
+      if(exist && exist.length > 0) throw new Error('Team is already registered');
+
+      const { data: teamData } = await sb.from('teams').select('team_name').eq('id', payload.team_id).single();
+
+      await sb.from('payments').insert([{
+        tournament_id: payload.tournament_id,
+        team_id: payload.team_id,
+        payer_name: teamData ? `Team ${teamData.team_name}` : 'Free Registration',
+        amount: 0, total_paid: 0, status: 'approved', verification_type: 'auto_free'
+      }]).throwOnError();
+      
+      const id = refId();
+      await sb.from('activity_logs').insert([{ ref_id: id, action: 'Free Registration', details: `${teamData ? teamData.team_name : 'A team'} registered for ${tour.title}.` }]);
+      return res.status(200).json({ ok: true });
+    }
+
     return res.status(400).json({ error: 'Invalid action' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
