@@ -1,3 +1,4 @@
+// filepath: api/admin-write.js
 const { getAdminClient, requireAdmin, sendTelegram, refId } = require('../lib/server');
 
 module.exports = async (req, res) => {
@@ -55,6 +56,12 @@ module.exports = async (req, res) => {
         const { id: trId, ...trFields } = payload;
         await sb.from('tournaments').update(trFields).eq('id', trId).throwOnError();
         return res.status(200).json({ ok: true });
+      case 'delete_tournament':
+        await sb.from('tournaments').delete().eq('id', payload.id).throwOnError();
+        return res.status(200).json({ ok: true });
+      case 'delete_payment':
+        await sb.from('payments').delete().eq('id', payload.id).throwOnError();
+        return res.status(200).json({ ok: true });
       
       case 'approve_player':
         await sb.from('players').update({ status: 'approved' }).eq('id', payload.id).throwOnError();
@@ -68,6 +75,18 @@ module.exports = async (req, res) => {
         return res.status(200).json({ ok: true });
       case 'delete_stat':
         await sb.from('player_stats').delete().eq('id', payload.id).throwOnError();
+        return res.status(200).json({ ok: true });
+
+      case 'reset_all':
+        await sb.from('player_stats').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await sb.from('payments').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await sb.from('players').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await sb.from('match_results').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await sb.from('matches').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await sb.from('teams').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await sb.from('tournaments').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await sb.from('activity_logs').delete().neq('id', '00000000-0000-0000-0000-000000000000').throwOnError();
+        await logAndNotify(sb, 'FULL RESET', 'Admin performed a full dashboard reset. All data wiped.');
         return res.status(200).json({ ok: true });
 
       default:
