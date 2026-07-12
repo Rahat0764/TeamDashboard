@@ -684,7 +684,7 @@ tailwind.config = {
         ${t.banner_id ? `
         <div class="relative w-full aspect-video overflow-hidden bg-slate-900">
           <img src="${t.banner_id}" loading="lazy" class="w-full h-full object-cover">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
           
           <div class="absolute top-3 right-3 z-50 flex flex-col items-end gap-2 pointer-events-auto">
             ${activeBadge}
@@ -743,22 +743,33 @@ tailwind.config = {
       
       let teamsHTML = '';
       if (uniqueTeamIds.length > 0) {
-          teamsHTML += `<div class="mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
-              <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-3 flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> Participating Teams (${uniqueTeamIds.length}${pp.slots ? ` / ${pp.slots}` : ''})</p>
-              <div class="flex flex-wrap gap-2">`;
+          teamsHTML += `<div class="mt-6 pt-5 border-t border-slate-200 dark:border-white/10">
+              <p class="text-xs uppercase font-bold tracking-widest text-slate-500 mb-4 flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4 text-qeRed"></i> Participating Teams (${uniqueTeamIds.length}${pp.slots ? ` / ${pp.slots}` : ''})</p>
+              <div class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar">`;
           
           uniqueTeamIds.forEach((teamId, idx) => {
               const team = window.data.teams.find(tm => tm.id === teamId);
               if (team) {
-                  const approvedPlayers = window.data.players.filter(p => p.team_id === team.id && p.status === 'approved').length;
+                  const teamPlayers = window.data.players.filter(p => p.team_id === team.id && p.status === 'approved');
+                  const mCount = teamPlayers.filter(p => p.role === 'main').length;
+                  const bCount = teamPlayers.filter(p => p.role === 'bench').length;
+                  const totalCount = mCount + bCount;
                   const hiddenClass = idx >= displayLimit ? 'hidden extra-team-' + t.id : '';
-                  teamsHTML += `<span class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1.5 text-slate-700 dark:text-slate-300 ${hiddenClass}"><img src="${team.logo_url || '/assets/logo-transparent.png'}" class="w-3.5 h-3.5 rounded-full object-cover"> ${team.team_name} <span class="bg-white dark:bg-black/50 text-slate-500 px-1.5 rounded text-[9px]">${approvedPlayers}</span></span>`;
+                  
+                  teamsHTML += `<div class="flex-shrink-0 w-64 bg-slate-50 dark:bg-[#0a0a0f] border border-slate-200 dark:border-white/5 rounded-2xl p-3.5 flex items-center gap-3.5 snap-start relative overflow-hidden shadow-sm ${hiddenClass}">
+                      <span class="absolute top-0 left-0 bg-qeRed text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg shadow-sm z-10">#${idx + 1}</span>
+                      <img src="${team.logo_url || '/assets/logo-transparent.png'}" loading="lazy" class="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm shrink-0 mt-1">
+                      <div class="min-w-0 flex-1 py-0.5">
+                          <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">${team.team_name}</h4>
+                          <p class="text-[9px] font-bold text-slate-500 mt-1.5 bg-white dark:bg-slate-800 px-2 py-1 rounded-md inline-block border border-slate-200 dark:border-slate-700 shadow-sm">Players: ${totalCount} (M: ${mCount}, B: ${bCount})</p>
+                      </div>
+                  </div>`;
               }
           });
           
           teamsHTML += `</div>`;
           if (uniqueTeamIds.length > displayLimit) {
-              teamsHTML += `<button type="button" onclick="document.querySelectorAll('.extra-team-${t.id}').forEach(el=>el.classList.toggle('hidden')); this.innerText = this.innerText === 'WAIT FOR NEXT ROUND' ? 'HIDE WAITING TEAMS' : 'WAIT FOR NEXT ROUND';" class="w-full text-center text-[10px] font-bold text-qeRed uppercase tracking-widest mt-4 hover:underline bg-qeRed/5 py-2 rounded-xl border border-qeRed/10 transition-colors">WAIT FOR NEXT ROUND</button>`;
+              teamsHTML += `<button type="button" onclick="document.querySelectorAll('.extra-team-${t.id}').forEach(el=>el.classList.toggle('hidden')); this.innerText = this.innerText === 'WAIT FOR NEXT ROUND' ? 'HIDE WAITING TEAMS' : 'WAIT FOR NEXT ROUND';" class="w-full text-center text-[11px] font-bold text-qeRed uppercase tracking-widest mt-2 py-3.5 bg-qeRed/5 rounded-xl border border-qeRed/10 hover:bg-qeRed hover:text-white transition-all shadow-sm">WAIT FOR NEXT ROUND</button>`;
           }
           teamsHTML += `</div>`;
       }
