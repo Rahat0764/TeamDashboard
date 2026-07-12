@@ -13,7 +13,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Cropper.js for Image Cropping -->
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -51,7 +51,6 @@ tailwind.config = {
   .toast-in { animation: toastIn .3s ease-out forwards; }
   @keyframes toastIn { from {opacity: 0; transform: translateX(110%)} to {opacity: 1; transform: translateX(0)} }
 
-  /* Loading Splash Screen CSS */
   #initial-loader { transition: opacity 0.4s ease, visibility 0.4s ease; }
   .hidden-loader { opacity: 0; visibility: hidden; }
 
@@ -242,7 +241,7 @@ tailwind.config = {
       } else if (type === 'banner') {
         document.getElementById('ipm-title').innerText = "Crop Event Banner";
         container.classList.add('rect-crop');
-        cropOptions.aspectRatio = 16 / 9; // 16:9 for banners
+        cropOptions.aspectRatio = 16 / 9;
       } else {
         document.getElementById('ipm-title').innerText = "Screenshot Proof Preview";
         container.classList.add('rect-crop');
@@ -572,7 +571,7 @@ tailwind.config = {
       }
     }
 
-    html += `<div class="grid grid-cols-1 gap-5">`; // Changed to 1 column for better grid inside
+    html += `<div class="grid grid-cols-1 gap-5">`;
     const approvedTeams = window.data.teams?.filter(t => t.status !== 'pending') || [];
     
     if(!approvedTeams.length) html += `<div class="col-span-full p-10 text-center text-slate-500 cut-card bg-white dark:bg-qeCard border border-slate-200 dark:border-white/5 shadow-sm font-medium">No teams added yet.</div>`;
