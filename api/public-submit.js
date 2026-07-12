@@ -9,6 +9,16 @@ module.exports = async (req, res) => {
   const { action, payload } = req.body || {};
 
   try {
+    if (action === 'submit_team') {
+      const { data, error } = await sb.from('teams').insert([{ ...payload, status: 'pending' }]).select().single();
+      if (error) throw error;
+      
+      const id = refId();
+      await sb.from('activity_logs').insert([{ ref_id: id, action: 'Team Request', details: `${payload.team_name} requested to register.` }]);
+      await sendTelegram(`🛡️ <b>New Team Request</b>\nName: ${payload.team_name}\nManager: ${payload.manager_name}\nRef: #${id}`);
+      return res.status(200).json({ ok: true });
+    }
+
     if (action === 'submit_player') {
       const { data, error } = await sb.from('players').insert([{ ...payload, status: 'pending' }]).select().single();
       if (error) throw error;
