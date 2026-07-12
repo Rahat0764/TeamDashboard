@@ -43,10 +43,8 @@ tailwind.config = {
   @keyframes fadeIn { from {opacity: 0; transform: translateY(10px)} to {opacity: 1; transform: translateY(0)} }
   .toast-in { animation: toastIn .3s ease-out forwards; }
   @keyframes toastIn { from {opacity: 0; transform: translateX(110%)} to {opacity: 1; transform: translateX(0)} }
-  
   #initial-loader { transition: opacity 0.4s ease, visibility 0.4s ease; }
   .hidden-loader { opacity: 0; visibility: hidden; pointer-events: none; }
-  
   ::selection { background: #c8203d; color: #fff; }
   .cropper-view-box,
   .cropper-face { border-radius: 50%; }
@@ -106,7 +104,7 @@ tailwind.config = {
   <div class="flex justify-around items-center h-16 px-2">
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('tournaments')" data-tab="tournaments"><i data-lucide="crosshair" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Events</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('teams')" data-tab="teams"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Teams</span></button>
-    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all text-qeRed" onclick="window.changeTab('dashboard')" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
+    <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('dashboard')" data-tab="dashboard"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Dash</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('standings')" data-tab="standings"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Rank</span></button>
     <button class="nav-btn flex flex-col items-center gap-1 flex-1 py-1 transition-all" onclick="window.changeTab('payments')" data-tab="payments"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[9px] disp font-bold uppercase tracking-wider mt-0.5">Pay</span></button>
   </div>
@@ -323,7 +321,7 @@ tailwind.config = {
       document.getElementById('cap-cancel').onclick = () => { window.hideModal(); resolve(false); };
       document.getElementById('cap-ok').onclick = async () => {
         const pw = document.getElementById('confirmPassInput').value;
-        const btn = document.getElementById('cap-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>'; lucide.createIcons();
+        const btn = document.getElementById('cap-ok'); const og = btn.innerHTML; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>'; lucide.createIcons();
         try {
           const res = await fetch('/api/admin-verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: pw }) });
           if(!res.ok) throw new Error('Incorrect password');
@@ -411,7 +409,8 @@ tailwind.config = {
   window.showEventInfo = (tId) => {
     const t = window.data.tournaments.find(x=>x.id===tId);
     let pp = t.prize_pool || {};
-    if(typeof pp === 'string') try{ pp=JSON.parse(pp); }catch(e){}
+    if(typeof pp === 'string') { try{ pp = JSON.parse(pp); } catch(e){ pp = {}; } }
+    if(Array.isArray(pp)) pp = {};
     
     let html = `<h3 class="disp text-2xl font-bold mb-4">${t.title}</h3>`;
     html += `<p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap mb-6">${t.description || 'No description provided.'}</p>`;
@@ -503,7 +502,7 @@ tailwind.config = {
         throw new Error("Failed to load data");
       }
       window.data = await res.json();
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error(e); throw e; }
   }
 
   window.updateNav = () => {
@@ -511,10 +510,18 @@ tailwind.config = {
       if(b.dataset.tab === window.activeTab){ 
          b.classList.add('text-qeRed'); 
          b.classList.remove('text-slate-500', 'dark:text-slate-500'); 
+         const icon = b.querySelector('i');
+         if(icon) { icon.classList.add('text-qeRed'); icon.classList.remove('text-slate-500', 'dark:text-slate-500'); }
+         const span = b.querySelector('span');
+         if(span) { span.classList.add('text-qeRed'); span.classList.remove('text-slate-500', 'dark:text-slate-500'); }
       }
       else { 
          b.classList.remove('text-qeRed'); 
          b.classList.add('text-slate-500', 'dark:text-slate-500'); 
+         const icon = b.querySelector('i');
+         if(icon) { icon.classList.remove('text-qeRed'); icon.classList.add('text-slate-500', 'dark:text-slate-500'); }
+         const span = b.querySelector('span');
+         if(span) { span.classList.remove('text-qeRed'); span.classList.add('text-slate-500', 'dark:text-slate-500'); }
       }
     });
   }
@@ -645,6 +652,11 @@ tailwind.config = {
     window.data.tournaments.forEach(t => {
       const isClosed = new Date(t.deadline).getTime() < new Date().getTime();
       const isFree = Number(t.entry_fee) === 0;
+      
+      let pp = t.prize_pool || {};
+      if (typeof pp === 'string') { try { pp = JSON.parse(pp); } catch(e) { pp = {}; } }
+      if (Array.isArray(pp)) pp = {};
+      const totalPrize = pp.total || 0;
 
       const activeBadge = !isClosed
         ? `<span class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md"><span class="relative flex w-2 h-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> Active</span>`
@@ -672,15 +684,27 @@ tailwind.config = {
                     ${freeBadge}
                 </div>
             </div>
+            ${totalPrize > 0 ? `
+            <div class="text-right">
+                <p class="text-[10px] uppercase tracking-widest text-amber-500 font-bold mb-1 shadow-black drop-shadow-md">Prize Pool</p>
+                <p class="text-3xl font-bold text-amber-400 disp leading-none drop-shadow-lg">৳${totalPrize}</p>
+            </div>` : ''}
           </div>
         </div>` 
         : `<div class="p-4 pb-0 flex justify-between items-start">
-            <div>
-                <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Entry Fee</p>
-                <div class="flex items-center">
-                    <p class="text-2xl font-bold text-emerald-500 disp leading-none">৳${t.entry_fee}</p>
-                    ${freeBadge}
+            <div class="flex gap-6">
+                <div>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Entry Fee</p>
+                    <div class="flex items-center">
+                        <p class="text-2xl font-bold text-emerald-500 disp leading-none">৳${t.entry_fee}</p>
+                        ${freeBadge}
+                    </div>
                 </div>
+                ${totalPrize > 0 ? `
+                <div>
+                    <p class="text-[10px] uppercase tracking-widest text-amber-600 font-bold mb-1">Prize Pool</p>
+                    <p class="text-2xl font-bold text-amber-500 disp leading-none">৳${totalPrize}</p>
+                </div>` : ''}
             </div>
             <div class="flex flex-col items-end gap-2 relative z-50 pointer-events-auto">
                 ${activeBadge}
@@ -1097,6 +1121,7 @@ tailwind.config = {
       if(typeof t.prize_pool === 'string') { try{ ppObj=JSON.parse(t.prize_pool); }catch(e){} }
       else { ppObj = t.prize_pool; }
     }
+    if (Array.isArray(ppObj)) ppObj = {}; 
 
     window.showModal(`
       <h3 class="font-bold disp text-xl mb-5 border-b border-slate-200 dark:border-white/10 pb-3"><i data-lucide="${t?'edit-2':'plus-circle'}" class="inline w-5 h-5 text-qeRed mb-1"></i> ${t?'Edit Event':'Add Event'}</h3>
